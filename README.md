@@ -3,7 +3,7 @@ Palabos With Cuda Support
 为何选择Cuda？
 1,OpenCL的优点与缺点：
 2,Cuda的优点与缺点：
-2,Palabos的特殊需求：
+3,Palabos的特殊需求：
 =======
 技术路线
 1，Palabos的特点：
