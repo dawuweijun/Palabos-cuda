@@ -16,3 +16,6 @@ add_subdirectory(multiPhysics)
 add_subdirectory(offLattice)
 add_subdirectory(parallelism)
 add_subdirectory(particles)
+
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/)
+# include_directories(${CMAKE_CURRENT_SOURCE_DIR}/externalLibraries/)
