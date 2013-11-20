@@ -1,22 +1,27 @@
-<center>Palabos With Cuda Support</center>
+Palabos With Cuda Support
 =============
-为何选择Cuda？
--------------
-1,OpenCL的优点与缺点：
+*   [Overview](#overview)
 
-2,Cuda的优点与缺点：
+*   [一，Palabos的基本架构：](#Palabos的基本架构)
+    *   [1,Palabos的数据结构;](#Some Data Structures Of Palabos)
+    *   [2,Palabos的并行方案;](#)
+        *   a.OpenMPI和OpenMP;
+        *   b.CoProcessor;
+        *   c.Why we need Internal GPU-based Palabos ?
+    *   3.Palabos架构的优缺点;
+    
+*   二，GPU并行编程为何选择Cuda？
+    * 1, OpenACC
+    * 2, OpenCL
+    * 3, CUDA
+    * 4, Why we choose CUDA?
+    
+*   RoadMap of CUDA support for Palabos
 
-3,Palabos的特殊需求：
-
-技术路线
-------------
-1，Palabos的特点：
-
-2，在哪里修改？
-
-项目状态
-------------
-一，目前，由于本比较忙，尚未进行针对Cuda的修改工作;
-
-二，关键原因是，Cuda 6 即将提供对Unified Memory(统一内存地址) 的支持，这将极大降低异构编程的复杂性，
+*   Current Status:
+    *   探讨技术路线;
+    *   Work On this Document
+    *   Waiting for Cuda 6;
+    
+    Cuda 6 即将提供对Unified Memory(统一内存地址) 的支持，这将极大降低异构编程的复杂性，
 为了降低编码的复杂性，决定对Cuda支持的工作要等到2014年Cuda发布之后进行。
