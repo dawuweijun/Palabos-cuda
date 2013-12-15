@@ -36,7 +36,7 @@
 #include "multiBlock/multiDataField2D.h"
 
 #include "multiGrid/multiGridManagement2D.h"
-#include "multiGrid/multiGridLattice2D.h"
+// #include "multiGrid/multiGridLattice2D.h"
 
 namespace plb {
 

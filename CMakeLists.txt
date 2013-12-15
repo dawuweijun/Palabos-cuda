@@ -35,6 +35,8 @@ elseif(CUDA_FOUND)
 	message(FATAL_ERROR "Cuda Not Found!")
 endif(CUDA_FOUND)
 
+include_directories(include)
+
 add_subdirectory(src)
 add_subdirectory(include)
 add_subdirectory(utility)

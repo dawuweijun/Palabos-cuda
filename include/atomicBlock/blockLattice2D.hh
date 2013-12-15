@@ -163,7 +163,7 @@ void BlockLattice2D<T,Descriptor>::specifyStatisticsStatus (
 }
 
 template<typename T, template<typename U> class Descriptor>
-void BlockLattice2D<T,Descriptor>::collide(Box2D domain) {
+PLB_HOST_ONLY void BlockLattice2D<T,Descriptor>::collide(Box2D domain) {
     PLB_PRECONDITION( (plint)Descriptor<T>::q==(plint)Descriptor<T>::numPop );
     // Make sure domain is contained within current lattice
     PLB_PRECONDITION( contained(domain, this->getBoundingBox()) );
@@ -301,8 +301,13 @@ void BlockLattice2D<T,Descriptor>::allocateAndInitialize() {
     this->getInternalStatistics().subscribeMax();     // Subscribe max uSqr
     plint nx = this->getNx();
     plint ny = this->getNy();
+#ifdef PLB_CUDA_DISABLED
     rawData = new Cell<T,Descriptor> [nx*ny];
     grid    = new Cell<T,Descriptor>* [nx];
+#else
+    cudaMallocManaged(&rawData, nx*ny);
+    cudaMallocManaged(&grid,nx);
+#endif
     for (plint iX=0; iX<nx; ++iX) {
         grid[iX] = rawData + iX*ny;
     }
@@ -316,12 +321,20 @@ void BlockLattice2D<T,Descriptor>::releaseMemory() {
         for (plint iY=0; iY<ny; ++iY) {
             Dynamics<T,Descriptor>* dynamics = &grid[iX][iY].getDynamics();
             if (dynamics != backgroundDynamics) {
-                delete dynamics;
+#ifdef PLB_CUDA_DISABLED  
+	      delete dynamics;
+#else
+	      cudaFree(dynamics);
+#endif
             }
         }
     }
     delete backgroundDynamics;
+#ifdef PLB_CUDA_DISABLED
     delete [] rawData;
+#else
+    cudaFree(rawData);
+#endif
     delete [] grid;
 }
 

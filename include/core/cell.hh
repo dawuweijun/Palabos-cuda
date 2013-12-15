@@ -113,7 +113,9 @@ template<typename T, template<typename U> class Descriptor>
 void Cell<T,Descriptor>::unSerialize(char const* data) {
     const plint numPop = Descriptor<T>::numPop;
     const plint numExt = Descriptor<T>::ExternalField::numScalars;
-
+/**
+ * TODO:此处执行了边界上的数据赋值，如何让其在GPU上执行？
+ */
     memcpy((void*)(&f[0]), (const void*)data, numPop*sizeof(T));
     if (numExt>0) {
         memcpy((void*)(external.get(0)), (const void*)(data+numPop*sizeof(T)), numExt*sizeof(T));
