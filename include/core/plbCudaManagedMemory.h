@@ -2,9 +2,9 @@
 #define CUDAMANAGED_H
 
 #include<cuda.h>
-
+#include <cuda_runtime_api.h>
 extern int cudaMallocManaged ( void * ptr,size_t len );
-extern int cudaFree ( void * ptr );
+// extern int cudaFree ( void * ptr );
 namespace plb
 {
 class  cudaManaged

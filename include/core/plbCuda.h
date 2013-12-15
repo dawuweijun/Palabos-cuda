@@ -77,7 +77,7 @@ cudaError_t checkCudaErrors()
 
 #define PLB_HOST_ONLY \
 #ifdef __CUDACC__ \
-  #undef __CUDACC__ \ 
+  #undef __CUDACC__ \
   #error "This function only can be called by host" \
 #endif
 
@@ -222,6 +222,8 @@ int hemiGetElementYStride()
 #endif
 }
 
+}//END NAMESPACE PLB
+
 #endif // PLB_CUDA_H
 
-}//END NAMESPACE PLB
+
