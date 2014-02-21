@@ -19,4 +19,4 @@ set(ATOMICBLOCK_SRC
 	reductiveDataProcessorWrapper3D.cpp
 )
 
-add_library(atomicBlock SHARED ${ATOMICBLOCK_SRC})
+add_library(atomicBlock STATIC ${ATOMICBLOCK_SRC})

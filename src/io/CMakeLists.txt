@@ -14,4 +14,4 @@ vtkDataOutput.cpp
 vtkStructuredDataOutput.cpp
 )
 
-add_library(io SHARED ${IO_SRC})
+add_library(io STATIC ${IO_SRC})

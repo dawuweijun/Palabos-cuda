@@ -6,4 +6,4 @@ set(PARALLELISM_SRC
 	sendRecvPool.cpp
 )
 
-add_library(parallelism SHARED ${PARALLELISM_SRC})
+add_library(parallelism STATIC ${PARALLELISM_SRC})

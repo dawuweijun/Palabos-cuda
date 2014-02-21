@@ -20,4 +20,4 @@ processorIdentifiers3D.cpp
 runTimeDiagnostics.cpp
 serializer.cpp
 )
-add_library(core SHARED ${CORE_SRC})
+add_library(core STATIC ${CORE_SRC})

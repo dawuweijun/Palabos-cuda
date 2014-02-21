@@ -5,7 +5,7 @@
  * 1010 Lausanne, Switzerland
  * E-mail contact: contact@flowkit.com
  *
- * The most recent release of Palabos can be downloaded at 
+ * The most recent release of Palabos can be downloaded at
  * <http://www.palabos.org/>
  *
  * The library Palabos is free software: you can redistribute it and/or
@@ -114,14 +114,14 @@ void XMLreader::mainProcessorIni( std::vector<TiXmlNode*> pParentVect )
         typedef std::map<std::string, std::vector<TiXmlNode*> > ChildMap;
         ChildMap childMap;
         TiXmlNode* pChild;
-        for ( pChild = pParent->FirstChild(); pChild != 0; pChild = pChild->NextSibling()) 
+        for ( pChild = pParent->FirstChild(); pChild != 0; pChild = pChild->NextSibling())
         {
             int type = pChild->Type();
-            if ( type==TiXmlNode::ELEMENT ) {
+            if ( type==TiXmlNode::TINYXML_ELEMENT ) {
                 std::string name(pChild->Value());
                 childMap[name].push_back(pChild);
             }
-            else if ( type==TiXmlNode::TEXT ) {
+            else if ( type==TiXmlNode::TINYXML_TEXT ) {
                 data.text = pChild->ToText()->ValueStr();
             }
         }

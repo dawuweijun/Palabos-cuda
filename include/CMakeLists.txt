@@ -18,4 +18,7 @@ add_subdirectory(parallelism)
 add_subdirectory(particles)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/)
+
+INSTALL(FILES ./palabos2D.h ./palabos2D.hh ./palabos3D.h ./palabos3D.hh
+DESTINATION ${CMAKE_INSTALL_PREFIX}/Palabos/)
 # include_directories(${CMAKE_CURRENT_SOURCE_DIR}/externalLibraries/)

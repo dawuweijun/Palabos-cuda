@@ -5,4 +5,4 @@ metaStuffWrapper2D.cpp
 metaStuffWrapper3D.cpp
 )
 
-add_library(dataProcessors SHARED ${DATAPROCESSORS_SRC})
+add_library(dataProcessors STATIC ${DATAPROCESSORS_SRC})

@@ -12,4 +12,4 @@ set(MULTIGRID_SRC
 	multiGridOperations3D.cpp
 	parallelizer3D.cpp
 )
-add_library(multiGrid SHARED ${MULTIGRID_SRC})
+add_library(multiGrid STATIC ${MULTIGRID_SRC})

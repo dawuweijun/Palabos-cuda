@@ -32,4 +32,4 @@ nonLocalTransfer2D.cpp
 sparseBlockStructure2D.cpp
 )
 
-add_library(multiBlock SHARED ${MULTIBLOCK_SRC})
+add_library(multiBlock STATIC ${MULTIBLOCK_SRC})

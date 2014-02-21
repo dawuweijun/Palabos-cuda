@@ -1,0 +1,6 @@
+file(GLOB ATOMICBLOCK_HEADERS *.h *.hh)
+
+install(
+	FILES ${ATOMICBLOCK_HEADERS}
+	DESTINATION ${CMAKE_INSTALL_PREFIX}/Palabos/atomicBlock
+)
