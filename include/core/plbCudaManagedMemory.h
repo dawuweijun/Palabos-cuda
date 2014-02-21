@@ -1,10 +1,10 @@
 #ifndef CUDAMANAGED_H
 #define CUDAMANAGED_H
 
+#include"plbDebug.h"
 #include<cuda.h>
 #include <cuda_runtime_api.h>
-extern int cudaMallocManaged ( void * ptr,size_t len );
-// extern int cudaFree ( void * ptr );
+
 namespace plb
 {
 class  cudaManaged
@@ -16,7 +16,7 @@ public:
     void *operator new ( size_t len )
     {
         void *ptr;
-        cudaMallocManaged ( &ptr, len );
+        PLB_ASSERT(cudaMallocManaged ( &ptr, len,cudaMemAttachGlobal)!=cudaErrorNotSupported);
         return ptr;
     }
     /*
