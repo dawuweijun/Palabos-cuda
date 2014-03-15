@@ -5,7 +5,7 @@
  * 1010 Lausanne, Switzerland
  * E-mail contact: contact@flowkit.com
  *
- * The most recent release of Palabos can be downloaded at 
+ * The most recent release of Palabos can be downloaded at
  * <http://www.palabos.org/>
  *
  * The library Palabos is free software: you can redistribute it and/or
@@ -123,7 +123,7 @@ BlockLattice2D<T,Descriptor>::BlockLattice2D(BlockLattice2D<T,Descriptor> const&
 
 /** The current lattice is deallocated, then the lattice from the rhs
  * is duplicated. This includes both particle distribution function
- * and external fields. 
+ * and external fields.
  * \warning The dynamics objects and internalProcessors are not copied
  * \param rhs the lattice to be duplicated
  */
@@ -136,7 +136,7 @@ BlockLattice2D<T,Descriptor>& BlockLattice2D<T,Descriptor>::operator= (
     return *this;
 }
 
-/** The swap is efficient, in the sense that only pointers to the 
+/** The swap is efficient, in the sense that only pointers to the
  * lattice are copied, and not the lattice itself.
  */
 template<typename T, template<typename U> class Descriptor>
@@ -163,17 +163,22 @@ void BlockLattice2D<T,Descriptor>::specifyStatisticsStatus (
 }
 
 template<typename T, template<typename U> class Descriptor>
-PLB_HOST_ONLY void BlockLattice2D<T,Descriptor>::collide(Box2D domain) {
+void BlockLattice2D<T,Descriptor>::collide(Box2D domain) {
     PLB_PRECONDITION( (plint)Descriptor<T>::q==(plint)Descriptor<T>::numPop );
     // Make sure domain is contained within current lattice
     PLB_PRECONDITION( contained(domain, this->getBoundingBox()) );
-
+#ifndef PLB_CUDA_DISABLED
+    //TODO :此处调用GPU版的collide
+    device_collide(domain,grid);
+    //TODO :是否需要数据同步?
+#else
     for (plint iX=domain.x0; iX<=domain.x1; ++iX) {
         for (plint iY=domain.y0; iY<=domain.y1; ++iY) {
             grid[iX][iY].collide(this->getInternalStatistics());
             grid[iX][iY].revert();
         }
     }
+#endif
 }
 
 /** \sa collide(int,int,int,int) */
@@ -281,7 +286,7 @@ void BlockLattice2D<T,Descriptor>::collideAndStream(Box2D domain)
 template<typename T, template<typename U> class Descriptor>
 void BlockLattice2D<T,Descriptor>::collideAndStream() {
     collideAndStream(this->getBoundingBox());
-    
+
     implementPeriodicity();
 
     this->executeInternalProcessors();
@@ -305,8 +310,13 @@ void BlockLattice2D<T,Descriptor>::allocateAndInitialize() {
     rawData = new Cell<T,Descriptor> [nx*ny];
     grid    = new Cell<T,Descriptor>* [nx];
 #else
-    cudaMallocManaged(&rawData, nx*ny);
-    cudaMallocManaged(&grid,nx);
+    PLB_ASSERT(
+      cudaMallocManaged(&rawData, nx*ny,cudaMemAttachHost)！=cudaErrorNotSupported
+    );
+    //TODO: 能使用此函数分配指针类型数组么？
+    PLB_ASSERT(
+      cudaMallocManaged(&grid,nx,cudaMemAttachHost)！=cudaErrorNotSupported
+    );
 #endif
     for (plint iX=0; iX<nx; ++iX) {
         grid[iX] = rawData + iX*ny;
@@ -321,7 +331,7 @@ void BlockLattice2D<T,Descriptor>::releaseMemory() {
         for (plint iY=0; iY<ny; ++iY) {
             Dynamics<T,Descriptor>* dynamics = &grid[iX][iY].getDynamics();
             if (dynamics != backgroundDynamics) {
-#ifdef PLB_CUDA_DISABLED  
+#ifdef PLB_CUDA_DISABLED
 	      delete dynamics;
 #else
 	      cudaFree(dynamics);
@@ -566,7 +576,7 @@ void BlockLatticeDataTransfer2D<T,Descriptor>::send (
             send_dynamic(domain, buffer); break;
         // Serialization is the same no matter if the dynamics object
         //   is being regenerated or not by the recipient.
-        case modif::allVariables:  
+        case modif::allVariables:
         case modif::dataStructure:
             send_all(domain,buffer); break;
         default: PLB_ASSERT(false);
@@ -686,7 +696,7 @@ void BlockLatticeDataTransfer2D<T,Descriptor>::receive_dynamic (
         for (plint iY=domain.y0; iY<=domain.y1; ++iY) {
             // No assert is included here, because incompatible types of
             //   dynamics are detected by asserts inside HierarchicUnserializer.
-            serializerPos = 
+            serializerPos =
                 unserialize (
                     lattice.get(iX,iY).getDynamics(), buffer, serializerPos );
         }
@@ -702,7 +712,7 @@ void BlockLatticeDataTransfer2D<T,Descriptor>::receive_all (
     for (plint iX=domain.x0; iX<=domain.x1; ++iX) {
         for (plint iY=domain.y0; iY<=domain.y1; ++iY) {
             // 1. Unserialize dynamic data.
-            posInBuffer = 
+            posInBuffer =
                 unserialize (
                     lattice.get(iX,iY).getDynamics(), buffer, posInBuffer );
             // 2. Unserialize static data.

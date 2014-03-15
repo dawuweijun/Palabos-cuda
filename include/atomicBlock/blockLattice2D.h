@@ -5,7 +5,7 @@
  * 1010 Lausanne, Switzerland
  * E-mail contact: contact@flowkit.com
  *
- * The most recent release of Palabos can be downloaded at 
+ * The most recent release of Palabos can be downloaded at
  * <http://www.palabos.org/>
  *
  * The library Palabos is free software: you can redistribute it and/or
@@ -41,6 +41,7 @@
 #ifndef PLB_CUDA_DISABLED
   #include "core/plbCuda.h"
   #include "core/plbCudaManagedMemory.h"
+  #include "atomicBlock/blockLattice2D.cuh"
 #endif
 
 namespace plb {
@@ -56,7 +57,7 @@ template<typename T, template<typename U> class Descriptor> class BlockLattice2D
  * 中使用cudaManagedMemory缓存需要交换的数据，避免在GPU和CPU之间复制BlockLattice中的
  * 所有数据。
  * 2,send-receive 和 attribute 策略有何区别？
- * 	
+ *
  * TODO:
  * 	1,需要BlockLatticeDataTransfer能够访问 BlockLattice2D 的私有数据成员
  * \ref BlockLattice2D::rawData 或者 \ref BlockLattice2D::grid;
@@ -120,7 +121,7 @@ private:
  * This class is not intended to be derived from.
  * TODO: 1,查找该类的成员变量的在进行运算时的角色，确定哪一个需要复制到GPU上;
  * 	2,修改BlockLattice2D的部分函数，使其能够在GPU上对rawData进行操作;
- * 	
+ *
  */
 template<typename T, template<typename U> class Descriptor>
 class BlockLattice2D : public BlockLatticeBase2D<T,Descriptor>,
@@ -153,7 +154,7 @@ public:
     /// Specify wheter statistics measurements are done on given rect. domain
     virtual void specifyStatisticsStatus(Box2D domain, bool status);
     /// Apply collision step to a rectangular domain
-    PLB_HOST_ONLY virtual void collide(Box2D domain);
+    virtual void collide(Box2D domain);
     /// Apply collision step to the whole domain
     PLB_HOST_ONLY virtual void collide();
     /// Apply streaming step to a rectangular domain
@@ -200,7 +201,7 @@ private:
 private:
     Dynamics<T,Descriptor>* backgroundDynamics;
     /*
-     * TODO: Inherit Cell from cudaManaged to enable Unified Memory; 
+     * TODO: Inherit Cell from cudaManaged to enable Unified Memory;
      */
     Cell<T,Descriptor>     *rawData;
     Cell<T,Descriptor>    **grid;
@@ -209,16 +210,16 @@ public:
     static CachePolicy2D& cachePolicy();
 template<typename T_, template<typename U_> class Descriptor_>
     friend class ExternalRhoJcollideAndStream2D;
-    
+
 #ifndef PLB_CUDA_DISABLED
     /**
-     * For CUDA_ENABLED, to enable \ref BlockLatticeDataTransfer2D access 
+     * For CUDA_ENABLED, to enable \ref BlockLatticeDataTransfer2D access
      * \ref BlockLattice2D::rawData and \ref BlockLattice2D::grid directly;
      */
 template<typename T_, template<typename U_> class Descriptor_>
     friend class BlockLatticeDataTransfer2D;
 #endif
-    
+
 };
 
 template<typename T, template<typename U> class Descriptor>

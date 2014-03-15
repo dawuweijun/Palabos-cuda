@@ -1,1 +1,4 @@
-#include <atomicBlock/blockLattice2D.h>
+#include <atomicBlock/blockLattice2D.cuh>
+// namespace plb {
+
+// }

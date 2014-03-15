@@ -17,7 +17,9 @@
 
 #include <stdio.h>
 #include <assert.h>
+#include "host_defines.h"
 #include "cuda_runtime_api.h"
+#include "driver_types.h"
 namespace plb
 {
 
