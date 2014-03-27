@@ -37,9 +37,9 @@
 #include "core/cell.h"
 #include "core/dynamicsIdentifiers.h"
 #include "latticeBoltzmann/indexTemplates.h"
-#include <Eigen3/Core>
-#include <Eigen3/LU>
-#include <Eigen3/Cholesky>
+#include <Eigen/Core>
+#include <Eigen/LU>
+#include <Eigen/Cholesky>
 
 namespace plb {
 
