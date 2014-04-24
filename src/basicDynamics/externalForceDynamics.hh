@@ -32,6 +32,7 @@
 #define EXTERNAL_FORCE_DYNAMICS_HH
 
 #include "basicDynamics/isoThermalDynamics.h"
+#include "basicDynamics/externalForceDynamics.h"
 #include "core/cell.h"
 #include "latticeBoltzmann/dynamicsTemplates.h"
 #include "latticeBoltzmann/momentTemplates.h"

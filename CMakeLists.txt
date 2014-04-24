@@ -29,6 +29,7 @@ find_package(MPI REQUIRED)
 
 if(${MPI_FOUND})
 	include_directories(${MPI_CXX_INCLUDE_PATH})
+	add_definitions(-DPLB_MPI_PARALLEL)
 else(${MPI_FOUND})
 	message(FATAL_ERROR "Required Package MPI Not Found")
 endif(${MPI_FOUND})
