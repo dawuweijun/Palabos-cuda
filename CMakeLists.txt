@@ -106,7 +106,7 @@ if (ALLOW_BUILD_PACKAGE)
 	endif (APPLE)
 endif (ALLOW_BUILD_PACKAGE)
 
-# add_definitions(-DPLB_CUDA_DISABLED)
+add_definitions(-DPLB_CUDA_DISABLED)
 
 include_directories(include)
 
