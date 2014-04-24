@@ -41,6 +41,10 @@
 #include <typeinfo>
 #include <cmath>
 
+#ifndef PLB_CUDA_DISABLED
+	#include "atomicBlock/blockLattice2D.cuh"
+#endif
+
 namespace plb {
 
 ////////////////////// Class BlockLattice2D /////////////////////////
