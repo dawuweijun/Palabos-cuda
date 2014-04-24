@@ -38,12 +38,6 @@
 #include <vector>
 #include <map>
 
-#ifndef PLB_CUDA_DISABLED
-  #include "core/plbCuda.h"
-  #include "core/plbCudaManagedMemory.h"
-  #include "atomicBlock/blockLattice2D.cuh"
-#endif
-
 namespace plb {
 
 template<typename T, template<typename U> class Descriptor> struct Dynamics;
