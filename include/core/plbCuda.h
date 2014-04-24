@@ -55,101 +55,99 @@ cudaError_t checkCudaErrors()
 }
 
 #ifdef __CUDACC__ // CUDA compiler
-#define PLB_CUDA_COMPILER              // to detect CUDACC compilation
-#define PLB_LOC_STRING "Device"
+	#define PLB_CUDA_COMPILER              // to detect CUDACC compilation
+	#define PLB_LOC_STRING "Device"
 
-#ifdef __CUDA_ARCH__
-#define PLB_DEV_CODE                 // to detect device compilation
-#endif
+	#ifdef __CUDA_ARCH__
+		#define PLB_DEV_CODE                 // to detect device compilation
+	#endif
 
-#define PLB_KERNEL(name)               __global__ void name ## _kernel
-#define PLB_KERNEL_NAME(name)          name ## _kernel
+	#define PLB_KERNEL(name)               __global__ void name ## _kernel
+	#define PLB_KERNEL_NAME(name)          name ## _kernel
 
-#if defined(DEBUG) || defined(_DEBUG)
-#define PLB_KERNEL_LAUNCH(name, gridDim, blockDim, sharedBytes, streamId, ...) \
-      do {                                                                     \
-        name ## _kernel<<< (gridDim), (blockDim), (sharedBytes), (streamId) >>>\
-            (__VA_ARGS__);                                                     \
-        checkCudaErrors();                                                     \
-      } while(0)
-#else
-#define PLB_KERNEL_LAUNCH(name, gridDim, blockDim, sharedBytes, streamId, ...) \
-      name ## _kernel<<< (gridDim) , (blockDim), (sharedBytes), (streamId) >>>(__VA_ARGS__)
-#endif
+	#if defined(DEBUG) || defined(_DEBUG)
+		#define PLB_KERNEL_LAUNCH(name, gridDim, blockDim, sharedBytes, streamId, ...) \
+			do {                                                                     \
+				name ## _kernel<<< (gridDim), (blockDim), (sharedBytes), (streamId) >>>\
+				(__VA_ARGS__);                                                     \
+				checkCudaErrors();                                                     \
+			} while(0)
+	#else
+		#define PLB_KERNEL_LAUNCH(name, gridDim, blockDim, sharedBytes, streamId, ...) \
+			name ## _kernel<<< (gridDim) , (blockDim), (sharedBytes), (streamId) >>>(__VA_ARGS__)
+	#endif
 
-#define PLB_HOST_ONLY \
-#ifdef __CUDACC__ \
-  #undef __CUDACC__ \
-  #error "This function only can be called by host" \
-#endif
+	#define PLB_HOST_ONLY \
+	#ifdef __CUDACC__ \
+		#undef __CUDACC__ \
+		#error "This function only can be called by host" \
+	#endif
 
-#define PLB_DEV_CALLABLE               __host__ __device__
-#define PLB_DEV_CALLABLE_INLINE        __host__ __device__ inline
-#define PLB_DEV_CALLABLE_MEMBER        __host__ __device__
-#define PLB_DEV_CALLABLE_INLINE_MEMBER __host__ __device__ inline
+	#define PLB_DEV_CALLABLE               __host__ __device__
+	#define PLB_DEV_CALLABLE_INLINE        __host__ __device__ inline
+	#define PLB_DEV_CALLABLE_MEMBER        __host__ __device__
+	#define PLB_DEV_CALLABLE_INLINE_MEMBER __host__ __device__ inline
 
 // Constants: declares both a device and a host copy of this constant
 // static and extern flavors can be used to declare static and extern
 // linkage as required.
-#define PLB_DEFINE_CONSTANT(def, value) \
-      __constant__ def ## _devconst = value; \
-      def ## _hostconst = value
-#define PLB_DEFINE_STATIC_CONSTANT(def, value) \
-      static __constant__ def ## _devconst = value; \
-      static def ## _hostconst = value
-#define PLB_DEFINE_EXTERN_CONSTANT(def) \
-      extern __constant__ def ## _devconst; \
-      extern def ## _hostconst
+	#define PLB_DEFINE_CONSTANT(def, value) \
+		__constant__ def ## _devconst = value; \
+		def ## _hostconst = value
+	#define PLB_DEFINE_STATIC_CONSTANT(def, value) \
+		static __constant__ def ## _devconst = value; \
+		static def ## _hostconst = value
+	#define PLB_DEFINE_EXTERN_CONSTANT(def) \
+		extern __constant__ def ## _devconst; \
+		extern def ## _hostconst
 
 // use to access device constant explicitly
-#define PLB_DEV_CONSTANT(name) name ## _devconst
+	#define PLB_DEV_CONSTANT(name) name ## _devconst
 
 // use to access a constant defined with PLB_DEFINE_*_CONSTANT
 // automatically chooses either host or device depending on compilation
-#ifdef PLB_DEV_CODE
-#define PLB_CONSTANT(name) name ## _devconst
-#else
-#define PLB_CONSTANT(name) name ## _hostconst
-#endif
+	#ifdef PLB_DEV_CODE
+		#define PLB_CONSTANT(name) name ## _devconst
+	#else
+		#define PLB_CONSTANT(name) name ## _hostconst
+	#endif
 
-#if !defined(PLB_ALIGN)
-#define PLB_ALIGN(n) __align__(n)
-#endif
+	#if !defined(PLB_ALIGN)
+		#define PLB_ALIGN(n) __align__(n)
+	#endif
 
 #else             // host compiler
-#define PLB_HOST_COMPILER              // to detect non-CUDACC compilation
-#define PLB_LOC_STRING "Host"
+	#define PLB_HOST_COMPILER              // to detect non-CUDACC compilation
+	#define PLB_LOC_STRING "Host"
 
-#define PLB_KERNEL(name)               void name
-#define PLB_KERNEL_NAME(name)          name
-#define PLB_KERNEL_LAUNCH(name, gridDim, blockDim, sharedBytes, streamId, ...) name(__VA_ARGS__)
+	#define PLB_KERNEL(name)               void name
+	#define PLB_KERNEL_NAME(name)          name
+	#define PLB_KERNEL_LAUNCH(name, gridDim, blockDim, sharedBytes, streamId, ...) name(__VA_ARGS__)
 
 
-#define PLB_HOST_ONLY
+	#define PLB_HOST_ONLY
 
-#define PLB_DEV_CALLABLE
-#define PLB_DEV_CALLABLE_INLINE        inline
-#define PLB_DEV_CALLABLE_MEMBER
-#define PLB_DEV_CALLABLE_INLINE_MEMBER inline
+	#define PLB_DEV_CALLABLE
+	#define PLB_DEV_CALLABLE_INLINE        inline
+	#define PLB_DEV_CALLABLE_MEMBER
+	#define PLB_DEV_CALLABLE_INLINE_MEMBER inline
 
-#define PLB_DEFINE_CONSTANT(def, value) def ## _hostconst = value
-#define PLB_DEFINE_STATIC_CONSTANT(def, value) static def ## _hostconst = value
-#define PLB_DEFINE_EXTERN_CONSTANT(def) extern def ## _hostconst
+	#define PLB_DEFINE_CONSTANT(def, value) def ## _hostconst = value
+	#define PLB_DEFINE_STATIC_CONSTANT(def, value) static def ## _hostconst = value
+	#define PLB_DEFINE_EXTERN_CONSTANT(def) extern def ## _hostconst
 
-#undef PLB_DEV_CONSTANT // requires NVCC, so undefined here!
-#define PLB_CONSTANT(name) name ## _hostconst
+	#undef PLB_DEV_CONSTANT // requires NVCC, so undefined here!
+	#define PLB_CONSTANT(name) name ## _hostconst
 
-#if !defined(PLB_ALIGN)
-
-#if defined(__GNUC__)
-#define PLB_ALIGN(n) __attribute__((aligned(n)))
-#elif defined(_MSC_VER)
-#define PLB_ALIGN(n) __declspec(align(n))
-#else
-#error "Please provide a definition of PLB_ALIGN for your host compiler!"
-#endif
-
-#endif
+	#if !defined(PLB_ALIGN)
+		#if defined(__GNUC__)
+			#define PLB_ALIGN(n) __attribute__((aligned(n)))
+		#elif defined(_MSC_VER)
+			#define PLB_ALIGN(n) __declspec(align(n))
+		#else
+			#error "Please provide a definition of PLB_ALIGN for your host compiler!"
+		#endif
+	#endif
 
 #endif
 
