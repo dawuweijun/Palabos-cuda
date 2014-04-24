@@ -32,6 +32,8 @@
 #include "mpi.h"
 #endif
 
+#include "core/plbCuda.h"
+
 #include <limits>
 #include <string>
 #include <cstddef>
