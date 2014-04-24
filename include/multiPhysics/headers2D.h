@@ -32,3 +32,4 @@
 #include "multiPhysics/shanChenLattices2D.h"
 #include "multiPhysics/shanChenProcessor2D.h"
 #include "multiPhysics/thermalDataAnalysis2D.h"
+#include "multiPhysics/heLeeProcessor2D.h"

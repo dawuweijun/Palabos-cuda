@@ -38,9 +38,9 @@ namespace plb {
 
    
 template<typename T>
-class FiniteDifference {
+class FiniteDifference3D {
 public:
-    FiniteDifference(ScalarField3D<T> const& field_,
+    FiniteDifference3D(ScalarField3D<T> const& field_,
                      plint x_, plint y_, plint z_ )
         : field(field_),
           x(x_), y(y_), z(z_)
@@ -176,15 +176,15 @@ private:
 };
 
 
-/* *************** Compute_C_processor ***************** */
+/* *************** Compute_C_processor3D ***************** */
 
 template<typename T, template<typename U> class Descriptor >
-Compute_C_processor <T,Descriptor>::Compute_C_processor(T M_)
+Compute_C_processor3D <T,Descriptor>::Compute_C_processor3D(T M_)
     : M(M_)
 { }
 
 template<typename T, template<typename U> class Descriptor >
-void Compute_C_processor<T,Descriptor>::processGenericBlocks (
+void Compute_C_processor3D<T,Descriptor>::processGenericBlocks (
         Box3D domain, std::vector<AtomicBlock3D*> blocks )
 {
     BlockLattice3D<T,Descriptor>& f = *dynamic_cast<BlockLattice3D<T,Descriptor>*>(blocks[0]);
@@ -204,14 +204,14 @@ void Compute_C_processor<T,Descriptor>::processGenericBlocks (
 
 
 template<typename T, template<typename U> class Descriptor >
-Compute_C_processor<T,Descriptor>*
-    Compute_C_processor<T,Descriptor>::clone() const
+Compute_C_processor3D<T,Descriptor>*
+    Compute_C_processor3D<T,Descriptor>::clone() const
 {
-    return new Compute_C_processor<T,Descriptor>(*this);
+    return new Compute_C_processor3D<T,Descriptor>(*this);
 }
 
 template<typename T, template<typename U> class Descriptor >
-void Compute_C_processor<T,Descriptor>::getTypeOfModification (
+void Compute_C_processor3D<T,Descriptor>::getTypeOfModification (
         std::vector<modif::ModifT>& modified ) const
 {
     modified[0] = modif::nothing; // f
@@ -220,10 +220,10 @@ void Compute_C_processor<T,Descriptor>::getTypeOfModification (
 }
 
 
-/* *************** Compute_gradC_rho_mu_processor ***************** */
+/* *************** Compute_gradC_rho_mu_processor3D ***************** */
 
 template<typename T>
-Compute_gradC_rho_mu_processor<T>::Compute_gradC_rho_mu_processor (
+Compute_gradC_rho_mu_processor3D<T>::Compute_gradC_rho_mu_processor3D (
         T beta_, T kappa_, T rho_h_, T rho_l_ )
     : beta(beta_),
       kappa(kappa_),
@@ -232,7 +232,7 @@ Compute_gradC_rho_mu_processor<T>::Compute_gradC_rho_mu_processor (
 { }
 
 template<typename T>
-void Compute_gradC_rho_mu_processor<T>::processGenericBlocks (
+void Compute_gradC_rho_mu_processor3D<T>::processGenericBlocks (
         Box3D domain, std::vector<AtomicBlock3D*> blocks )
 {
     // blocks[0] stands for the unused f.
@@ -244,11 +244,11 @@ void Compute_gradC_rho_mu_processor<T>::processGenericBlocks (
     for (plint iX=domain.x0; iX<=domain.x1; ++iX) {
         for (plint iY=domain.y0; iY<=domain.y1; ++iY) {
             for (plint iZ=domain.z0; iZ<=domain.z1; ++iZ) {
-                FiniteDifference<T>(C,iX,iY,iZ).centralGradient(gradC.get(iX,iY,iZ));
+                FiniteDifference3D<T>(C,iX,iY,iZ).centralGradient(gradC.get(iX,iY,iZ));
                 T C_ = C.get(iX,iY,iZ);
                 rho.get(iX,iY,iZ) = C_ * (rho_h-rho_l) + rho_l;
                 mu.get(iX,iY,iZ) = 4.*beta*C_*(C_-0.5)*(C_-1.) -
-                                   kappa*FiniteDifference<T>(C,iX,iY,iZ).laplacian();
+                                   kappa*FiniteDifference3D<T>(C,iX,iY,iZ).laplacian();
             }
         }
     }
@@ -256,14 +256,14 @@ void Compute_gradC_rho_mu_processor<T>::processGenericBlocks (
 
 
 template<typename T>
-Compute_gradC_rho_mu_processor<T>*
-    Compute_gradC_rho_mu_processor<T>::clone() const
+Compute_gradC_rho_mu_processor3D<T>*
+    Compute_gradC_rho_mu_processor3D<T>::clone() const
 {
-    return new Compute_gradC_rho_mu_processor<T>(*this);
+    return new Compute_gradC_rho_mu_processor3D<T>(*this);
 }
 
 template<typename T>
-void Compute_gradC_rho_mu_processor<T>::getTypeOfModification (
+void Compute_gradC_rho_mu_processor3D<T>::getTypeOfModification (
         std::vector<modif::ModifT>& modified ) const
 {
     modified[0] = modif::nothing;  // f
@@ -274,14 +274,14 @@ void Compute_gradC_rho_mu_processor<T>::getTypeOfModification (
 }
 
 
-/* *************** Compute_gradMu_laplaceMu_processor ***************** */
+/* *************** Compute_gradMu_laplaceMu_processor3D ***************** */
 
 template<typename T, template<typename U> class Descriptor >
-Compute_gradMu_laplaceMu_processor <T,Descriptor>::Compute_gradMu_laplaceMu_processor()
+Compute_gradMu_laplaceMu_processor3D <T,Descriptor>::Compute_gradMu_laplaceMu_processor3D()
 { }
 
 template<typename T, template<typename U> class Descriptor >
-void Compute_gradMu_laplaceMu_processor<T,Descriptor>::processGenericBlocks (
+void Compute_gradMu_laplaceMu_processor3D<T,Descriptor>::processGenericBlocks (
         Box3D domain, std::vector<AtomicBlock3D*> blocks )
 {
     // blocks[0] stands for the unused f.
@@ -292,8 +292,8 @@ void Compute_gradMu_laplaceMu_processor<T,Descriptor>::processGenericBlocks (
     for (plint iX=domain.x0; iX<=domain.x1; ++iX) {
         for (plint iY=domain.y0; iY<=domain.y1; ++iY) {
             for (plint iZ=domain.z0; iZ<=domain.z1; ++iZ) {
-                FiniteDifference<T>(mu,iX,iY,iZ).centralGradient(gradMu.get(iX,iY,iZ));
-                laplaceMu.get(iX,iY,iZ) = FiniteDifference<T>(mu,iX,iY,iZ).laplacian();
+                FiniteDifference3D<T>(mu,iX,iY,iZ).centralGradient(gradMu.get(iX,iY,iZ));
+                laplaceMu.get(iX,iY,iZ) = FiniteDifference3D<T>(mu,iX,iY,iZ).laplacian();
             }
         }
     }
@@ -301,14 +301,14 @@ void Compute_gradMu_laplaceMu_processor<T,Descriptor>::processGenericBlocks (
 
 
 template<typename T, template<typename U> class Descriptor >
-Compute_gradMu_laplaceMu_processor<T,Descriptor>*
-    Compute_gradMu_laplaceMu_processor<T,Descriptor>::clone() const
+Compute_gradMu_laplaceMu_processor3D<T,Descriptor>*
+    Compute_gradMu_laplaceMu_processor3D<T,Descriptor>::clone() const
 {
-    return new Compute_gradMu_laplaceMu_processor<T,Descriptor>(*this);
+    return new Compute_gradMu_laplaceMu_processor3D<T,Descriptor>(*this);
 }
 
 template<typename T, template<typename U> class Descriptor >
-void Compute_gradMu_laplaceMu_processor<T,Descriptor>::getTypeOfModification (
+void Compute_gradMu_laplaceMu_processor3D<T,Descriptor>::getTypeOfModification (
         std::vector<modif::ModifT>& modified ) const
 {
     modified[0] = modif::nothing;  // f
@@ -321,7 +321,7 @@ void Compute_gradMu_laplaceMu_processor<T,Descriptor>::getTypeOfModification (
 /* *************** Compute_gradMu_laplaceMu_u_p1_processor ***************** */
 
 template<typename T, template<typename U> class Descriptor >
-Compute_gradMu_laplaceMu_u_p1_processor <T,Descriptor>::Compute_gradMu_laplaceMu_u_p1_processor (
+Compute_gradMu_laplaceMu_u_p1_processor3D <T,Descriptor>::Compute_gradMu_laplaceMu_u_p1_processor3D (
         T rho_h_, T rho_l_, T RT_ )
     : rho_h(rho_h_),
       rho_l(rho_l_),
@@ -329,7 +329,7 @@ Compute_gradMu_laplaceMu_u_p1_processor <T,Descriptor>::Compute_gradMu_laplaceMu
 { }
 
 template<typename T, template<typename U> class Descriptor >
-void Compute_gradMu_laplaceMu_u_p1_processor<T,Descriptor>::processGenericBlocks (
+void Compute_gradMu_laplaceMu_u_p1_processor3D<T,Descriptor>::processGenericBlocks (
         Box3D domain, std::vector<AtomicBlock3D*> blocks )
 {
     // blocks[0] stands for the unused f.
@@ -351,8 +351,8 @@ void Compute_gradMu_laplaceMu_u_p1_processor<T,Descriptor>::processGenericBlocks
                 Array<T,3>& gradC_  = gradC.get(iX,iY,iZ);
                 T invRho            = (T)1 / rho.get(iX,iY,iZ);
 
-                FiniteDifference<T>(mu,iX,iY,iZ).centralGradient(gradMu_);
-                laplaceMu.get(iX,iY,iZ) = FiniteDifference<T>(mu,iX,iY,iZ).laplacian();
+                FiniteDifference3D<T>(mu,iX,iY,iZ).centralGradient(gradMu_);
+                laplaceMu.get(iX,iY,iZ) = FiniteDifference3D<T>(mu,iX,iY,iZ).laplacian();
                 // Use templates to compute order-0 and order-1 moment of g.
                 momentTemplates<T,Descriptor>::get_rhoBar_j (
                         g.get(iX,iY,iZ), p1.get(iX,iY,iZ), u_);
@@ -368,14 +368,14 @@ void Compute_gradMu_laplaceMu_u_p1_processor<T,Descriptor>::processGenericBlocks
 
 
 template<typename T, template<typename U> class Descriptor >
-Compute_gradMu_laplaceMu_u_p1_processor<T,Descriptor>*
-    Compute_gradMu_laplaceMu_u_p1_processor<T,Descriptor>::clone() const
+Compute_gradMu_laplaceMu_u_p1_processor3D<T,Descriptor>*
+    Compute_gradMu_laplaceMu_u_p1_processor3D<T,Descriptor>::clone() const
 {
-    return new Compute_gradMu_laplaceMu_u_p1_processor<T,Descriptor>(*this);
+    return new Compute_gradMu_laplaceMu_u_p1_processor3D<T,Descriptor>(*this);
 }
 
 template<typename T, template<typename U> class Descriptor >
-void Compute_gradMu_laplaceMu_u_p1_processor<T,Descriptor>::getTypeOfModification (
+void Compute_gradMu_laplaceMu_u_p1_processor3D<T,Descriptor>::getTypeOfModification (
         std::vector<modif::ModifT>& modified ) const
 {
     modified[0] = modif::nothing;  // f
@@ -394,7 +394,7 @@ void Compute_gradMu_laplaceMu_u_p1_processor<T,Descriptor>::getTypeOfModificatio
 /* *************** HeLeeCollisionProcessor ***************** */
 
 template<typename T, template<typename U> class Descriptor >
-HeLeeCollisionProcessor <T,Descriptor>::HeLeeCollisionProcessor (
+HeLeeCollisionProcessor3D <T,Descriptor>::HeLeeCollisionProcessor3D (
         T rho_h_, T rho_l_, T tau_h_, T tau_l_, T M_, T RT_,
         bool initialize_ )
     : rho_h(rho_h_),
@@ -407,7 +407,7 @@ HeLeeCollisionProcessor <T,Descriptor>::HeLeeCollisionProcessor (
 { }
 
 template<typename T, template<typename U> class Descriptor >
-void HeLeeCollisionProcessor<T,Descriptor>::computeAdvectionTerms (
+void HeLeeCollisionProcessor3D<T,Descriptor>::computeAdvectionTerms (
         ScalarField3D<T> const& C, T& adv_gradC, T& bias_adv_gradC,
         plint iX, plint iY, plint iZ, plint iPop )
 {
@@ -423,7 +423,7 @@ void HeLeeCollisionProcessor<T,Descriptor>::computeAdvectionTerms (
 }
 
 template<typename T, template<typename U> class Descriptor >
-void HeLeeCollisionProcessor<T,Descriptor>::processGenericBlocks (
+void HeLeeCollisionProcessor3D<T,Descriptor>::processGenericBlocks (
         Box3D domain, std::vector<AtomicBlock3D*> blocks )
 {
     typedef Descriptor<T> D;
@@ -452,10 +452,10 @@ void HeLeeCollisionProcessor<T,Descriptor>::processGenericBlocks (
                 T tau = C_*(tau_h-tau_l) + tau_l;
 
                 Array<T,3> biasGradC, biasGradMu, gradP, biasGradP;
-                FiniteDifference<T>(C,iX,iY,iZ).biasedGradient(biasGradC);
-                FiniteDifference<T>(mu,iX,iY,iZ).biasedGradient(biasGradMu);
-                FiniteDifference<T>(p1,iX,iY,iZ).centralGradient(gradP);
-                FiniteDifference<T>(p1,iX,iY,iZ).biasedGradient(biasGradP);
+                FiniteDifference3D<T>(C,iX,iY,iZ).biasedGradient(biasGradC);
+                FiniteDifference3D<T>(mu,iX,iY,iZ).biasedGradient(biasGradMu);
+                FiniteDifference3D<T>(p1,iX,iY,iZ).centralGradient(gradP);
+                FiniteDifference3D<T>(p1,iX,iY,iZ).biasedGradient(biasGradP);
 
                 T uGradC =
                     VectorTemplateImpl<T,3>::scalarProduct(u_, gradC.get(iX,iY,iZ));
@@ -522,14 +522,14 @@ void HeLeeCollisionProcessor<T,Descriptor>::processGenericBlocks (
 
 
 template<typename T, template<typename U> class Descriptor >
-HeLeeCollisionProcessor<T,Descriptor>*
-    HeLeeCollisionProcessor<T,Descriptor>::clone() const
+HeLeeCollisionProcessor3D<T,Descriptor>*
+    HeLeeCollisionProcessor3D<T,Descriptor>::clone() const
 {
-    return new HeLeeCollisionProcessor<T,Descriptor>(*this);
+    return new HeLeeCollisionProcessor3D<T,Descriptor>(*this);
 }
 
 template<typename T, template<typename U> class Descriptor >
-void HeLeeCollisionProcessor<T,Descriptor>::getTypeOfModification (
+void HeLeeCollisionProcessor3D<T,Descriptor>::getTypeOfModification (
         std::vector<modif::ModifT>& modified ) const
 {
     modified[0] = modif::staticVariables;   // f

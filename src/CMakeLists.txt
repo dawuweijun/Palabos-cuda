@@ -1,20 +1,9 @@
-# add_subdirectory(include)
+file(GLOB_RECURSE CPP_FILE_LIST *.cpp)
 
-add_subdirectory(atomicBlock)
-add_subdirectory(algorithm)
-add_subdirectory(basicDynamics)
-add_subdirectory(boundaryCondition)
-add_subdirectory(coProcessors)
-add_subdirectory(complexDynamics)
-add_subdirectory(core)
-add_subdirectory(dataProcessors)
-add_subdirectory(finiteDifference)
-add_subdirectory(io)
-add_subdirectory(latticeBoltzmann)
-add_subdirectory(libraryInterfaces)
-add_subdirectory(multiBlock)
-add_subdirectory(multiGrid)
-add_subdirectory(multiPhysics)
-add_subdirectory(offLattice)
-add_subdirectory(parallelism)
-add_subdirectory(particles)
+# message(FATAL_ERROR "{${CPP_FILE_LIST}")
+
+add_library(Palabos SHARED ${CPP_FILE_LIST})
+
+target_link_libraries(Palabos tinyxml ${MPI_CXX_LIBRARIES})
+
+install(TARGETS Palabos DESTINATION ${INSTALL_DIR_LIB} COMPONENT library)

@@ -1,84 +1,121 @@
-cmake_minimum_required(VERSION 2.6)
-project(Palabos-Cuda)
-
-include_directories(/usr/lib/openmpi/include/)
+project(Palabos)
+cmake_minimum_required(VERSION 2.8)
 
 
-#######################################################################
-#
-#######################################################################
 find_package(Eigen3 REQUIRED)
-if(EIGEN3_FOUND)
-	include_directories(${EIGEN3_INCLUDE_DIR})
-elseif(EIGEN3_FOUND)
-	message(FATAL_ERROR "Eigen3 Not Found!")
-endif(EIGEN3_FOUND)
 
-#######################################################################
-#
-#######################################################################
-find_package(PkgConfig)
-if(PKG_CONFIG_FOUND)
-      pkg_check_modules(TINYXML REQUIRED tinyxml)
-      include_directories(TINYXML_INCLUDE_DIRS)
-elseif(PKG_CONFIG_FOUND)
-      message(FATAL_ERROR "Pkg-config Not Found!")
-endif(PKG_CONFIG_FOUND)
+if(${EIGEN3_FOUND})
+		include_directories(${EIGEN3_INCLUDE_DIR})
+else(${EIGEN3_FOUND})
+		message(FATAL_ERROR "Required Package Eigen3 Not Found")
+endif(${EIGEN3_FOUND})
 
-#######################################################################
-#
-#######################################################################
-# find_package(CUDA)
-# if(CUDA_FOUND)
-# 	include_directories(${CUDA_INCLUDE_DIRS})
-# 	message(FATAL_ERROR ${CUDA_INCLUDE_DIRS})
-# elseif(CUDA_FOUND)
-# 	message(FATAL_ERROR "Cuda Not Found!")
-# endif(CUDA_FOUND)
 
-include_directories(/usr/local/cuda-6.0/include/)
+find_package(PkgConfig REQUIRED)
 
-#######################################################################
-#
-#######################################################################
-find_package(MPI)
-if(MPI_CXX_FOUND)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${MPI_CXX_COMPILE_FLAGS}")
-# 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}:${OpenMP_C_FLAGS}")
+if(${PKG_CONFIG_FOUND})
+	pkg_check_modules(TinyXML REQUIRED tinyxml)
+	if(TinyXML_FOUND)
+		include_directories(${TinyXML_INCLUDE_DIRS})
+#  		message(FATAL_ERROR ${TinyXML_INCLUDE_DIRS})
+	else(TinyXML_FOUND)
+		message(FATAL_ERROR "Required Package TinyXML Not Found")
+	endif(TinyXML_FOUND)
+else(${PKG_CONFIG_FOUND})
+	message(FATAL_ERROR "Required Package PkgConfig Not Found")
+endif(${PKG_CONFIG_FOUND})
+
+find_package(MPI REQUIRED)
+
+if(${MPI_FOUND})
 	include_directories(${MPI_CXX_INCLUDE_PATH})
 	add_definitions(-DPLB_MPI_PARALLEL)
-elseif(MPI_CXX_FOUND)
-	message("MPI Not Support")
-endif(MPI_CXX_FOUND)
+else(${MPI_FOUND})
+	message(FATAL_ERROR "Required Package MPI Not Found")
+endif(${MPI_FOUND})
 
-#######################################################################
-#
-#######################################################################
-if("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU")
-    add_definitions(-DPLB_USE_GCC)
-elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
+include_directories(src)
 
-elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "BGP")
-    add_definitions(-DPLB_USE_BGP)
-endif()
+set(ALLOW_BUILD_HEADERS 0 CACHE TYPE BOOL)
+set(ALLOW_BUILD_PACKAGE 0 CACHE TYPE BOOL)
+
+# SET RELEVANT VARS FOR PACKAGE
+if (ALLOW_BUILD_PACKAGE)
+	if (APPLE)
+	elseif (UNIX)
+	    SET(PACKAGE_TYPE "DEB")    # DEB or RPM
+	endif (APPLE)
+
+	SET(PACKAGE_MAINTAINER "HuiJie Zhang <yitianbuji@gmail.com>")
+	#SET(PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/about.txt")
+	SET(PACKAGE_LICENSE_FILE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
+
+	SET(PACKAGE_VERSION_MAJOR "1")
+	SET(PACKAGE_VERSION_MINOR "4")
+	SET(PACKAGE_VERSION_PATCH "1")
+
+	SET(PACKAGE_SYSTEM_NAME "amd64")
+endif (ALLOW_BUILD_PACKAGE)
+
+
+if (APPLE)
+    set(INSTALL_DIR_BIN "/usr/local/bin")
+    set(INSTALL_DIR_LIB "/usr/local/lib")
+    set(INSTALL_DIR_PLUGINS "/usr/local/bin")
+    set(INSTALL_DIR_HEADERS "/usr/local/include")
+elseif (UNIX)
+    set(INSTALL_DIR_BIN "/usr/bin")
+    set(INSTALL_DIR_LIB "/usr/lib")
+    SET(INSTALL_DIR_PLUGINS "/usr/bin")
+    set(INSTALL_DIR_HEADERS "/usr/include")
+endif (APPLE)
+
+
+# CREATE PACKAGE
+if (ALLOW_BUILD_PACKAGE)
+	if (APPLE)
+	    # ...
+	elseif (UNIX)
+	    # COMMON
+	    SET(CPACK_DEBIAN_PACKAGE_MAINTAINER ${PACKAGE_MAINTAINER})
+
+	    SET(CPACK_PACKAGE_DESCRIPTION_FILE ${PACKAGE_DESCRIPTION_FILE})
+	    SET(CPACK_RESOURCE_FILE_LICENSE ${PACKAGE_LICENSE_FILE})
+
+	    SET(CPACK_PACKAGE_VERSION_MAJOR ${PACKAGE_VERSION_MAJOR})
+	    SET(CPACK_PACKAGE_VERSION_MINOR ${PACKAGE_VERSION_MINOR})
+	    SET(CPACK_PACKAGE_VERSION_PATCH ${PACKAGE_VERSION_PATCH})
+
+	    SET(CPACK_SYSTEM_NAME ${PACKAGE_SYSTEM_NAME})
+
+	    # DEB SPECIFIC
+	    if (PACKAGE_TYPE STREQUAL "DEB")
+	        SET(CPACK_GENERATOR "DEB")
+	        SET(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON) # autogenerate dependency information (package d-shlibs should be installed)
+	        #依赖Eigen3，tinyxml2,mpi,imagemagick,vtk6-dev
+	        SET(CPACK_DEBIAN_PACKAGE_DEPENDS "vtk6 (>= 6.0.0), libboost-system1.54.0 (>= 1.54.0)")
+	        #推荐paraview,
+	    endif (PACKAGE_TYPE STREQUAL "DEB")
+
+	    # RPM SPECIFIC
+	    if (PACKAGE_TYPE STREQUAL "RPM")
+	        SET(CPACK_GENERATOR "RPM")
+
+	    endif(PACKAGE_TYPE STREQUAL "RPM")
+	    INCLUDE(CPack)
+	endif (APPLE)
+endif (ALLOW_BUILD_PACKAGE)
+
+# add_definitions(-DPLB_CUDA_DISABLED)
 
 include_directories(include)
 
-add_subdirectory(src)
-add_subdirectory(include)
 add_subdirectory(utility)
+
 add_subdirectory(examples)
 
+add_subdirectory(src)
 
-
-#######################################################################
-# uninstall target
-#######################################################################
-
-configure_file(
-    "${CMAKE_CURRENT_SOURCE_DIR}/cmake_uninstall.cmake.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
-    IMMEDIATE @ONLY)
-
-add_custom_target(uninstall
-    COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/src/
+		DESTINATION ${INSTALL_DIR_HEADERS}/Palabos-1.4
+		)
