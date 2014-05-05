@@ -26,5 +26,28 @@
  * Groups all the include files for the 2D off-lattice directory.
  */
 
+#include "offLattice/marchingCube.h"
+#include "offLattice/triangleSet.h"
+#include "offLattice/nextNeighbors2D.h"
+#include "offLattice/triangleToDef.h"
+#include "offLattice/triangularSurfaceMesh.h"
+#include "offLattice/voxelizer2D.h"
 #include "offLattice/makeSparse2D.h"
+#include "offLattice/triangleHash.h"
+#include "offLattice/offLatticeBoundaryProcessor2D.h"
+#include "offLattice/offLatticeBoundaryProfiles2D.h"
+// #include "offLattice/offLatticeBoundaryCondition2D.h"
+#include "offLattice/boundaryShapes2D.h"
+// #include "offLattice/triangleBoundary2D.h"
+#include "offLattice/offLatticeModel2D.h"
+#include "offLattice/guoOffLatticeModel2D.h"
+// #include "offLattice/bouzidiOffLatticeModel2D.h"
+// #include "offLattice/guoAdvDiffOffLatticeModel2D.h"
+#include "offLattice/triangleSetGenerator.h"
+// #include "offLattice/immersedWalls2D.h"
+// #include "offLattice/filippovaHaenel2D.h"
+
+#ifndef PLB_BGP
+// #include "offLattice/generalizedOffLatticeModel2D.h"
+#endif
 

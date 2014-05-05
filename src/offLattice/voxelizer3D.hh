@@ -28,7 +28,7 @@
 #define VOXELIZER_HH
 
 #include "core/globalDefs.h"
-#include "offLattice/voxelizer.h"
+#include "offLattice/voxelizer3D.h"
 #include "atomicBlock/dataField3D.h"
 #include "multiBlock/multiBlockGenerator3D.h"
 

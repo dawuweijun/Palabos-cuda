@@ -23,8 +23,41 @@
 */
 
 /** \file
- * Groups all the include files for the 2D off-lattice directory.
+ * Helper functions for domain initialization -- header file.
  */
+#ifndef NEXT_NEIGHBORS_3D_H
+#define NEXT_NEIGHBORS_3D_H
 
-#include "offLattice/makeSparse2D.hh"
-#include "offLattice/guoOffLatticeModel2D.hh"
+#include "core/globalDefs.h"
+
+namespace plb {
+
+template <typename T>
+struct NextNeighbor {
+    static const int numNeighbors=26;
+    static const int c[numNeighbors][3];
+    static const T d1;
+    static const T d2;
+    static const T d3;
+    static const T d[numNeighbors];
+    static const T id1;
+    static const T id2;
+    static const T id3;
+    static const T invD[numNeighbors];
+};
+
+template<typename T, template<typename U> class Descriptor>
+struct NextNeighborPop {
+    NextNeighborPop();
+    int ids[NextNeighbor<T>::numNeighbors];
+};
+
+template<typename T, template<typename U> class Descriptor>
+inline plint nextNeighborPop(plint iNeighbor) {
+    static NextNeighborPop<T,Descriptor> instance;
+    return instance.ids[iNeighbor];
+}
+
+}  // namespace plb
+
+#endif  // NEXT_NEIGHBORS_3D_H

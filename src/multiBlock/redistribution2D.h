@@ -23,8 +23,31 @@
 */
 
 /** \file
- * Groups all the include files for the 2D off-lattice directory.
+ * Utilities for 2D multi data distributions -- header file.
  */
 
-#include "offLattice/makeSparse2D.hh"
-#include "offLattice/guoOffLatticeModel2D.hh"
+#ifndef REDISTRIBUTION_2D_H
+#define REDISTRIBUTION_2D_H
+
+#include "parallelism/mpiManager.h"
+#include "core/globalDefs.h"
+#include "multiBlock/multiBlockManagement2D.h"
+
+namespace plb {
+
+struct MultiBlockRedistribute2D {
+    virtual ~MultiBlockRedistribute2D() { }
+    virtual MultiBlockManagement2D redistribute(MultiBlockManagement2D const& original) const=0;
+};
+
+class RandomRedistribute2D : public MultiBlockRedistribute2D {
+public:
+    RandomRedistribute2D(pluint rseed_=10);
+    virtual MultiBlockManagement2D redistribute(MultiBlockManagement2D const& original) const;
+private:
+    pluint rseed;
+};
+
+}  // namespace plb
+
+#endif  // REDISTRIBUTION_2D_H

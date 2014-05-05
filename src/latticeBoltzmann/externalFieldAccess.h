@@ -31,7 +31,7 @@
 #define EXTERNAL_FIELD_ACCESS_H
 
 #include "core/globalDefs.h"
-
+#include "core/plbDebug.h"
 namespace plb {
 
 // The two classes and the function which follow implement a template mechanism
