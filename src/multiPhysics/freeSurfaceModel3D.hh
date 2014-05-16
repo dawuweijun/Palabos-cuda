@@ -2054,7 +2054,7 @@ void FreeSurfaceEqualMassExcessReDistribution3D<T,Descriptor>
 }
 
 template< typename T,template<typename U> class Descriptor>
-void FreeSurfaceInterfaceFilter<T,Descriptor>
+void FreeSurfaceInterfaceFilter3D<T,Descriptor>
         ::processGenericBlocks(Box3D domain,std::vector<AtomicBlock3D*> atomicBlocks)
 {
     typedef Descriptor<T> D;
