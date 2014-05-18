@@ -1156,7 +1156,7 @@ void TwoPhaseCompletion3D<T,Descriptor>
 
 
 template< typename T,template<typename U> class Descriptor>
-void VerifyTwoPhase<T,Descriptor>
+void VerifyTwoPhase3D<T,Descriptor>
         ::processGenericBlocks(Box3D domain,std::vector<AtomicBlock3D*> atomicBlocks)
 {
     typedef Descriptor<T> D;
