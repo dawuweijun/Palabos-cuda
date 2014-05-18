@@ -728,7 +728,6 @@ void FreeSurfaceGeometry2D<T,Descriptor>::processGenericBlocks ( Box2D domain, s
                     Array<T,2> gradVF;
                     gradVF[0] = 0.5 * ( svfx1 - svfx0 );
                     gradVF[1] = 0.5 * ( svfy1 - svfy0 );
-//                         gradVF[2] = 0.5 * ( svfz1 - svfz0 );
                     T norm_gradVF = norm ( gradVF );
                     if ( norm_gradVF <= eps )
                     {
@@ -836,21 +835,20 @@ void FreeSurfaceGeometry2D<T,Descriptor>::processGenericBlocks ( Box2D domain, s
                     }
                     PLB_ASSERT ( numWallCells != 0 );
                     int norm2_inwardWallNormal = inwardWallNormal[0] * inwardWallNormal[0] +
-                                                 inwardWallNormal[1] * inwardWallNormal[1] +
-                                                 inwardWallNormal[2] * inwardWallNormal[2];
+                                                 inwardWallNormal[1] * inwardWallNormal[1];
                     PLB_ASSERT ( norm2_inwardWallNormal != 0 );
 
                     int iWallNormalDirection;
                     // The inwardWallNormal is aligned with one axis.
-                    if ( inwardWallNormal[0] != 0 && inwardWallNormal[1] == 0 && inwardWallNormal[2] == 0 )
+                    if ( inwardWallNormal[0] != 0 && inwardWallNormal[1] == 0 )
                     {
                         iWallNormalDirection = 0;
                     }
-                    else if ( inwardWallNormal[1] != 0 && inwardWallNormal[2] == 0 && inwardWallNormal[0] == 0 )
+                    else if ( inwardWallNormal[1] != 0 && inwardWallNormal[0] == 0 )
                     {
                         iWallNormalDirection = 1;
                     }
-                    else if ( inwardWallNormal[2] != 0 && inwardWallNormal[0] == 0 && inwardWallNormal[1] == 0 )
+                    else if ( inwardWallNormal[0] == 0 && inwardWallNormal[1] == 0 )
                     {
                         iWallNormalDirection = 2;
                     }
@@ -873,7 +871,7 @@ void FreeSurfaceGeometry2D<T,Descriptor>::processGenericBlocks ( Box2D domain, s
                                    };
                         for ( int iSum = 0; iSum < 3; iSum++ )
                         {
-                            if ( sumDirection[iSum][0] + sumDirection[iSum][1] + sumDirection[iSum][2] != 0 )
+                            if ( sumDirection[iSum][0] + sumDirection[iSum][1] != 0 )
                             {
                                 sum[iSum] = 0.0;
                                 for ( int d = 0; d <= 3; d++ )
@@ -919,13 +917,11 @@ void FreeSurfaceGeometry2D<T,Descriptor>::processGenericBlocks ( Box2D domain, s
                     // Reset the inward wall normal to be unitary and to contain information on the direction.
                     inwardWallNormal[0] = iWallNormalDirection != 0 ? 0 : ( inwardWallNormal[0] > 0 ? 1 : -1 );
                     inwardWallNormal[1] = iWallNormalDirection != 1 ? 0 : ( inwardWallNormal[1] > 0 ? 1 : -1 );
-                    inwardWallNormal[2] = iWallNormalDirection != 2 ? 0 : ( inwardWallNormal[2] > 0 ? 1 : -1 );
 
                     // Define a wall normal that shows only the wall normal axis.
                     Array<int,2> wallNormal;
                     wallNormal[0] = iWallNormalDirection == 0 ? 1 : 0;
                     wallNormal[1] = iWallNormalDirection == 1 ? 1 : 0;
-                    wallNormal[2] = iWallNormalDirection == 2 ? 1 : 0;
 
                     // Compute the wall tangent vectors.
                     int iWallTangentDirection0 = iWallNormalDirection == 0 ? 1 : ( iWallNormalDirection == 1 ) ? 2 : 0;
@@ -933,11 +929,9 @@ void FreeSurfaceGeometry2D<T,Descriptor>::processGenericBlocks ( Box2D domain, s
                     Array<int,2> wallTangent0;
                     wallTangent0[0] = iWallTangentDirection0 == 0 ? 1 : 0;
                     wallTangent0[1] = iWallTangentDirection0 == 1 ? 1 : 0;
-                    wallTangent0[2] = iWallTangentDirection0 == 2 ? 1 : 0;
                     Array<int,2> wallTangent1;
                     wallTangent1[0] = iWallTangentDirection1 == 0 ? 1 : 0;
                     wallTangent1[1] = iWallTangentDirection1 == 1 ? 1 : 0;
-                    wallTangent1[2] = iWallTangentDirection1 == 2 ? 1 : 0;
 
                     // Locally smooth the volume fraction to compute an estimate of the 2D normal.
                     T svfcp = param.smoothVolumeFraction ( iX, iY );
@@ -1005,7 +999,6 @@ void FreeSurfaceGeometry2D<T,Descriptor>::processGenericBlocks ( Box2D domain, s
                     T wallNormalComponent = norm_normal2D / tanContactAngle;
                     normal[0] = normal2D[0] * wallTangent0[0] + normal2D[1] * wallTangent1[0] + wallNormalComponent * wallNormal[0];
                     normal[1] = normal2D[0] * wallTangent0[1] + normal2D[1] * wallTangent1[1] + wallNormalComponent * wallNormal[1];
-                    normal[2] = normal2D[0] * wallTangent0[2] + normal2D[1] * wallTangent1[2] + wallNormalComponent * wallNormal[2];
                     T norm_normal = norm ( normal );
                     if ( norm_normal <= eps )
                     {
@@ -1036,35 +1029,29 @@ void FreeSurfaceGeometry2D<T,Descriptor>::processGenericBlocks ( Box2D domain, s
                     Array<int,2> tangent0;
                     tangent0[0] = iTangentDirection0 == 0 ? 1 : 0;
                     tangent0[1] = iTangentDirection0 == 1 ? 1 : 0;
-                    tangent0[2] = iTangentDirection0 == 2 ? 1 : 0;
                     Array<int,2> tangent1;
                     tangent1[0] = iTangentDirection1 == 0 ? 1 : 0;
                     tangent1[1] = iTangentDirection1 == 1 ? 1 : 0;
-                    tangent1[2] = iTangentDirection1 == 2 ? 1 : 0;
 
                     int i0 = -1;
                     int j0 = -1;
                     if ( inwardWallNormal[0] == tangent0[0] &&
-                            inwardWallNormal[1] == tangent0[1] &&
-                            inwardWallNormal[2] == tangent0[2] )
+                            inwardWallNormal[1] == tangent0[1] )
                     {
                         i0 = 0;
                     }
                     else if ( inwardWallNormal[0] == -tangent0[0] &&
-                              inwardWallNormal[1] == -tangent0[1] &&
-                              inwardWallNormal[2] == -tangent0[2] )
+                              inwardWallNormal[1] == -tangent0[1] )
                     {
                         i0 = 2;
                     }
                     else if ( inwardWallNormal[0] == tangent1[0] &&
-                              inwardWallNormal[1] == tangent1[1] &&
-                              inwardWallNormal[2] == tangent1[2] )
+                              inwardWallNormal[1] == tangent1[1] )
                     {
                         j0 = 0;
                     }
                     else if ( inwardWallNormal[0] == -tangent1[0] &&
-                              inwardWallNormal[1] == -tangent1[1] &&
-                              inwardWallNormal[2] == -tangent1[2] )
+                              inwardWallNormal[1] == -tangent1[1] )
                     {
                         j0 = 2;
                     }
@@ -1076,18 +1063,15 @@ void FreeSurfaceGeometry2D<T,Descriptor>::processGenericBlocks ( Box2D domain, s
                     Array<T,2> v1, v2; // In the wallTangent0, wallTangent1 base.
                     v1[0] = fabs ( normal2D[0] );
                     v1[1] = fabs ( normal2D[1] );
-                    v1[2] = 0.0;
                     if ( integrationDirection2D == 0 )
                     {
                         v2[0] = 1.0;
                         v2[1] = 0.0;
-                        v2[2] = 0.0;
                     }
                     else
                     {
                         v2[0] = 0.0;
                         v2[1] = 1.0;
-                        v2[2] = 0.0;
                     }
                     T cosAlpha = cos ( angleBetweenVectors ( v1, v2 ) );
                     T correction = 1.0 / ( tanContactAngle * cosAlpha );
@@ -1207,25 +1191,26 @@ void TwoPhaseComputeCurvature2D<T,Descriptor>::processGenericBlocks ( Box2D doma
                         if ( isaContactAngleCell )
                         {
                             // Construction of a new orthonormal basis.
-                            Array<T,2> wallTangent0 ( ( T ) 0.0, ( T ) 0.0 );
-                            Array<T,2> wallTangent1 ( ( T ) 0.0, ( T ) 0.0 );
+//                             Array<T,2> wallTangent0 ( -wallNormal[1], wallNormal[0] );
+//                             Array<T,2> wallTangent1 ( ( T ) 0.0, ( T ) 0.0 );
                             //FIXME
-//                                 gramSchmidt2D ( wallNormal, wallTangent0, wallTangent1 );
+//                             gramSchmidt ( wallNormal, wallTangent0, wallTangent1 );
 
                             // Transformation matrix from the standard Euclidean basis to the basis
                             // (wallTangent0, wallTangent1, wallNormal).
                             T a[2][2];
-                            a[0][0] = wallTangent0[0];
-                            a[0][1] = wallTangent0[1];
-                            a[1][0] = wallTangent1[0];
-                            a[1][1] = wallTangent1[1];
+                            a[0][0] = wallNormal[0];
+                            a[0][1] = wallNormal[1];
+                            a[1][0] = -wallNormal[1];
+                            a[1][1] = wallNormal[0];
 //TODO FIX THIS
-                            T det = a[0][0] * ( a[1][1] * a[2][2] - a[1][2] * a[2][1] ) -
-                                    a[0][1] * ( a[1][0] * a[2][2] - a[1][2] * a[2][0] ) +
-                                    a[0][2] * ( a[1][0] * a[2][1] - a[1][1] * a[2][0] );
+                            T det = a[0][0]*a[1][1] - a[0][1]*a[1][0];
+
+
                             PLB_ASSERT ( fabs ( det ) > eps );
 
                             // Make sure that the new basis is counter-clockwise oriented.
+#if 0
                             if ( det < ( T ) 0.0 )
                             {
                                 Array<T,2> tmp ( wallTangent0 );
@@ -1239,14 +1224,15 @@ void TwoPhaseComputeCurvature2D<T,Descriptor>::processGenericBlocks ( Box2D doma
 
                                 det = -det;
                             }
+#endif
                             T inv_det = 1.0 / fabs ( det );
 
                             // Inverse of the transformation matrix.
                             T inv[2][2];
-                            inv[0][0] = inv_det * ( a[1][1] * a[2][2] - a[1][2] * a[2][1] );
-                            inv[0][1] = inv_det * ( a[0][2] * a[2][1] - a[0][1] * a[2][2] );
-                            inv[1][0] = inv_det * ( a[1][2] * a[2][0] - a[1][0] * a[2][2] );
-                            inv[1][1] = inv_det * ( a[0][0] * a[2][2] - a[0][2] * a[2][0] );
+                            inv[0][0] = inv_det *a[1][1];
+                            inv[0][1] = -inv_det *a[0][1];
+                            inv[1][0] = -inv_det *a[1][0];
+                            inv[1][1] = inv_det *a[0][0];
 
                             // Express the outward pointing unit normal of the free surface
                             // in the new basis.
@@ -1254,7 +1240,7 @@ void TwoPhaseComputeCurvature2D<T,Descriptor>::processGenericBlocks ( Box2D doma
                             Array<T,2> newNormal ( ( T ) 0.0, ( T ) 0.0 );
                             for ( int i = 0; i < 2; i++ )
                             {
-                                for ( int j = 0; j < 3; j++ )
+                                for ( int j = 0; j < 2; j++ )
                                 {
                                     newNormal[i] += normal[j] * inv[j][i];
                                 }
@@ -1268,12 +1254,11 @@ void TwoPhaseComputeCurvature2D<T,Descriptor>::processGenericBlocks ( Box2D doma
 
                             newNormal[0] = cos ( phi ) * sin ( theta );
                             newNormal[1] = sin ( phi ) * sin ( theta );
-//                             newNormal[2] = cos ( theta );
 
                             normal.resetToZero();
-                            for ( int i = 0; i < 3; i++ )
+                            for ( int i = 0; i < 2; i++ )
                             {
-                                for ( int j = 0; j < 3; j++ )
+                                for ( int j = 0; j < 2; j++ )
                                 {
                                     normal[i] += newNormal[j] * a[j][i];
                                 }
@@ -1334,7 +1319,7 @@ void TwoPhaseComputeCurvature2D<T,Descriptor>::processGenericBlocks ( Box2D doma
 
                     Array<T,2>& normal = tmpNormal.get ( i, j );
 
-                    curv += D::t[iPop]* ( D::c[iPop][0]*normal[0] + D::c[iPop][1]*normal[1] + D::c[iPop][2]*normal[2] );
+                    curv += D::t[iPop]* ( D::c[iPop][0]*normal[0] + D::c[iPop][1]*normal[1] );
                 }
                 curv *= D::invCs2;
             }
@@ -1350,7 +1335,7 @@ void TwoPhaseComputeCurvature2D<T,Descriptor>::processGenericBlocks ( Box2D doma
 
                 plint i, j;
                 T h;
-                T dnx_dx, dny_dy, dnz_dz;
+                T dnx_dx, dny_dy;
                 T v1, v2;
 
                 i = iX - domain.x0 + 1;
@@ -1810,7 +1795,6 @@ void FreeSurfaceIniInterfaceToAnyNodes2D<T,Descriptor>
                 {
                     plint nextX = iX+D::c[iPop][0];
                     plint nextY = iY+D::c[iPop][1];
-                    //plint nextZ = iZ+D::c[iPop][2];
 
                     // The concurrent read/write on param.flag is not an issue here, because the
                     // result in any case is that all adjacent fluid cells have become interface.
@@ -2121,7 +2105,6 @@ void FreeSurfaceInterfaceFilter2D<T,Descriptor>
         Array<plint,2> node = interfaceNodes[i];
         plint iX=node[0];
         plint iY=node[1];
-        plint iZ=node[2];
         T rho = T();
         Array<T,2> j;
         j.resetToZero();

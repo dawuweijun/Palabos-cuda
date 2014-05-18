@@ -79,8 +79,6 @@ void ExternalRhoJcollideAndStream2D<T,Descriptor>::boundaryStream (
         BlockLattice2D<T,Descriptor>& lattice,
         Box2D const& bound, Box2D const& domain )
 {
-    // Make sure bound is contained within current lattice
-    PLB_PRECONDITION( contained(bound, this->getBoundingBox()) );
     // Make sure domain is contained within bound
     PLB_PRECONDITION( contained(domain, bound) );
 

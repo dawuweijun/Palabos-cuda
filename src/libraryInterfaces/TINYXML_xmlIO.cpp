@@ -81,8 +81,8 @@ void XMLreader::mainProcessorIni( std::vector<TiXmlNode*> pParentVect )
 {
     std::map<plint, TiXmlNode*> parents;
     for (pluint iParent=0; iParent<pParentVect.size(); ++iParent) {
-        PLB_PRECONDITION( pParentVect[iParent]->Type()==TiXmlNode::DOCUMENT ||
-                          pParentVect[iParent]->Type()==TiXmlNode::ELEMENT );
+		PLB_PRECONDITION( pParentVect[iParent]->Type()==TiXmlNode::TINYXML_DOCUMENT ||
+                          pParentVect[iParent]->Type()==TiXmlNode::TINYXML_ELEMENT );
 
         TiXmlElement* pParentElement = pParentVect[iParent]->ToElement();
         plint id=0;

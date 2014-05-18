@@ -715,7 +715,7 @@ void TwoPhaseComputeInterfaceLists2D<T,Descriptor>::processGenericBlocks (
                     {
                         plint nextX = iX+D::c[iPop][0];
                         plint nextY = iY+D::c[iPop][1];
-                        //plint nextZ = iZ+D::c[iPop][2];
+
                         if ( param.flag ( nextX,nextY ) ==protectEmpty )
                         {
                             isAdjacentToProtected = true;
@@ -799,7 +799,6 @@ void TwoPhaseComputeInterfaceLists2D<T,Descriptor>::processGenericBlocks (
         {
             plint nextX = iX+D::c[iPop][0];
             plint nextY = iY+D::c[iPop][1];
-            //plint nextZ = iZ+D::c[iPop][2];
             Node nextNode ( nextX,nextY );
 
             if ( param.flag ( nextX,nextY ) ==fluid )
@@ -835,7 +834,6 @@ void TwoPhaseComputeInterfaceLists2D<T,Descriptor>::processGenericBlocks (
                 {
                     plint nextX = iX+D::c[iPop][0];
                     plint nextY = iY+D::c[iPop][1];
-                    //plint nextZ = iZ+D::c[iPop][2];
 
                     if ( isEmpty ( param.flag ( nextX,nextY ) ) ||
                             param.flag ( nextX,nextY ) ==interface )
@@ -1811,7 +1809,6 @@ void TwoPhaseRemoveFalseInterfaceCells2D<T,Descriptor>
                     {
                         plint nextX = iX+D::c[iPop][0];
                         plint nextY = iY+D::c[iPop][1];
-                        //plint nextZ = iZ+D::c[iPop][2];
                         int fl = param.flag ( nextX,nextY );
                         if ( fl!=interface && fl!=wall )
                         {

@@ -65,25 +65,6 @@ std::vector<MultiBlock2D*> aggregateFreeSurfaceParams2D (
     return aggregation;
 }
 
-/// Data structure for holding lists of cells along the free surface in an AtomicContainerBlock.
-/*
-template< typename T,template<typename U> class Descriptor>
-struct InterfaceLists : public ContainerBlockData {
-    typedef Array<plint,Descriptor<T>::d> Node;
-    /// Holds all nodes which have excess mass.
-    std::map<Node,T> massExcess;
-    /// Holds all nodes that need to change status from interface to fluid.
-    std::set<Node>   interfaceToFluid;
-    /// Holds all nodes that need to change status from interface to empty.
-    std::set<Node>   interfaceToEmpty;
-    /// Holds all nodes that need to change status from empty to interface.
-    std::set<Node>   emptyToInterface;
-
-    virtual InterfaceLists<T,Descriptor>* clone() const {
-        return new InterfaceLists<T,Descriptor>(*this);
-    }
-};
-*/
 /// A wrapper offering convenient access to the free-surface data provided to
 /// data processors. Avoids verbous casting, asserting, etc.
 template<typename T,template<typename U> class Descriptor>
