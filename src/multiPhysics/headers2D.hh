@@ -35,4 +35,4 @@
 #include "multiPhysics/twoPhaseModel2D.hh"
 #include "multiPhysics/freeSurfaceAnalysis2D.hh"
 #include "multiPhysics/freeSurfaceModel2D.hh"
-
+#include "multiPhysics/REVProcessor2D.hh"
