@@ -27,4 +27,4 @@
  */
 
 #include "offLattice/makeSparse2D.hh"
-
+#include "offLattice/guoOffLatticeModel2D.hh"

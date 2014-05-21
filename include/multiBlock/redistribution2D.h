@@ -23,15 +23,31 @@
 */
 
 /** \file
- * Groups all the 2D include files in the directory multiPhysics.
+ * Utilities for 2D multi data distributions -- header file.
  */
 
-#include "multiPhysics/boussinesqThermalProcessor2D.h"
-#include "multiPhysics/advectionDiffusion2D.h"
-#include "multiPhysics/interparticlePotential.h"
-#include "multiPhysics/shanChenLattices2D.h"
-#include "multiPhysics/shanChenProcessor2D.h"
-#include "multiPhysics/thermalDataAnalysis2D.h"
-#include "multiPhysics/heLeeProcessor2D.h"
-#include "multiPhysics/twoPhaseModel2D.h"
-#include "multiPhysics/freeSurfaceAnalysis2D.h"
+#ifndef REDISTRIBUTION_2D_H
+#define REDISTRIBUTION_2D_H
+
+#include "parallelism/mpiManager.h"
+#include "core/globalDefs.h"
+#include "multiBlock/multiBlockManagement2D.h"
+
+namespace plb {
+
+struct MultiBlockRedistribute2D {
+    virtual ~MultiBlockRedistribute2D() { }
+    virtual MultiBlockManagement2D redistribute(MultiBlockManagement2D const& original) const=0;
+};
+
+class RandomRedistribute2D : public MultiBlockRedistribute2D {
+public:
+    RandomRedistribute2D(pluint rseed_=10);
+    virtual MultiBlockManagement2D redistribute(MultiBlockManagement2D const& original) const;
+private:
+    pluint rseed;
+};
+
+}  // namespace plb
+
+#endif  // REDISTRIBUTION_2D_H

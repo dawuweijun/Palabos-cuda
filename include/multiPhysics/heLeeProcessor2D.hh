@@ -170,13 +170,11 @@ void Compute_gradC_rho_mu_processor2D<T>::processGenericBlocks (
     {
         for ( plint iY=domain.y0; iY<=domain.y1; ++iY )
         {
-//             for (plint iZ=domain.z0; iZ<=domain.z1; ++iZ) {
             FiniteDifference2D<T> ( C,iX,iY ).centralGradient ( gradC.get ( iX,iY ) );
             T C_ = C.get ( iX,iY );
             rho.get ( iX,iY ) = C_ * ( rho_h-rho_l ) + rho_l;
             mu.get ( iX,iY ) = 4.*beta*C_* ( C_-0.5 ) * ( C_-1. ) -
                                kappa*FiniteDifference2D<T> ( C,iX,iY ).laplacian();
-//             }
         }
     }
 }
@@ -220,10 +218,8 @@ void Compute_gradMu_laplaceMu_processor2D<T,Descriptor>::processGenericBlocks (
     {
         for ( plint iY=domain.y0; iY<=domain.y1; ++iY )
         {
-//             for (plint iZ=domain.z0; iZ<=domain.z1; ++iZ) {
             FiniteDifference2D<T> ( mu,iX,iY ).centralGradient ( gradMu.get ( iX,iY ) );
             laplaceMu.get ( iX,iY ) = FiniteDifference2D<T> ( mu,iX,iY ).laplacian();
-//             }
         }
     }
 }
@@ -276,7 +272,6 @@ void Compute_gradMu_laplaceMu_u_p1_processor2D<T,Descriptor>::processGenericBloc
     {
         for ( plint iY=domain.y0; iY<=domain.y1; ++iY )
         {
-//             for (plint iZ=domain.z0; iZ<=domain.z1; ++iZ) {
             Array<T,2>& u_      = u.get ( iX,iY );
             Array<T,2>& gradMu_ = gradMu.get ( iX,iY );
             Array<T,2>& gradC_  = gradC.get ( iX,iY );
@@ -292,7 +287,6 @@ void Compute_gradMu_laplaceMu_u_p1_processor2D<T,Descriptor>::processGenericBloc
             p1.get ( iX,iY ) +=
                 0.5*RT * ( rho_h-rho_l )
                 * VectorTemplateImpl<T,2>::scalarProduct ( u_, gradC_ );
-//             }
         }
     }
 }

@@ -1,7 +1,7 @@
 project(Palabos)
 cmake_minimum_required(VERSION 2.8)
 
-
+#######################################################################
 find_package(Eigen3 REQUIRED)
 
 if(${EIGEN3_FOUND})
@@ -9,6 +9,13 @@ if(${EIGEN3_FOUND})
 else(${EIGEN3_FOUND})
 		message(FATAL_ERROR "Required Package Eigen3 Not Found")
 endif(${EIGEN3_FOUND})
+#######################################################################
+find_package(CUDA REQUIRED)
+if(CUDA_FOUND)
+	include_directories(${CUDA_INCLUDE_DIRS})
+else(CUDA_FOUND)
+	message(FATAL_ERROR "CUDA NOT FOUND")
+endif(CUDA_FOUND)
 
 
 find_package(PkgConfig REQUIRED)
@@ -118,4 +125,7 @@ add_subdirectory(src)
 
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/
 		DESTINATION ${INSTALL_DIR_HEADERS}/Palabos-1.4
+		FILES_MATCHING
+		PATTERN *.h
+		PATTERN *.hh
 		)

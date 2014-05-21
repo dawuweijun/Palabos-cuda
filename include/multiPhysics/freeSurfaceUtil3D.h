@@ -30,48 +30,13 @@
 #include "multiBlock/multiContainerBlock3D.h"
 #include "multiBlock/multiDataField3D.h"
 #include "multiBlock/multiBlockLattice3D.h"
+#include "multiPhysics/freeSurfaceUtil.h"
 
 #include <vector>
 #include <set>
 #include <string>
 
 namespace plb {
-
-/// Constants used in a free surface flag matrix for cell tagging.
-namespace twoPhaseFlag {
-    enum Flag {empty=0, interface=1, fluid=2, wall=4, protect=5, protectEmpty=6};
-    inline std::string flagToString(int flag) {
-        switch(flag) {
-            case empty:     return "empty";
-            case interface: return "interface";
-            case fluid:     return "fluid";
-            case wall:      return "wall";
-            case protect:   return "protect";
-            case protectEmpty:   return "protectEmpty";
-            default: PLB_ASSERT( false );
-        }
-    }
-    inline Flag invert(int flag) {
-        switch(flag) {
-            case empty:     return fluid;
-            case interface: return interface;
-            case fluid:     return empty;
-            case wall:      return wall;
-            case protect:   return protect;
-            case protectEmpty: return protectEmpty;
-            default: PLB_ASSERT( false );
-        }
-    }
-    inline bool isWet(int flag) {
-        return flag==interface || flag==fluid || flag==protect; 
-    }
-    inline bool isFullWet(int flag) {
-        return flag==fluid || flag==protect; 
-    }
-    inline bool isEmpty(int flag) {
-        return flag==empty || flag==protectEmpty; 
-    }
-}
 
 /// Create a parameter-list for most free-surface data processors.
 template< typename T,template<typename U> class Descriptor>
@@ -98,24 +63,6 @@ std::vector<MultiBlock3D*> aggregateFreeSurfaceParams (
 
     return aggregation;
 }
-
-/// Data structure for holding lists of cells along the free surface in an AtomicContainerBlock.
-template< typename T,template<typename U> class Descriptor>
-struct InterfaceLists : public ContainerBlockData {
-    typedef Array<plint,Descriptor<T>::d> Node;
-    /// Holds all nodes which have excess mass.
-    std::map<Node,T> massExcess;
-    /// Holds all nodes that need to change status from interface to fluid.
-    std::set<Node>   interfaceToFluid;
-    /// Holds all nodes that need to change status from interface to empty.
-    std::set<Node>   interfaceToEmpty;
-    /// Holds all nodes that need to change status from empty to interface.
-    std::set<Node>   emptyToInterface;
-
-    virtual InterfaceLists<T,Descriptor>* clone() const {
-        return new InterfaceLists<T,Descriptor>(*this);
-    }
-};
 
 /// A wrapper offering convenient access to the free-surface data provided to
 /// data processors. Avoids verbous casting, asserting, etc.

@@ -51,7 +51,7 @@ void ExternalRhoJcollideAndStream2D<T,Descriptor>::collide (
             Cell<T,Descriptor>& cell = lattice.get(iX,iY);
             T rhoBar            = rhoBarField.get(iX+offset1.x, iY+offset1.y);
             Array<T,2> const& j = jField.get(iX+offset2.x, iY+offset2.y);
-            cell.getDynamics().collide(cell, rhoBar, j, T(), stat);
+			cell.getDynamics().collideExternal(cell, rhoBar, j, T(), stat);
             cell.revert();
         }
     }
@@ -68,7 +68,7 @@ void ExternalRhoJcollideAndStream2D<T,Descriptor>::bulkCollideAndStream (
             Cell<T,Descriptor>& cell = lattice.get(iX,iY);
             T rhoBar            = rhoBarField.get(iX+offset1.x, iY+offset1.y);
             Array<T,2> const& j = jField.get(iX+offset2.x, iY+offset2.y);
-            cell.getDynamics().collide(cell, rhoBar, j, T(), stat);
+			cell.getDynamics().collideExternal(cell, rhoBar, j, T(), stat);
             latticeTemplates<T,Descriptor>::swapAndStream2D(lattice.grid, iX, iY);
         }
     }
@@ -79,8 +79,6 @@ void ExternalRhoJcollideAndStream2D<T,Descriptor>::boundaryStream (
         BlockLattice2D<T,Descriptor>& lattice,
         Box2D const& bound, Box2D const& domain )
 {
-    // Make sure bound is contained within current lattice
-    PLB_PRECONDITION( contained(bound, this->getBoundingBox()) );
     // Make sure domain is contained within bound
     PLB_PRECONDITION( contained(domain, bound) );
 

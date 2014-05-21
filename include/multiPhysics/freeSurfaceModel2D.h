@@ -22,24 +22,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FREE_SURFACE_MODEL_3D_H
-#define FREE_SURFACE_MODEL_3D_H
+#ifndef FREE_SURFACE_MODEL_2D_H
+#define FREE_SURFACE_MODEL_2D_H
 
 #include <algorithm>
 #include "core/globalDefs.h"
-#include "atomicBlock/dataProcessingFunctional3D.h"
-#include "multiBlock/defaultMultiBlockPolicy3D.h"
-#include "multiPhysics/freeSurfaceUtil3D.h"
-#include "multiPhysics/freeSurfaceInitializer3D.h"
-#include "dataProcessors/dataInitializerWrapper3D.h"
-#include "basicDynamics/dynamicsProcessor3D.h"
+#include "atomicBlock/dataProcessingFunctional2D.h"
+#include "multiBlock/defaultMultiBlockPolicy2D.h"
+#include "multiPhysics/freeSurfaceUtil2D.h"
+#include "multiPhysics/freeSurfaceInitializer2D.h"
+#include "dataProcessors/dataInitializerWrapper2D.h"
+#include "basicDynamics/dynamicsProcessor2D.h"
 
 namespace plb {
 
 template<typename T, template<typename U> class Descriptor>
-class TwoPhaseComputeNormals3D : public BoxProcessingFunctional3D {
+class TwoPhaseComputeNormals2D : public BoxProcessingFunctional2D {
 public:
-    TwoPhaseComputeNormals3D()
+    TwoPhaseComputeNormals2D()
     {
         if (sizeof(T) == sizeof(float))
             precision = FLT;
@@ -50,10 +50,10 @@ public:
         else
             PLB_ASSERT(false);
     }
-    virtual TwoPhaseComputeNormals3D<T,Descriptor>* clone() const {
-        return new TwoPhaseComputeNormals3D<T,Descriptor>(*this);
+    virtual TwoPhaseComputeNormals2D<T,Descriptor>* clone() const {
+        return new TwoPhaseComputeNormals2D<T,Descriptor>(*this);
     }
-    virtual void processGenericBlocks(Box3D domain, std::vector<AtomicBlock3D*> atomicBlocks);
+    virtual void processGenericBlocks(Box2D domain, std::vector<AtomicBlock2D*> atomicBlocks);
     virtual void getTypeOfModification (std::vector<modif::ModifT>& modified) const {
         std::fill(modified.begin(), modified.end(), modif::nothing);
         modified[0] = modif::nothing;         // Fluid.
@@ -72,9 +72,9 @@ private:
 };
 
 template<typename T, template<typename U> class Descriptor>
-class FreeSurfaceGeometry3D : public BoxProcessingFunctional3D {
+class FreeSurfaceGeometry2D : public BoxProcessingFunctional2D {
 public:
-    FreeSurfaceGeometry3D(T contactAngle_)
+    FreeSurfaceGeometry2D(T contactAngle_)
         : contactAngle(contactAngle_)
     {
         Precision precision;
@@ -99,10 +99,10 @@ public:
             useContactAngle = 1;
         }
     }
-    virtual FreeSurfaceGeometry3D<T,Descriptor>* clone() const {
-        return new FreeSurfaceGeometry3D<T,Descriptor>(*this);
+    virtual FreeSurfaceGeometry2D<T,Descriptor>* clone() const {
+        return new FreeSurfaceGeometry2D<T,Descriptor>(*this);
     }
-    virtual void processGenericBlocks(Box3D domain, std::vector<AtomicBlock3D*> atomicBlocks);
+    virtual void processGenericBlocks(Box2D domain, std::vector<AtomicBlock2D*> atomicBlocks);
     virtual void getTypeOfModification (std::vector<modif::ModifT>& modified) const {
         std::fill(modified.begin(), modified.end(), modif::nothing);
         modified[0] = modif::nothing;             // Fluid.
@@ -117,11 +117,11 @@ public:
         modified[9] = modif::nothing;             // Outside density.
     }
 private:
-    ScalarField3D<int> *getInterfaceFlags(Box3D domain, FreeSurfaceProcessorParam3D<T,Descriptor>& param);
-    void computeHeights3D(FreeSurfaceProcessorParam3D<T,Descriptor>& param, int integrationDirection,
-            plint iX, plint iY, plint iZ, T h[3][3]);
-    void computeHeights2D(FreeSurfaceProcessorParam3D<T,Descriptor>& param, Array<int,3>& wallTangent0,
-            Array<int,3>& wallTangent1, int integrationDirection, plint iX, plint iY, plint iZ, T h[3]);
+    ScalarField2D<int> *getInterfaceFlags(Box2D domain, FreeSurfaceProcessorParam2D<T,Descriptor>& param);
+    void computeHeights2D(FreeSurfaceProcessorParam2D<T,Descriptor>& param, int integrationDirection,
+            plint iX, plint iY, T h[3][3]);
+    void computeHeights2D(FreeSurfaceProcessorParam2D<T,Descriptor>& param, Array<int,2>& wallTangent0,
+            Array<int,2>& wallTangent1, int integrationDirection, plint iX, plint iY, T h[3]);
 private:
     enum { unTagged = 000, notInterface = 001, regular = 002, contactLine = 004, adjacent = 010 };
 private:
@@ -131,9 +131,9 @@ private:
 };
 
 template<typename T, template<typename U> class Descriptor>
-class TwoPhaseComputeCurvature3D : public BoxProcessingFunctional3D {
+class TwoPhaseComputeCurvature2D : public BoxProcessingFunctional2D {
 public:
-    TwoPhaseComputeCurvature3D(T contactAngle_, Box3D globalBoundingBox_)
+    TwoPhaseComputeCurvature2D(T contactAngle_, Box2D globalBoundingBox_)
         : contactAngle(contactAngle_),
           globalBoundingBox(globalBoundingBox_)
     {
@@ -163,10 +163,10 @@ public:
             contactAngle *= pi / (T) 180.0;
         }
     }
-    virtual TwoPhaseComputeCurvature3D<T,Descriptor>* clone() const {
-        return new TwoPhaseComputeCurvature3D<T,Descriptor>(*this);
+    virtual TwoPhaseComputeCurvature2D<T,Descriptor>* clone() const {
+        return new TwoPhaseComputeCurvature2D<T,Descriptor>(*this);
     }
-    virtual void processGenericBlocks(Box3D domain, std::vector<AtomicBlock3D*> atomicBlocks);
+    virtual void processGenericBlocks(Box2D domain, std::vector<AtomicBlock2D*> atomicBlocks);
     virtual void getTypeOfModification (std::vector<modif::ModifT>& modified) const {
         std::fill(modified.begin(), modified.end(), modif::nothing);
         modified[0] = modif::nothing;             // Fluid.
@@ -183,7 +183,7 @@ public:
 private:
     T contactAngle;
     int useContactAngle;
-    Box3D globalBoundingBox;
+    Box2D globalBoundingBox;
     Precision precision;
 };
 
@@ -197,11 +197,11 @@ private:
   *   - mass.
   **/
 template< typename T,template<typename U> class Descriptor>
-class FreeSurfaceMassChange3D : public BoxProcessingFunctional3D {
+class FreeSurfaceMassChange2D : public BoxProcessingFunctional2D {
 public:
-    virtual void processGenericBlocks(Box3D domain, std::vector<AtomicBlock3D*> atomicBlocks);
-    virtual FreeSurfaceMassChange3D<T,Descriptor>* clone() const {
-        return new FreeSurfaceMassChange3D<T,Descriptor>(*this);
+    virtual void processGenericBlocks(Box2D domain, std::vector<AtomicBlock2D*> atomicBlocks);
+    virtual FreeSurfaceMassChange2D<T,Descriptor>* clone() const {
+        return new FreeSurfaceMassChange2D<T,Descriptor>(*this);
     }
     virtual void getTypeOfModification(std::vector<modif::ModifT>& modified) const {
         std::fill(modified.begin(), modified.end(), modif::nothing);
@@ -231,12 +231,12 @@ public:
 // ASK: This data processor loops over the whole volume. Is this really
 //      necessary, or could one of the lists be used instead?
 template<typename T, template<typename U> class Descriptor>
-class FreeSurfaceCompletion3D : public BoxProcessingFunctional3D {
+class FreeSurfaceCompletion2D : public BoxProcessingFunctional2D {
 public:
-    virtual FreeSurfaceCompletion3D<T,Descriptor>* clone() const {
-        return new FreeSurfaceCompletion3D<T,Descriptor>(*this);
+    virtual FreeSurfaceCompletion2D<T,Descriptor>* clone() const {
+        return new FreeSurfaceCompletion2D<T,Descriptor>(*this);
     }
-    virtual void processGenericBlocks(Box3D domain, std::vector<AtomicBlock3D*> atomicBlocks);
+    virtual void processGenericBlocks(Box2D domain, std::vector<AtomicBlock2D*> atomicBlocks);
     virtual void getTypeOfModification (std::vector<modif::ModifT>& modified) const {
         std::fill(modified.begin(), modified.end(), modif::nothing);
         modified[0] = modif::nothing;         // Fluid. Should be: staticVariables.
@@ -261,14 +261,14 @@ public:
   *   - mass-fraction, density, momentum, flag (because setting bounce-back).
   **/
 template<typename T, template<typename U> class Descriptor>
-class FreeSurfaceMacroscopic3D : public BoxProcessingFunctional3D {
+class FreeSurfaceMacroscopic2D : public BoxProcessingFunctional2D {
 public:
-    FreeSurfaceMacroscopic3D(T rhoDefault_)
+    FreeSurfaceMacroscopic2D(T rhoDefault_)
         : rhoDefault(rhoDefault_)
     { }
-    virtual void processGenericBlocks(Box3D domain, std::vector<AtomicBlock3D*> atomicBlocks);
-    virtual FreeSurfaceMacroscopic3D<T,Descriptor>* clone() const {
-        return new FreeSurfaceMacroscopic3D<T,Descriptor>(*this);
+    virtual void processGenericBlocks(Box2D domain, std::vector<AtomicBlock2D*> atomicBlocks);
+    virtual FreeSurfaceMacroscopic2D<T,Descriptor>* clone() const {
+        return new FreeSurfaceMacroscopic2D<T,Descriptor>(*this);
     }
     virtual void getTypeOfModification (std::vector<modif::ModifT>& modified) const {
         std::fill(modified.begin(), modified.end(), modif::nothing);
@@ -296,14 +296,14 @@ private:
   *   - mass-fraction, density, momentum, flag (because setting bounce-back).
   **/
 template<typename T, template<typename U> class Descriptor>
-class TwoPhaseAddSurfaceTension3D : public BoxProcessingFunctional3D {
+class TwoPhaseAddSurfaceTension2D : public BoxProcessingFunctional2D {
 public:
-    TwoPhaseAddSurfaceTension3D(T surfaceTension_)
+    TwoPhaseAddSurfaceTension2D(T surfaceTension_)
         : surfaceTension(surfaceTension_)
     { }
-    virtual void processGenericBlocks(Box3D domain, std::vector<AtomicBlock3D*> atomicBlocks);
-    virtual TwoPhaseAddSurfaceTension3D<T,Descriptor>* clone() const {
-        return new TwoPhaseAddSurfaceTension3D<T,Descriptor>(*this);
+    virtual void processGenericBlocks(Box2D domain, std::vector<AtomicBlock2D*> atomicBlocks);
+    virtual TwoPhaseAddSurfaceTension2D<T,Descriptor>* clone() const {
+        return new TwoPhaseAddSurfaceTension2D<T,Descriptor>(*this);
     }
     virtual void getTypeOfModification (std::vector<modif::ModifT>& modified) const {
         std::fill(modified.begin(), modified.end(), modif::nothing);
@@ -333,12 +333,12 @@ private:
   *   - empty-to-interface list: defined in bulk+1
   **/
 template<typename T,template<typename U> class Descriptor>
-class FreeSurfaceComputeInterfaceLists3D : public BoxProcessingFunctional3D
+class FreeSurfaceComputeInterfaceLists2D : public BoxProcessingFunctional2D
 {
 public:
-    virtual void processGenericBlocks(Box3D domain, std::vector<AtomicBlock3D*> atomicBlocks);
-    virtual FreeSurfaceComputeInterfaceLists3D<T,Descriptor>* clone() const {
-        return new FreeSurfaceComputeInterfaceLists3D<T,Descriptor>(*this);
+    virtual void processGenericBlocks(Box2D domain, std::vector<AtomicBlock2D*> atomicBlocks);
+    virtual FreeSurfaceComputeInterfaceLists2D<T,Descriptor>* clone() const {
+        return new FreeSurfaceComputeInterfaceLists2D<T,Descriptor>(*this);
     }
     virtual void getTypeOfModification (std::vector<modif::ModifT>& modified) const {
         std::fill(modified.begin(), modified.end(), modif::nothing);
@@ -368,13 +368,13 @@ private:
   *   - mass-excess-list: defined in bulk+1
   **/
 template<typename T,template<typename U> class Descriptor>
-class FreeSurfaceIniInterfaceToAnyNodes3D : public BoxProcessingFunctional3D {
+class FreeSurfaceIniInterfaceToAnyNodes2D : public BoxProcessingFunctional2D {
 public:
-    FreeSurfaceIniInterfaceToAnyNodes3D(T rhoDefault_);
-    virtual void processGenericBlocks(Box3D domain, std::vector<AtomicBlock3D*> atomicBlocks);
+    FreeSurfaceIniInterfaceToAnyNodes2D(T rhoDefault_);
+    virtual void processGenericBlocks(Box2D domain, std::vector<AtomicBlock2D*> atomicBlocks);
 
-    virtual FreeSurfaceIniInterfaceToAnyNodes3D<T,Descriptor>* clone() const {
-        return new FreeSurfaceIniInterfaceToAnyNodes3D<T,Descriptor>(*this);
+    virtual FreeSurfaceIniInterfaceToAnyNodes2D<T,Descriptor>* clone() const {
+        return new FreeSurfaceIniInterfaceToAnyNodes2D<T,Descriptor>(*this);
     }
     virtual void getTypeOfModification(std::vector<modif::ModifT>& modified) const {
         std::fill(modified.begin(), modified.end(), modif::nothing);
@@ -408,31 +408,31 @@ private:
   *   - momentum
   **/
 template<typename T,template<typename U> class Descriptor>
-class FreeSurfaceIniEmptyToInterfaceNodes3D: public BoxProcessingFunctional3D {
+class FreeSurfaceIniEmptyToInterfaceNodes2D: public BoxProcessingFunctional2D {
 public:
-    FreeSurfaceIniEmptyToInterfaceNodes3D(Dynamics<T,Descriptor>* dynamicsTemplate_, Array<T,Descriptor<T>::d> force_)
+    FreeSurfaceIniEmptyToInterfaceNodes2D(Dynamics<T,Descriptor>* dynamicsTemplate_, Array<T,Descriptor<T>::d> force_)
         : dynamicsTemplate(dynamicsTemplate_), force(force_)
     { }
-    FreeSurfaceIniEmptyToInterfaceNodes3D(FreeSurfaceIniEmptyToInterfaceNodes3D<T,Descriptor> const& rhs)
+    FreeSurfaceIniEmptyToInterfaceNodes2D(FreeSurfaceIniEmptyToInterfaceNodes2D<T,Descriptor> const& rhs)
         : dynamicsTemplate(rhs.dynamicsTemplate->clone()),
           force(rhs.force)
     { }
-    FreeSurfaceIniEmptyToInterfaceNodes3D<T,Descriptor>* operator=(
-            FreeSurfaceIniEmptyToInterfaceNodes3D<T,Descriptor> const& rhs)
+    FreeSurfaceIniEmptyToInterfaceNodes2D<T,Descriptor>* operator=(
+            FreeSurfaceIniEmptyToInterfaceNodes2D<T,Descriptor> const& rhs)
     { 
-        FreeSurfaceIniEmptyToInterfaceNodes3D<T,Descriptor>(rhs).swap(*this);
+        FreeSurfaceIniEmptyToInterfaceNodes2D<T,Descriptor>(rhs).swap(*this);
         return *this;
     }
-    void swap(FreeSurfaceIniEmptyToInterfaceNodes3D<T,Descriptor>& rhs) {
+    void swap(FreeSurfaceIniEmptyToInterfaceNodes2D<T,Descriptor>& rhs) {
         std::swap(dynamicsTemplate, rhs.dynamicsTemplate);
         std::swap(force, rhs.force);
     }
-    ~FreeSurfaceIniEmptyToInterfaceNodes3D() {
+    ~FreeSurfaceIniEmptyToInterfaceNodes2D() {
         delete dynamicsTemplate;
     }
-    virtual void processGenericBlocks(Box3D domain, std::vector<AtomicBlock3D*> atomicBlocks);
-    virtual FreeSurfaceIniEmptyToInterfaceNodes3D<T,Descriptor>* clone() const {
-        return new FreeSurfaceIniEmptyToInterfaceNodes3D<T,Descriptor>(*this);
+    virtual void processGenericBlocks(Box2D domain, std::vector<AtomicBlock2D*> atomicBlocks);
+    virtual FreeSurfaceIniEmptyToInterfaceNodes2D<T,Descriptor>* clone() const {
+        return new FreeSurfaceIniEmptyToInterfaceNodes2D<T,Descriptor>(*this);
     }
     virtual void getTypeOfModification (std::vector<modif::ModifT>& modified) const {
         std::fill(modified.begin(), modified.end(), modif::nothing);
@@ -465,14 +465,14 @@ private:
   *   - mass, density, mass-fraction, dynamics, force, momentum, flag: in bulk+1
   **/
 template<typename T,template<typename U> class Descriptor>
-class FreeSurfaceRemoveFalseInterfaceCells3D : public BoxProcessingFunctional3D {
+class FreeSurfaceRemoveFalseInterfaceCells2D : public BoxProcessingFunctional2D {
 public:
-    FreeSurfaceRemoveFalseInterfaceCells3D(T rhoDefault_)
+    FreeSurfaceRemoveFalseInterfaceCells2D(T rhoDefault_)
         : rhoDefault(rhoDefault_)
     { }
-    virtual void processGenericBlocks(Box3D domain, std::vector<AtomicBlock3D*> atomicBlocks);
-    virtual FreeSurfaceRemoveFalseInterfaceCells3D<T,Descriptor>* clone() const {
-        return new FreeSurfaceRemoveFalseInterfaceCells3D<T,Descriptor>(*this);
+    virtual void processGenericBlocks(Box2D domain, std::vector<AtomicBlock2D*> atomicBlocks);
+    virtual FreeSurfaceRemoveFalseInterfaceCells2D<T,Descriptor>* clone() const {
+        return new FreeSurfaceRemoveFalseInterfaceCells2D<T,Descriptor>(*this);
     }
     virtual void getTypeOfModification(std::vector<modif::ModifT>& modified) const {
         std::fill(modified.begin(), modified.end(), modif::nothing);
@@ -501,11 +501,11 @@ private:
   *   - mass, mass-fraction
   **/
 template<typename T,template<typename U> class Descriptor>
-class FreeSurfaceEqualMassExcessReDistribution3D : public BoxProcessingFunctional3D {
+class FreeSurfaceEqualMassExcessReDistribution2D : public BoxProcessingFunctional2D {
 public:
-    virtual void processGenericBlocks(Box3D domain, std::vector<AtomicBlock3D*> atomicBlocks);
-    virtual FreeSurfaceEqualMassExcessReDistribution3D<T,Descriptor>* clone() const {
-        return new FreeSurfaceEqualMassExcessReDistribution3D(*this);
+    virtual void processGenericBlocks(Box2D domain, std::vector<AtomicBlock2D*> atomicBlocks);
+    virtual FreeSurfaceEqualMassExcessReDistribution2D<T,Descriptor>* clone() const {
+        return new FreeSurfaceEqualMassExcessReDistribution2D(*this);
     }
     virtual void getTypeOfModification(std::vector<modif::ModifT>& modified) const {
         std::fill(modified.begin(), modified.end(), modif::nothing);
@@ -523,11 +523,11 @@ public:
 };
 
 template<typename T,template<typename U> class Descriptor>
-class TwoPhaseComputeStatistics3D : public BoxProcessingFunctional3D {
+class TwoPhaseComputeStatistics2D : public BoxProcessingFunctional2D {
 public:
-    virtual void processGenericBlocks(Box3D domain, std::vector<AtomicBlock3D*> atomicBlocks);
-    virtual TwoPhaseComputeStatistics3D<T,Descriptor>* clone() const {
-        return new TwoPhaseComputeStatistics3D(*this);
+    virtual void processGenericBlocks(Box2D domain, std::vector<AtomicBlock2D*> atomicBlocks);
+    virtual TwoPhaseComputeStatistics2D<T,Descriptor>* clone() const {
+        return new TwoPhaseComputeStatistics2D(*this);
     }
     virtual void getTypeOfModification(std::vector<modif::ModifT>& modified) const {
         std::fill(modified.begin(), modified.end(), modif::nothing);
@@ -545,11 +545,11 @@ public:
 };
 
 template< typename T,template<typename U> class Descriptor>
-class FreeSurfaceInterfaceFilter3D : public BoxProcessingFunctional3D {
+class FreeSurfaceInterfaceFilter2D : public BoxProcessingFunctional2D {
 public:
-    virtual void processGenericBlocks(Box3D domain, std::vector<AtomicBlock3D*> atomicBlocks);
-    virtual FreeSurfaceInterfaceFilter3D<T,Descriptor>* clone() const {
-        return new FreeSurfaceInterfaceFilter3D<T,Descriptor>(*this);
+    virtual void processGenericBlocks(Box2D domain, std::vector<AtomicBlock2D*> atomicBlocks);
+    virtual FreeSurfaceInterfaceFilter2D<T,Descriptor>* clone() const {
+        return new FreeSurfaceInterfaceFilter2D<T,Descriptor>(*this);
     }
     virtual void getTypeOfModification(std::vector<modif::ModifT>& modified) const {
         std::fill(modified.begin(), modified.end(), modif::nothing);
@@ -567,19 +567,19 @@ public:
 };
 
 template<typename T,template<typename U> class Descriptor>
-class InitializeInterfaceLists3D : public BoxProcessingFunctional3D {
-    virtual void processGenericBlocks(Box3D domain, std::vector<AtomicBlock3D*> atomicBlocks)
+class InitializeInterfaceLists2D : public BoxProcessingFunctional2D {
+    virtual void processGenericBlocks(Box2D domain, std::vector<AtomicBlock2D*> atomicBlocks)
     {
         PLB_ASSERT(atomicBlocks.size()==1);
         
-        AtomicContainerBlock3D* containerInterfaceLists = dynamic_cast<AtomicContainerBlock3D*>(atomicBlocks[0]);
+        AtomicContainerBlock2D* containerInterfaceLists = dynamic_cast<AtomicContainerBlock2D*>(atomicBlocks[0]);
         PLB_ASSERT(containerInterfaceLists);
         InterfaceLists<T,Descriptor>* interfaceLists = new InterfaceLists<T,Descriptor>;
         containerInterfaceLists->setData(interfaceLists);
 
     }
-    virtual InitializeInterfaceLists3D<T,Descriptor>* clone() const {
-        return new InitializeInterfaceLists3D<T,Descriptor>(*this);
+    virtual InitializeInterfaceLists2D<T,Descriptor>* clone() const {
+        return new InitializeInterfaceLists2D<T,Descriptor>(*this);
     }
     virtual void getTypeOfModification(std::vector<modif::ModifT>& modified) const {
         // Default-assign potential other parameters present in a multi-fluid system.
@@ -588,18 +588,18 @@ class InitializeInterfaceLists3D : public BoxProcessingFunctional3D {
     }
 };
 
-/// Wrapper for execution of InitializeInterfaceLists3D.
+/// Wrapper for execution of InitializeInterfaceLists2D.
 template<typename T,template<typename U> class Descriptor>
-void initializeInterfaceLists3D(MultiContainerBlock3D& interfaceListBlock) {
-    std::vector<MultiBlock3D*> arg;
+void initializeInterfaceLists2D(MultiContainerBlock2D& interfaceListBlock) {
+    std::vector<MultiBlock2D*> arg;
     arg.push_back(&interfaceListBlock);
     applyProcessingFunctional (
-            new InitializeInterfaceLists3D<T,Descriptor>,
+            new InitializeInterfaceLists2D<T,Descriptor>,
             interfaceListBlock.getBoundingBox(), arg );
 }
 
 template<typename T, template<typename U> class Descriptor>
-struct FreeSurfaceFields3D {
+struct FreeSurfaceFields2D {
     //static const int envelopeWidth = 2;
     static const int envelopeWidth = 3; // Necessary when we use height functions to compute the curvature,
                                         // or when double smoothing is used at the data processor that computes the
@@ -610,56 +610,56 @@ struct FreeSurfaceFields3D {
 
     static const int envelopeWidthForImmersedWalls = 4;
 
-    FreeSurfaceFields3D(SparseBlockStructure3D const& blockStructure,
+    FreeSurfaceFields2D(SparseBlockStructure2D const& blockStructure,
                         Dynamics<T,Descriptor>* dynamics_,
-                        T rhoDefault_, T surfaceTension_, T contactAngle_, Array<T,3> force_,
+                        T rhoDefault_, T surfaceTension_, T contactAngle_, Array<T,2> force_,
                         bool useImmersedWalls = false)
         : dynamics(dynamics_),
           rhoDefault(rhoDefault_), surfaceTension(surfaceTension_), contactAngle(contactAngle_), force(force_),
           lattice (
-                MultiBlockManagement3D (
-                        blockStructure, defaultMultiBlockPolicy3D().getThreadAttribution(),
+                MultiBlockManagement2D (
+                        blockStructure, defaultMultiBlockPolicy2D().getThreadAttribution(),
                         smallEnvelopeWidth ),
-                defaultMultiBlockPolicy3D().getBlockCommunicator(),
-                defaultMultiBlockPolicy3D().getCombinedStatistics(),
-                defaultMultiBlockPolicy3D().getMultiCellAccess<T,Descriptor>(), dynamics->clone() ),
+                defaultMultiBlockPolicy2D().getBlockCommunicator(),
+                defaultMultiBlockPolicy2D().getCombinedStatistics(),
+                defaultMultiBlockPolicy2D().getMultiCellAccess<T,Descriptor>(), dynamics->clone() ),
           helperLists(lattice),
           mass(lattice),
           flag (
-                MultiBlockManagement3D (
+                MultiBlockManagement2D (
                         blockStructure,
-                        defaultMultiBlockPolicy3D().getThreadAttribution(),
+                        defaultMultiBlockPolicy2D().getThreadAttribution(),
                         useImmersedWalls ? envelopeWidthForImmersedWalls : envelopeWidth ),
-                defaultMultiBlockPolicy3D().getBlockCommunicator(),
-                defaultMultiBlockPolicy3D().getCombinedStatistics(),
-                defaultMultiBlockPolicy3D().getMultiScalarAccess<int>() ),
-          volumeFraction((MultiBlock3D&) flag),
+                defaultMultiBlockPolicy2D().getBlockCommunicator(),
+                defaultMultiBlockPolicy2D().getCombinedStatistics(),
+                defaultMultiBlockPolicy2D().getMultiScalarAccess<int>() ),
+          volumeFraction((MultiBlock2D&) flag),
           curvature (
-                MultiBlockManagement3D (
+                MultiBlockManagement2D (
                         blockStructure,
-                        defaultMultiBlockPolicy3D().getThreadAttribution(),
+                        defaultMultiBlockPolicy2D().getThreadAttribution(),
                         envelopeWidth ),
-                defaultMultiBlockPolicy3D().getBlockCommunicator(),
-                defaultMultiBlockPolicy3D().getCombinedStatistics(),
-                defaultMultiBlockPolicy3D().getMultiScalarAccess<T>() ),
-          outsideDensity((MultiBlock3D&) curvature),
+                defaultMultiBlockPolicy2D().getBlockCommunicator(),
+                defaultMultiBlockPolicy2D().getCombinedStatistics(),
+                defaultMultiBlockPolicy2D().getMultiScalarAccess<T>() ),
+          outsideDensity((MultiBlock2D&) curvature),
           rhoBar (
-                MultiBlockManagement3D (
+                MultiBlockManagement2D (
                         blockStructure,
-                        defaultMultiBlockPolicy3D().getThreadAttribution(),
+                        defaultMultiBlockPolicy2D().getThreadAttribution(),
                         useImmersedWalls ? envelopeWidthForImmersedWalls : smallEnvelopeWidth ),
-                defaultMultiBlockPolicy3D().getBlockCommunicator(),
-                defaultMultiBlockPolicy3D().getCombinedStatistics(),
-                defaultMultiBlockPolicy3D().getMultiScalarAccess<T>() ),
+                defaultMultiBlockPolicy2D().getBlockCommunicator(),
+                defaultMultiBlockPolicy2D().getCombinedStatistics(),
+                defaultMultiBlockPolicy2D().getMultiScalarAccess<T>() ),
           j (
-                MultiBlockManagement3D (
+                MultiBlockManagement2D (
                         blockStructure,
-                        defaultMultiBlockPolicy3D().getThreadAttribution(),
+                        defaultMultiBlockPolicy2D().getThreadAttribution(),
                         useImmersedWalls ? envelopeWidthForImmersedWalls : smallEnvelopeWidth ),
-                defaultMultiBlockPolicy3D().getBlockCommunicator(),
-                defaultMultiBlockPolicy3D().getCombinedStatistics(),
-                defaultMultiBlockPolicy3D().getMultiTensorAccess<T,3>() ),
-          normal((MultiBlock3D&) curvature)
+                defaultMultiBlockPolicy2D().getBlockCommunicator(),
+                defaultMultiBlockPolicy2D().getCombinedStatistics(),
+                defaultMultiBlockPolicy2D().getMultiTensorAccess<T,2>() ),
+          normal((MultiBlock2D&) curvature)
     {
         Precision precision;
         if (sizeof(T) == sizeof(float))
@@ -685,7 +685,7 @@ struct FreeSurfaceFields3D {
         twoPhaseArgs = aggregateFreeSurfaceParams(lattice, rhoBar, j, mass, volumeFraction,
                     flag, normal, helperLists, curvature, outsideDensity);
 
-        initializeInterfaceLists3D<T,Descriptor>(helperLists);
+        initializeInterfaceLists2D<T,Descriptor>(helperLists);
         lattice.periodicity().toggleAll(true);
         mass.periodicity().toggleAll(true);
         flag.periodicity().toggleAll(true);
@@ -708,7 +708,7 @@ struct FreeSurfaceFields3D {
         freeSurfaceDataProcessors(rhoDefault, force, *dynamics);
     }
 
-    FreeSurfaceFields3D(FreeSurfaceFields3D<T,Descriptor> const& rhs)
+    FreeSurfaceFields2D(FreeSurfaceFields2D<T,Descriptor> const& rhs)
         : dynamics(rhs.dynamics->clone()),
           rhoDefault(rhs.rhoDefault),
           surfaceTension(rhs.surfaceTension),
@@ -729,7 +729,7 @@ struct FreeSurfaceFields3D {
           twoPhaseArgs(rhs.twoPhaseArgs)
     { }
 
-    void swap(FreeSurfaceFields3D<T,Descriptor>& rhs)
+    void swap(FreeSurfaceFields2D<T,Descriptor>& rhs)
     {
         std::swap(dynamics, rhs.dynamics);
         std::swap(rhoDefault, rhs.rhoDefault);
@@ -751,18 +751,18 @@ struct FreeSurfaceFields3D {
         std::swap(twoPhaseArgs, rhs.twoPhaseArgs);
     }
 
-    FreeSurfaceFields3D<T,Descriptor>& operator=(FreeSurfaceFields3D<T,Descriptor> const& rhs)
+    FreeSurfaceFields2D<T,Descriptor>& operator=(FreeSurfaceFields2D<T,Descriptor> const& rhs)
     {
-        FreeSurfaceFields3D<T,Descriptor>(rhs).swap(*this);
+        FreeSurfaceFields2D<T,Descriptor>(rhs).swap(*this);
         return *this;
     }
 
-    FreeSurfaceFields3D<T,Descriptor>* clone() const
+    FreeSurfaceFields2D<T,Descriptor>* clone() const
     {
-        return new FreeSurfaceFields3D<T,Descriptor>(*this);
+        return new FreeSurfaceFields2D<T,Descriptor>(*this);
     }
 
-    ~FreeSurfaceFields3D() {
+    ~FreeSurfaceFields2D() {
         delete dynamics;
     }
 
@@ -796,16 +796,16 @@ struct FreeSurfaceFields3D {
 
     void defaultInitialize() {
         applyProcessingFunctional (
-           new DefaultInitializeFreeSurface3D<T,Descriptor>(dynamics->clone(), force, rhoDefault),
+           new DefaultInitializeFreeSurface2D<T,Descriptor>(dynamics->clone(), force, rhoDefault),
                    lattice.getBoundingBox(), twoPhaseArgs );
     }
 
     void partiallyDefaultInitialize() {
         applyProcessingFunctional (
-           new PartiallyDefaultInitializeFreeSurface3D<T,Descriptor>(dynamics->clone(), force, rhoDefault),
+           new PartiallyDefaultInitializeFreeSurface2D<T,Descriptor>(dynamics->clone(), force, rhoDefault),
                    lattice.getBoundingBox(), twoPhaseArgs );
     }
-    void freeSurfaceDataProcessors(T rhoDefault, Array<T,3> force, Dynamics<T,Descriptor>& dynamics)
+    void freeSurfaceDataProcessors(T rhoDefault, Array<T,2> force, Dynamics<T,Descriptor>& dynamics)
     {
         plint pl; // Processor level.
 
@@ -813,11 +813,11 @@ struct FreeSurfaceFields3D {
         pl = 0;
 
         integrateProcessingFunctional (
-                new ExternalRhoJcollideAndStream3D<T,Descriptor>,
+                new ExternalRhoJcollideAndStream2D<T,Descriptor>,
                 lattice.getBoundingBox(), rhoBarJparam, pl );
 
         integrateProcessingFunctional (
-                new TwoPhaseComputeNormals3D<T,Descriptor>,
+                new TwoPhaseComputeNormals2D<T,Descriptor>,
                 lattice.getBoundingBox(), twoPhaseArgs, pl );
 
         /***** New level ******/
@@ -825,7 +825,7 @@ struct FreeSurfaceFields3D {
 
         if (useSurfaceTension) {
             integrateProcessingFunctional (
-                    new TwoPhaseComputeCurvature3D<T,Descriptor>(contactAngle, lattice.getBoundingBox()),
+                    new TwoPhaseComputeCurvature2D<T,Descriptor>(contactAngle, lattice.getBoundingBox()),
                     lattice.getBoundingBox(), twoPhaseArgs, pl );
             
             // To change to the curvature calculation with height functions, uncomment the next data processor and
@@ -833,38 +833,38 @@ struct FreeSurfaceFields3D {
             // surface tension, the normals are not computed at all. Be careful if you intent to use
             // the normals and do not have the surface tension algorithm enabled.
             //integrateProcessingFunctional (
-            //        new FreeSurfaceGeometry3D<T,Descriptor>(contactAngle),
+            //        new FreeSurfaceGeometry2D<T,Descriptor>(contactAngle),
             //        lattice.getBoundingBox(), twoPhaseArgs, pl );
         }
 
         integrateProcessingFunctional (
-            new FreeSurfaceMassChange3D<T,Descriptor>, lattice.getBoundingBox(),
+            new FreeSurfaceMassChange2D<T,Descriptor>, lattice.getBoundingBox(),
             twoPhaseArgs, pl );
        
         integrateProcessingFunctional (
-            new FreeSurfaceCompletion3D<T,Descriptor>,
+            new FreeSurfaceCompletion2D<T,Descriptor>,
             lattice.getBoundingBox(), twoPhaseArgs, pl );
                                     
         integrateProcessingFunctional (
-            new FreeSurfaceMacroscopic3D<T,Descriptor>(rhoDefault), 
+            new FreeSurfaceMacroscopic2D<T,Descriptor>(rhoDefault),
             lattice.getBoundingBox(), twoPhaseArgs, pl );
         /***** New level ******/
         //pl++;
 
         //integrateProcessingFunctional (
-        //        new FreeSurfaceInterfaceFilter<T,Descriptor>(),
+        //        new FreeSurfaceInterfaceFilter2D<T,Descriptor>(),
         //        lattice.getBoundingBox(), twoPhaseArgs, pl );
 
         /***** New level ******/
         //pl++;
 
         //integrateProcessingFunctional (
-        //        new FreeSurfaceInterfaceFilter<T,Descriptor>(),
+        //        new FreeSurfaceInterfaceFilter2D<T,Descriptor>(),
         //        lattice.getBoundingBox(), twoPhaseArgs, pl );
 
         if (useSurfaceTension) {
             integrateProcessingFunctional (
-                new TwoPhaseAddSurfaceTension3D<T,Descriptor>(surfaceTension), 
+                new TwoPhaseAddSurfaceTension2D<T,Descriptor>(surfaceTension),
                 lattice.getBoundingBox(), twoPhaseArgs, pl );
         }
 
@@ -872,15 +872,15 @@ struct FreeSurfaceFields3D {
         pl++;
 
         integrateProcessingFunctional (
-            new FreeSurfaceComputeInterfaceLists3D<T,Descriptor>(),
+            new FreeSurfaceComputeInterfaceLists2D<T,Descriptor>(),
             lattice.getBoundingBox(), twoPhaseArgs, pl );
 
         integrateProcessingFunctional (
-            new FreeSurfaceIniInterfaceToAnyNodes3D<T,Descriptor>(rhoDefault),
+            new FreeSurfaceIniInterfaceToAnyNodes2D<T,Descriptor>(rhoDefault),
             lattice.getBoundingBox(), twoPhaseArgs, pl );
             
         integrateProcessingFunctional (
-            new FreeSurfaceIniEmptyToInterfaceNodes3D<T,Descriptor>(dynamics.clone(), force),
+            new FreeSurfaceIniEmptyToInterfaceNodes2D<T,Descriptor>(dynamics.clone(), force),
                                     lattice.getBoundingBox(),
                                     twoPhaseArgs, pl ); 
 
@@ -888,18 +888,18 @@ struct FreeSurfaceFields3D {
         pl++;
 
         integrateProcessingFunctional (
-            new FreeSurfaceRemoveFalseInterfaceCells3D<T,Descriptor>(rhoDefault),
+            new FreeSurfaceRemoveFalseInterfaceCells2D<T,Descriptor>(rhoDefault),
             lattice.getBoundingBox(), twoPhaseArgs, pl);
 
         /***** New level ******/
         pl++;
 
         integrateProcessingFunctional (
-            new FreeSurfaceEqualMassExcessReDistribution3D<T,Descriptor>(),
+            new FreeSurfaceEqualMassExcessReDistribution2D<T,Descriptor>(),
             lattice.getBoundingBox(), twoPhaseArgs, pl );
 
         integrateProcessingFunctional (
-            new TwoPhaseComputeStatistics3D<T,Descriptor>,
+            new TwoPhaseComputeStatistics2D<T,Descriptor>,
             lattice.getBoundingBox(), twoPhaseArgs, pl );
     }
 
@@ -908,22 +908,22 @@ struct FreeSurfaceFields3D {
     T surfaceTension;
     T contactAngle;
     int useSurfaceTension;
-    Array<T,3> force;
-    MultiBlockLattice3D<T, Descriptor> lattice;
-    MultiContainerBlock3D helperLists;
-    MultiScalarField3D<T> mass;
-    MultiScalarField3D<int> flag;
-    MultiScalarField3D<T> volumeFraction;
-    MultiScalarField3D<T> curvature;
-    MultiScalarField3D<T> outsideDensity;
-    MultiScalarField3D<T> rhoBar;
-    MultiTensorField3D<T,3> j;
-    MultiTensorField3D<T,3> normal;
-    std::vector<MultiBlock3D*> rhoBarJparam;
-    std::vector<MultiBlock3D*> twoPhaseArgs;
+    Array<T,2> force;
+    MultiBlockLattice2D<T, Descriptor> lattice;
+    MultiContainerBlock2D helperLists;
+    MultiScalarField2D<T> mass;
+    MultiScalarField2D<int> flag;
+    MultiScalarField2D<T> volumeFraction;
+    MultiScalarField2D<T> curvature;
+    MultiScalarField2D<T> outsideDensity;
+    MultiScalarField2D<T> rhoBar;
+    MultiTensorField2D<T,2> j;
+    MultiTensorField2D<T,2> normal;
+    std::vector<MultiBlock2D*> rhoBarJparam;
+    std::vector<MultiBlock2D*> twoPhaseArgs;
 };
 
 }  // namespace plb
 
-#endif  // FREE_SURFACE_MODEL_3D_H
+#endif  // FREE_SURFACE_MODEL_2D_H
 

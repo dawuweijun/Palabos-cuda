@@ -31,7 +31,7 @@
 #include "offLattice/nextNeighbors3D.hh"
 #include "offLattice/triangleToDef.hh"
 #include "offLattice/triangularSurfaceMesh.hh"
-#include "offLattice/voxelizer.hh"
+#include "offLattice/voxelizer3D.hh"
 #include "offLattice/makeSparse3D.hh"
 #include "offLattice/triangleHash.hh"
 #include "offLattice/offLatticeBoundaryProcessor3D.hh"

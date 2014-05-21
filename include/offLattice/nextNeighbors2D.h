@@ -23,15 +23,41 @@
 */
 
 /** \file
- * Groups all the 2D include files in the directory multiPhysics.
+ * Helper functions for domain initialization -- header file.
  */
+#ifndef NEXT_NEIGHBORS_3D_H
+#define NEXT_NEIGHBORS_3D_H
 
-#include "multiPhysics/boussinesqThermalProcessor2D.h"
-#include "multiPhysics/advectionDiffusion2D.h"
-#include "multiPhysics/interparticlePotential.h"
-#include "multiPhysics/shanChenLattices2D.h"
-#include "multiPhysics/shanChenProcessor2D.h"
-#include "multiPhysics/thermalDataAnalysis2D.h"
-#include "multiPhysics/heLeeProcessor2D.h"
-#include "multiPhysics/twoPhaseModel2D.h"
-#include "multiPhysics/freeSurfaceAnalysis2D.h"
+#include "core/globalDefs.h"
+
+namespace plb {
+
+template <typename T>
+struct NextNeighbor {
+    static const int numNeighbors=26;
+    static const int c[numNeighbors][3];
+    static const T d1;
+    static const T d2;
+    static const T d3;
+    static const T d[numNeighbors];
+    static const T id1;
+    static const T id2;
+    static const T id3;
+    static const T invD[numNeighbors];
+};
+
+template<typename T, template<typename U> class Descriptor>
+struct NextNeighborPop {
+    NextNeighborPop();
+    int ids[NextNeighbor<T>::numNeighbors];
+};
+
+template<typename T, template<typename U> class Descriptor>
+inline plint nextNeighborPop(plint iNeighbor) {
+    static NextNeighborPop<T,Descriptor> instance;
+    return instance.ids[iNeighbor];
+}
+
+}  // namespace plb
+
+#endif  // NEXT_NEIGHBORS_3D_H

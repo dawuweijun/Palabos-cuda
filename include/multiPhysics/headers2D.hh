@@ -32,4 +32,7 @@
 #include "multiPhysics/shanChenProcessor2D.hh"
 #include "multiPhysics/thermalDataAnalysis2D.hh"
 #include "multiPhysics/heLeeProcessor2D.hh"
+#include "multiPhysics/twoPhaseModel2D.hh"
+#include "multiPhysics/freeSurfaceAnalysis2D.hh"
+#include "multiPhysics/freeSurfaceModel2D.hh"
 
