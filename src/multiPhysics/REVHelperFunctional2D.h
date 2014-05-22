@@ -29,20 +29,32 @@
 namespace plb
 {
 template <typename T1 ,typename T2>
-class ComputeLocalK2D:public BoxProcessingFunctional2D_TT<T1,2,T2,4>
+class ComputeLocalInvK2D:public BoxProcessingFunctional2D_TT<T1,2,T2,4>
 {
 public:
-    ComputeLocalK2D ( T1 K_[2][2],T1 dir_[2] ) :K ( K_ ),rawKDir ( dir_ )
+    ComputeLocalInvK2D ( T1 K_[2][2],T1 dir_[2] ) :K ( K_ ), rawKDir ( dir_ )
     {
         PLB_PRECONDITION ( rawKDir[0]*rawKDir[0]+rawKDir[1]*rawKDir[1]==1. );
+        //此处计算invK
+        T1 det=K_[0][0]*K_[1][1]-K_[0][1]*K_[1][0];
+
+        PLB_ASSERT ( abs ( det ) >0. );
+
+        T1 inv_det=1./abs ( det );
+
+        invK[0] = inv_det *K_[1][1];
+        invK[1] = -inv_det *K_[0][1];
+        invK[2] = -inv_det *K_[1][0];
+        invK[3] = inv_det *K_[0][0];
+
     };
     void process ( Box2D domain, TensorField2D<T1,2>& orient,TensorField2D<T2,4>& invK );
-    virtual ComputeLocalK2D* clone() const
+    virtual ComputeLocalInvK2D* clone() const
     {
-        return new ComputeLocalK2D ( K );
+        return new ComputeLocalInvK2D ( K );
     };
 private:
-    T1 K[2][2] ,rawKDir[2];
+    T1 K[2][2],invK[2][2] ,rawKDir[2];
 };
 }//namespace plb
 #endif

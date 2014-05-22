@@ -22,21 +22,47 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef REV_HELPER_FUNCTIONAL_2D_H
-#define REV_HELPER_FUNCTIONAL_2D_H
+#ifndef REV_HELPER_FUNCTIONAL_3D_H
+#define REV_HELPER_FUNCTIONAL_3D_H
 #include "core/globalDefs.h"
-#include "atomicBlock/dataProcessingFunctional2D.h"
+#include "atomicBlock/dataProcessingFunctional3D.h"
 namespace plb
 {
-template <typename T>
-class InvKFromOrientAndDiagK2D:public BoxProcessingFunctional2D_NN<T>
+template <typename T1,typename T2>
+class ComputeLocalInvK3D:public BoxProcessingFunctional3D_TT<T1,3,T2,9>
 {
 public:
-    InvKFromOrientAndDiagK2D(Array< T, 2  > &diagK_) { }
-    virtual void process ( Box2D domain, NTensorField2D<T1>& field1,NTensorField2D<T2>& field2 );
-    virtual InvKFromOrientAndDiagK2D* clone() const;
+    ComputeLocalInvK3D ( T1 K_[3][3],T1 dir_[3] ) :K ( K_ ),rawKDir ( dir_ )
+    {
+        PLB_PRECONDITION ( rawKDir[0]*rawKDir[0]+rawKDir[1]*rawKDir[1]+rawKDir[2]*rawKDir[2]==1. );
+        //此处计算invK
+        T1 det=K[0][0] * ( K[1][1] * K[2][2] - K[1][2] * K[2][1] ) -
+               K[0][1] * ( K[1][0] * K[2][2] - K[1][2] * K[2][0] ) +
+               K[0][2] * ( K[1][0] * K[2][1] - K[1][1] * K[2][0] );
+
+        PLB_ASSERT ( abs ( det ) >0. );
+
+        T1 inv_det =1./abs ( det );
+
+
+        invK[0][0] = inv_det * ( K[1][1] * K[2][2] - K[1][2] * K[2][1] );
+        invK[0][1] = inv_det * ( K[0][2] * K[2][1] - K[0][1] * K[2][2] );
+        invK[0][2] = inv_det * ( K[0][1] * K[1][2] - K[0][2] * K[1][1] );
+        invK[1][0] = inv_det * ( K[1][2] * K[2][0] - K[1][0] * K[2][2] );
+        invK[1][1] = inv_det * ( K[0][0] * K[2][2] - K[0][2] * K[2][0] );
+        invK[1][2] = inv_det * ( K[0][2] * K[1][0] - K[0][0] * K[1][2] );
+        invK[2][0] = inv_det * ( K[1][0] * K[2][1] - K[1][1] * K[2][0] );
+        invK[2][1] = inv_det * ( K[0][1] * K[2][0] - K[0][0] * K[2][1] );
+        invK[2][2] = inv_det * ( K[0][0] * K[1][1] - K[0][1] * K[1][0] );
+
+    };
+    virtual void process ( Box3D domain, TensorField3D<T1,3>& orient,TensorField3D<T2,9>& invK );
+    virtual ComputeLocalInvK3D* clone() const
+    {
+        return new ComputeLocalInvK3D ( K,rawKDir );
+    };
 private:
-    Array< T, 2  > diagK;
+    T1 K[3][3] ,invK[3][3],rawKDir[3];
 };
 }//namespace plb
 #endif
