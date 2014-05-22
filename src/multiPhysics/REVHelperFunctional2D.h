@@ -5,7 +5,7 @@
  * 1010 Lausanne, Switzerland
  * E-mail contact: contact@flowkit.com
  *
- * The most recent release of Palabos can be downloaded at 
+ * The most recent release of Palabos can be downloaded at
  * <http://www.palabos.org/>
  *
  * The library Palabos is free software: you can redistribute it and/or
@@ -20,20 +20,30 @@
  *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
-/** \file
- * Groups all the generic 2D implementation files in the directory multiPhysics.
  */
 
-#include "multiPhysics/boussinesqThermalProcessor2D.hh"
-#include "multiPhysics/advectionDiffusion2D.hh"
-#include "multiPhysics/interparticlePotential.hh"
-#include "multiPhysics/shanChenProcessor2D.hh"
-#include "multiPhysics/thermalDataAnalysis2D.hh"
-#include "multiPhysics/heLeeProcessor2D.hh"
-#include "multiPhysics/twoPhaseModel2D.hh"
-#include "multiPhysics/freeSurfaceAnalysis2D.hh"
-#include "multiPhysics/freeSurfaceModel2D.hh"
-#include "multiPhysics/REVProcessor2D.hh"
-#include "multiPhysics/REVHelperFunctional2D.hh"
+#ifndef REV_HELPER_FUNCTIONAL_2D_H
+#define REV_HELPER_FUNCTIONAL_2D_H
+#include "core/globalDefs.h"
+#include "atomicBlock/dataProcessingFunctional2D.h"
+namespace plb
+{
+template <typename T1 ,typename T2>
+class ComputeLocalK2D:public BoxProcessingFunctional2D_TT<T1,2,T2,4>
+{
+public:
+    ComputeLocalK2D ( T1 K_[2][2],T1 dir_[2] ) :K ( K_ ),rawKDir ( dir_ )
+    {
+        PLB_PRECONDITION ( rawKDir[0]*rawKDir[0]+rawKDir[1]*rawKDir[1]==1. );
+    };
+    void process ( Box2D domain, TensorField2D<T1,2>& orient,TensorField2D<T2,4>& invK );
+    virtual ComputeLocalK2D* clone() const
+    {
+        return new ComputeLocalK2D ( K );
+    };
+private:
+    T1 K[2][2] ,rawKDir[2];
+};
+}//namespace plb
+#endif
+

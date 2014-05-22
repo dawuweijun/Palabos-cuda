@@ -5,7 +5,7 @@
  * 1010 Lausanne, Switzerland
  * E-mail contact: contact@flowkit.com
  *
- * The most recent release of Palabos can be downloaded at 
+ * The most recent release of Palabos can be downloaded at
  * <http://www.palabos.org/>
  *
  * The library Palabos is free software: you can redistribute it and/or
@@ -20,20 +20,24 @@
  *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
-/** \file
- * Groups all the generic 2D implementation files in the directory multiPhysics.
  */
 
-#include "multiPhysics/boussinesqThermalProcessor2D.hh"
-#include "multiPhysics/advectionDiffusion2D.hh"
-#include "multiPhysics/interparticlePotential.hh"
-#include "multiPhysics/shanChenProcessor2D.hh"
-#include "multiPhysics/thermalDataAnalysis2D.hh"
-#include "multiPhysics/heLeeProcessor2D.hh"
-#include "multiPhysics/twoPhaseModel2D.hh"
-#include "multiPhysics/freeSurfaceAnalysis2D.hh"
-#include "multiPhysics/freeSurfaceModel2D.hh"
-#include "multiPhysics/REVProcessor2D.hh"
-#include "multiPhysics/REVHelperFunctional2D.hh"
+#ifndef REV_HELPER_FUNCTIONAL_2D_H
+#define REV_HELPER_FUNCTIONAL_2D_H
+#include "core/globalDefs.h"
+#include "atomicBlock/dataProcessingFunctional2D.h"
+namespace plb
+{
+template <typename T>
+class InvKFromOrientAndDiagK2D:public BoxProcessingFunctional2D_NN<T>
+{
+public:
+    InvKFromOrientAndDiagK2D(Array< T, 2  > &diagK_) { }
+    virtual void process ( Box2D domain, NTensorField2D<T1>& field1,NTensorField2D<T2>& field2 );
+    virtual InvKFromOrientAndDiagK2D* clone() const;
+private:
+    Array< T, 2  > diagK;
+};
+}//namespace plb
+#endif
+

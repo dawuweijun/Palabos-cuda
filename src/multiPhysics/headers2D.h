@@ -36,3 +36,4 @@
 #include "multiPhysics/twoPhaseModel2D.h"
 #include "multiPhysics/freeSurfaceAnalysis2D.h"
 #include "multiPhysics/REVProcessor2D.h"
+#include "multiPhysics/REVHelperFunctional2D.h"
