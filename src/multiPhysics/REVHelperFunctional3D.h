@@ -28,11 +28,15 @@
 #include "atomicBlock/dataProcessingFunctional3D.h"
 namespace plb
 {
-template <typename T1,typename T2>
-class ComputeLocalInvK3D:public BoxProcessingFunctional3D_TT<T1,3,T2,9>
+template <typename T1,typename T2=T1>
+class BoxLocalInvKFunctional3D:public BoxProcessingFunctional3D_TT<T1,3,T2,9>
 {
+
 public:
-    ComputeLocalInvK3D ( T1 K_[3][3],T1 dir_[3] ) :K ( K_ ),rawKDir ( dir_ )
+	typedef Array< T1, 3  > Vector3D;
+	typedef Array< BoxLocalInvKFunctional3D::Vector3D,3 > Matrix3D;
+
+    BoxLocalInvKFunctional3D ( const Matrix3D& K_,const Vector3D& dir_ ):K(K_),rawKDir(dir_)
     {
         PLB_PRECONDITION ( rawKDir[0]*rawKDir[0]+rawKDir[1]*rawKDir[1]+rawKDir[2]*rawKDir[2]==1. );
         //此处计算invK
@@ -57,12 +61,20 @@ public:
 
     };
     virtual void process ( Box3D domain, TensorField3D<T1,3>& orient,TensorField3D<T2,9>& invK );
-    virtual ComputeLocalInvK3D* clone() const
+    virtual BoxLocalInvKFunctional3D* clone() const
     {
-        return new ComputeLocalInvK3D ( K,rawKDir );
+        return new BoxLocalInvKFunctional3D ( K,rawKDir );
     };
+
+    void getTypeOfModification ( std::vector<modif::ModifT>& modified ) const
+    {
+
+    };
+
 private:
-    T1 K[3][3] ,invK[3][3],rawKDir[3];
+    Matrix3D K ;
+    T1 invK[3][3];
+    Vector3D rawKDir;
 };
 }//namespace plb
 #endif

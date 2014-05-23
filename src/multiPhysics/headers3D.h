@@ -45,3 +45,5 @@
 #include "multiPhysics/bubbleMatch3D.h"
 #include "multiPhysics/twoPhaseModel3D.h"
 #include "multiPhysics/REVProcessor3D.h"
+#include "multiPhysics/REVHelperFunctional3D.h"
+#include "multiPhysics/REVHelperWrapper3D.h"

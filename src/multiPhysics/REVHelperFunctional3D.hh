@@ -22,14 +22,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef REV_HELPER_FUNCTIONAL_3D_H
-#define REV_HELPER_FUNCTIONAL_3D_H
+#ifndef REV_HELPER_FUNCTIONAL_3D_HH
+#define REV_HELPER_FUNCTIONAL_3D_HH
 #include "multiPhysics/REVHelperFunctional3D.h"
 #include "core/array.h"
 namespace plb
 {
 template <typename T1,typename T2>
-void ComputeLocalInvK3D<T1,T2>::process ( Box3D domain, TensorField3D<T1,3>& orient,TensorField3D<T2,9>& invK )
+void BoxLocalInvKFunctional3D<T1,T2>::process ( Box3D domain, TensorField3D<T1,3>& orient,TensorField3D<T2,9>& invK )
 {
     T1 rmat[3][3];
     T2 Axis[3],normAxis[3];
@@ -91,5 +91,5 @@ void ComputeLocalInvK3D<T1,T2>::process ( Box3D domain, TensorField3D<T1,3>& ori
     }
 }
 }//namespace plb
-#endif
+#endif //REV_HELPER_FUNCTIONAL_3D_HH
 

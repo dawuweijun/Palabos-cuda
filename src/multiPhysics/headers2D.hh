@@ -37,3 +37,4 @@
 #include "multiPhysics/freeSurfaceModel2D.hh"
 #include "multiPhysics/REVProcessor2D.hh"
 #include "multiPhysics/REVHelperFunctional2D.hh"
+#include "multiPhysics/REVHelperWrapper2D.hh"

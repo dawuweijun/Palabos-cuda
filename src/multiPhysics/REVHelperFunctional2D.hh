@@ -29,7 +29,7 @@
 namespace plb
 {
 template <typename T1,typename T2>
-void ComputeLocalInvK2D<T1,T2>::process ( Box2D domain, TensorField2D<T1,2>& orient,TensorField2D<T2,4>& invK )
+void BoxLocalInvKFunctional2D<T1,T2>::process ( Box2D domain, TensorField2D<T1,2>& orient,TensorField2D<T2,4>& invK )
 {
     T1 rmat[2][2];
 
