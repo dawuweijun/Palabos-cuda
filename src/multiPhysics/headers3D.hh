@@ -41,4 +41,6 @@
 #include "multiPhysics/bubbleHistory3D.hh"
 #include "multiPhysics/bubbleMatch3D.hh"
 #include "multiPhysics/twoPhaseModel3D.hh"
-
+#include "multiPhysics/REVProcessor3D.hh"
+#include "multiPhysics/REVHelperFunctional3D.hh"
+#include "multiPhysics/REVHelperWrapper3D.hh"

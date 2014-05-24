@@ -21,7 +21,8 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-
+#ifndef PALABOS_2D_H
+#define PALABOS_2D_H
 #include <core/globalDefs.h>
 #include <parallelism/headers2D.h>
 #include <latticeBoltzmann/headers2D.h>
@@ -42,3 +43,4 @@
 #include <libraryInterfaces/headers2D.h>
 #include <tinyxml.h>
 
+#endif
