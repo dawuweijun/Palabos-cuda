@@ -1,6 +1,0 @@
-file(GLOB COPROCESSORS_HEADERS *.h *.hh)
-
-install(
-	FILES ${COPROCESSORS_HEADERS}
-	DESTINATION ${CMAKE_INSTALL_PREFIX}/Palabos/coProcessors
-)
