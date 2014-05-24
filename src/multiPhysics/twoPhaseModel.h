@@ -26,6 +26,7 @@
 #define TWOPHASEMODEL_H
 #include "core/globalDefs.h"
 #include "core/plbDebug.h"
+#include "atomicBlock/atomicContainerBlock2D.h"
 namespace plb
 {
 
@@ -40,7 +41,7 @@ namespace plb
  **/
 typedef enum {kinetic=1, dynamic=2, bubblePressure=3, constRho=4, freeSurface=5} TwoPhaseModel;
 
-TwoPhaseModel stringToTwoPhaseModel ( std::string modelName )
+inline TwoPhaseModel stringToTwoPhaseModel ( std::string modelName )
 {
     if ( modelName=="kinetic" )
     {
@@ -101,3 +102,4 @@ struct TwoPhaseInterfaceLists : public ContainerBlockData {
 
 }//namespace plb
 #endif
+
