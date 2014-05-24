@@ -20,7 +20,7 @@ std::auto_ptr<MultiTensorField2D<T2,4> >computeLocalInvK2D (
     const typename BoxLocalInvKFunctional2D<T1,T2>::Vector2D &dir )
 {
     MultiTensorField2D<T2,4>* invK = new MultiTensorField2D<T2,4> ( orient.getNx(), orient.getNy() );
-    computeLocalInvK2D ( orient,invK,K,dir );
+    computeLocalInvK2D ( orient,*invK,K,dir );
     return std::auto_ptr<MultiTensorField2D<T2,4> > ( invK );
 };
 

@@ -26,10 +26,11 @@
 #define REV_HELPER_FUNCTIONAL_2D_HH
 #include "multiPhysics/REVHelperFunctional2D.h"
 #include "core/array.h"
+#include "io/parallelIO.h"
 namespace plb
 {
 template <typename T1,typename T2>
-void BoxLocalInvKFunctional2D<T1,T2>::process ( Box2D domain, TensorField2D<T1,2>& orient,TensorField2D<T2,4>& invK )
+void BoxLocalInvKFunctional2D<T1,T2>::process ( Box2D domain, TensorField2D<T1,2>& orient,TensorField2D<T2,4>& invKField )
 {
     T1 rmat[2][2];
 
@@ -39,9 +40,12 @@ void BoxLocalInvKFunctional2D<T1,T2>::process ( Box2D domain, TensorField2D<T1,2
         {
             const Array< T1, 2> &to_B=orient.get ( iX,iY );
             double sqrNorm=to_B[0]*to_B[0]+to_B[1]*to_B[1];
-            Array< T2, 4 > &tmpinvk=invK.get ( iX,iY );
+
+            PLB_PRECONDITION ( std::abs ( sqrNorm-0.5 ) <0.500001 );
+
+            Array< T2, 4 > &tmpinvk=invKField.get ( iX,iY );
             tmpinvk.resetToZero();
-            PLB_PRECONDITION ( sqrNorm==0.||sqrNorm==1. );
+
             if ( sqrNorm!=0. )
             {
                 //计算角度
@@ -49,8 +53,8 @@ void BoxLocalInvKFunctional2D<T1,T2>::process ( Box2D domain, TensorField2D<T1,2
                 T1 cosTheta = rawKDir[0]*to_B[0]+rawKDir[1]*to_B[1];
                 //计算顺时针旋转矩阵
                 rmat[0][0]=cosTheta;
-                rmat[0][1]=sinTheta;
-                rmat[1][0]=-sinTheta;
+                rmat[0][1]=-sinTheta;
+                rmat[1][0]=sinTheta;
                 rmat[1][1]=cosTheta;
                 //计算渗透率矩阵的逆矩阵
                 tmpinvk[0]=invK[0][0]*rmat[0][0]+invK[0][1]*rmat[1][0];
@@ -64,6 +68,7 @@ void BoxLocalInvKFunctional2D<T1,T2>::process ( Box2D domain, TensorField2D<T1,2
 
 }//namespace plb
 #endif
+
 
 
 

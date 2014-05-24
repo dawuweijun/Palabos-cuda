@@ -29,7 +29,7 @@
 namespace plb
 {
 template <typename T1,typename T2>
-void BoxLocalInvKFunctional3D<T1,T2>::process ( Box3D domain, TensorField3D<T1,3>& orient,TensorField3D<T2,9>& invK )
+void BoxLocalInvKFunctional3D<T1,T2>::process ( Box3D domain, TensorField3D<T1,3>& orient,TensorField3D<T2,9>& invKField )
 {
     T1 rmat[3][3];
     T2 Axis[3],normAxis[3];
@@ -41,9 +41,11 @@ void BoxLocalInvKFunctional3D<T1,T2>::process ( Box3D domain, TensorField3D<T1,3
             {
                 const Array< T1, 3> &to_B=orient.get ( iX,iY,iZ );
                 double sqrNorm=to_B[0]*to_B[0]+to_B[1]*to_B[1]+to_B[2]*to_B[2];
-                Array< T2, 9 > &tmpinvk=invK.get ( iX,iY ,iZ );
+                Array< T2, 9 > &tmpinvk=invKField.get ( iX,iY ,iZ );
                 tmpinvk.resetToZero();
-                PLB_PRECONDITION ( sqrNorm==0.||sqrNorm==1. );
+
+                PLB_PRECONDITION ( std::abs ( sqrNorm-0.5 ) <0.500001 );
+
                 if ( sqrNorm!=0. )
                 {
                     //计算出from rawDir to B 的单位旋转轴axis：
