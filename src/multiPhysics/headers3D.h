@@ -43,6 +43,7 @@
 #include "multiPhysics/createBubbles3D.h"
 #include "multiPhysics/bubbleHistory3D.h"
 #include "multiPhysics/bubbleMatch3D.h"
+#include "multiPhysics/twoPhaseModel.h"
 #include "multiPhysics/twoPhaseModel3D.h"
 #include "multiPhysics/REVProcessor3D.h"
 #include "multiPhysics/REVHelperFunctional3D.h"

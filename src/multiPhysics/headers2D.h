@@ -33,6 +33,7 @@
 #include "multiPhysics/shanChenProcessor2D.h"
 #include "multiPhysics/thermalDataAnalysis2D.h"
 #include "multiPhysics/heLeeProcessor2D.h"
+#include "multiPhysics/twoPhaseModel.h"
 #include "multiPhysics/twoPhaseModel2D.h"
 #include "multiPhysics/freeSurfaceAnalysis2D.h"
 #include "multiPhysics/REVProcessor2D.h"
