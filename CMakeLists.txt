@@ -123,7 +123,7 @@ add_subdirectory(examples)
 
 add_subdirectory(src)
 
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/src/
 		DESTINATION ${INSTALL_DIR_HEADERS}/Palabos-1.4
 		FILES_MATCHING
 		PATTERN *.h
