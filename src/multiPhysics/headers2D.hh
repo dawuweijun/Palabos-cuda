@@ -38,3 +38,5 @@
 #include "multiPhysics/REVProcessor2D.hh"
 #include "multiPhysics/REVHelperFunctional2D.hh"
 #include "multiPhysics/REVHelperWrapper2D.hh"
+#include "multiPhysics/freeSurfaceBoundaryCondition2D.hh"
+#include "multiPhysics/freeSurfaceInitializer2D.hh"

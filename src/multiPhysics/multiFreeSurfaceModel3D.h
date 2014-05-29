@@ -298,10 +298,10 @@ struct MultiFreeSurfaceFields3D {
             useSurfaceTension2 = 1;
         }
 
-        twoPhaseArgs1 = aggregateFreeSurfaceParams(lattice1, rhoBar1, j1, mass1, volumeFraction1,
+        twoPhaseArgs1 = aggregateFreeSurfaceParams3D(lattice1, rhoBar1, j1, mass1, volumeFraction1,
                     flag1, normal1, helperLists1, curvature1, outsideDensity1);
 
-        twoPhaseArgs2 = aggregateFreeSurfaceParams(lattice2, rhoBar2, j2, mass2, volumeFraction2,
+        twoPhaseArgs2 = aggregateFreeSurfaceParams3D(lattice2, rhoBar2, j2, mass2, volumeFraction2,
                     flag2, normal2, helperLists2, curvature2, outsideDensity2);
 
         multiFreeSurfaceArgs = twoPhaseArgs1;

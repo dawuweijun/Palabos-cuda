@@ -39,3 +39,4 @@
 #include "multiPhysics/REVProcessor2D.h"
 #include "multiPhysics/REVHelperFunctional2D.h"
 #include "multiPhysics/REVHelperWrapper2D.h"
+#include "multiPhysics/freeSurfaceBoundaryCondition2D.h"

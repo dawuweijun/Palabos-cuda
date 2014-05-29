@@ -143,7 +143,7 @@ public:
     }
 private:
     void subDomainVolumeFraction (
-            plint iX, plint iY, plint iZ, int& flag, T& volumeFraction );
+            plint iX, plint iY, int& flag, T& volumeFraction );
 private:
     InsideFunction const& insideFunction;
     plint subDivision;
