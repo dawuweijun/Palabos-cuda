@@ -219,6 +219,27 @@ private:
     bool initialize;
 };
 
+/// Implementation of the collision step for ForcedD2Q9Descriptor.
+using namespace descriptors;
+template<typename T >
+class HeLeeCollisionProcessor2D<T,ForcedD2Q9Descriptor> : public BoxProcessingFunctional2D
+{
+public:
+	HeLeeCollisionProcessor2D (
+		T rho_h_, T rho_l_, T tau_h_, T tau_l_, T M_, T RT_,
+		bool initialize_ = false );
+	virtual void processGenericBlocks(Box2D domain, std::vector<AtomicBlock2D*> blocks);
+	virtual HeLeeCollisionProcessor2D<T,descriptors::ForcedD2Q9Descriptor>* clone() const;
+	virtual void getTypeOfModification(std::vector<modif::ModifT>& modified) const;
+private:
+	void computeAdvectionTerms (
+		ScalarField2D<T> const& C, T& adv_gradC, T& bias_adv_gradC,
+		plint iX, plint iY, plint iPop );
+private:
+	T rho_h, rho_l, tau_h, tau_l, M, RT;
+	bool initialize;
+};
+
 }  // namespace Palabos
 
 #endif  // HE_LEE_LATTICES_2D_H
