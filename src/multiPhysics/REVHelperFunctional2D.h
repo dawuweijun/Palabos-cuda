@@ -54,7 +54,7 @@ public:
         modified[1] = modif::staticVariables;
     };
 private:
-    Matrix2D rawTensor[2][2];
+    Matrix2D rawTensor;
     Vector2D rawKDir;
 };
 }//namespace plb
