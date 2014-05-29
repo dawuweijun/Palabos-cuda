@@ -6,22 +6,22 @@ namespace plb
 /* *************** Local InvK ******************************************* */
 template <typename T1,typename T2>
 void computeLocalInvK3D ( MultiTensorField3D<T1,3>& orient,
-                          MultiTensorField3D<T2,9>& invK ,
-                          const typename BoxLocalInvKFunctional3D<T1,T2>::Matrix3D &K,
-                          const typename BoxLocalInvKFunctional3D<T1,T2>::Vector3D &dir )
+                          MultiTensorField3D<T2,9>& localInvK ,
+                          const typename BoxTensorRotationFunctional3D<T1,T2>::Matrix3D &rawInvK,
+                          const typename BoxTensorRotationFunctional3D<T1,T2>::Vector3D &rawDir )
 {
     applyProcessingFunctional (
-        new BoxLocalInvKFunctional3D<T1,T2> ( K,dir ), orient.getBoundingBox(), orient, invK );
+        new BoxTensorRotationFunctional3D<T1,T2> ( rawInvK,rawDir ), orient.getBoundingBox(), orient, localInvK );
 };
 template <typename T1,typename T2>
 std::auto_ptr<TensorField3D<T2,9> >computeLocalInvK3D (
     MultiTensorField3D<T1,3>& orient,
-    const typename BoxLocalInvKFunctional3D<T1,T2>::Matrix3D &K,
-    const typename BoxLocalInvKFunctional3D<T1,T2>::Vector3D &dir )
+    const typename BoxTensorRotationFunctional3D<T1,T2>::Matrix3D &rawInvK,
+    const typename BoxTensorRotationFunctional3D<T1,T2>::Vector3D &rawDir )
 {
-    TensorField3D<T2,9>* invK = new TensorField3D<T2,9> ( orient.getNx(), orient.getNy() );
-    computeLocalInvK3D ( orient,invK,K,dir );
-    return std::auto_ptr<TensorField3D<T2,9> > ( invK );
+    TensorField3D<T2,9>* localInvK = new TensorField3D<T2,9> ( orient.getNx(), orient.getNy() );
+    computeLocalInvK3D ( orient,localInvK,rawInvK,rawDir );
+    return std::auto_ptr<TensorField3D<T2,9> > ( localInvK );
 };
 
 }//namespace plb

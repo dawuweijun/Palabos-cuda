@@ -30,31 +30,23 @@
 namespace plb
 {
 template <typename T1 ,typename T2>
-class BoxLocalInvKFunctional2D:public BoxProcessingFunctional2D_TT<T1,2,T2,4>
+class BoxTensorRotationFunctional2D:public BoxProcessingFunctional2D_TT<T1,2,T2,4>
 {
 public:
 
     typedef Array<T1,2> Vector2D;
-    typedef Array<BoxLocalInvKFunctional2D::Vector2D,2> Matrix2D;
-
-    BoxLocalInvKFunctional2D ( const Matrix2D &K_, const Vector2D &dir ) :K ( K_ ),rawKDir ( dir )
+    typedef Array<BoxTensorRotationFunctional2D::Vector2D,2> Matrix2D;
+    /*
+     * TODO:仅仅对张量进行旋转
+     */
+    BoxTensorRotationFunctional2D ( const Matrix2D &rawTensor_, const Vector2D &dir_ ) :rawTensor ( rawTensor_ ),rawKDir ( dir_ )
     {
         PLB_PRECONDITION ( std::abs ( rawKDir[0]*rawKDir[0]+rawKDir[1]*rawKDir[1]-1.0 ) <1.e-8 );
-        std::cout<<rawKDir[0]<<rawKDir[1]<<std::endl;
-        //此处计算invK
-        T1 det=K_[0][0]*K_[1][1]-K_[0][1]*K_[1][0];
-        PLB_PRECONDITION ( std::abs ( det ) >0. );
-
-        T1 inv_det=1./std::abs ( det );
-        invK[0][0] = inv_det *K_[1][1];
-        invK[0][1] = -inv_det *K_[0][1];
-        invK[1][0] = -inv_det *K_[1][0];
-        invK[1][1] = inv_det *K_[0][0];
     };
-    void process ( Box2D domain, TensorField2D<T1,2>& orient,TensorField2D<T2,4>& invKField );
-    virtual BoxLocalInvKFunctional2D* clone() const
+    void process ( Box2D domain, TensorField2D<T1,2>& orientTo,TensorField2D<T2,4>& tensorField );
+    virtual BoxTensorRotationFunctional2D* clone() const
     {
-        return new BoxLocalInvKFunctional2D<T1,T2> ( K, rawKDir );
+        return new BoxTensorRotationFunctional2D<T1,T2> ( rawTensor, rawKDir );
     };
     void getTypeOfModification ( std::vector<modif::ModifT>& modified ) const
     {
@@ -62,8 +54,7 @@ public:
         modified[1] = modif::staticVariables;
     };
 private:
-    Matrix2D K;
-    T1 invK[2][2];
+    Matrix2D rawTensor[2][2];
     Vector2D rawKDir;
 };
 }//namespace plb
