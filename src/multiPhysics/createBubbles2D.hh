@@ -22,58 +22,32 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CREATE_BUBBLES_3D_HH
-#define CREATE_BUBBLES_3D_HH
+#ifndef CREATE_BUBBLES_2D_HH
+#define CREATE_BUBBLES_2D_HH
 
-#include "multiPhysics/createBubbles3D.h"
-#include "offLattice/makeSparse3D.h"
-#include "atomicBlock/dataProcessingFunctional3D.h"
-#include "multiPhysics/freeSurfaceUtil3D.h"
+#include "multiPhysics/createBubbles2D.h"
+#include "offLattice/makeSparse2D.h"
+#include "atomicBlock/dataProcessingFunctional2D.h"
+#include "multiPhysics/freeSurfaceUtil2D.h"
 #include <limits>
 
 
 namespace plb {
 
 template<typename T, template<typename U> class Descriptor>
-void punchSphere( std::vector<MultiBlock3D*> const& twoPhaseArgs, Array<T,3> const& center, T radius,
-                  T rhoEmpty, T rho0, Dynamics<T,Descriptor>& dynamics, Box3D domain )
+void punchSphere( std::vector<MultiBlock2D*> const& twoPhaseArgs, Array<T,3> const& center, T radius,
+                  T rhoEmpty, T rho0, Dynamics<T,Descriptor>& dynamics, Box2D domain )
 {
     applyProcessingFunctional (
-            new PunchSphere3D<T,Descriptor>(center, radius, rho0),
+            new PunchSphere2D<T,Descriptor>(center, radius, rho0),
             domain, twoPhaseArgs );
-
-    /*
-    applyProcessingFunctional (
-        new FreeSurfaceComputeInterfaceLists3D<T,Descriptor>(),
-        domain, twoPhaseArgs );
-
-    applyProcessingFunctional (
-        new FreeSurfaceIniInterfaceToAnyNodes3D<T,Descriptor>(rhoEmpty),
-        domain, twoPhaseArgs );
-
-    applyProcessingFunctional (
-        new FreeSurfaceIniEmptyToInterfaceNodes3D<T,Descriptor>(dynamics.clone(), Array<T,3>(0.,0.,0.)),
-                                domain, twoPhaseArgs );
-
-    applyProcessingFunctional (
-        new FreeSurfaceRemoveFalseInterfaceCells3D<T,Descriptor>(rhoEmpty),
-        domain, twoPhaseArgs );
-
-    applyProcessingFunctional (
-        new FreeSurfaceEqualMassExcessReDistribution3D<T,Descriptor>(),
-        domain, twoPhaseArgs );
-
-    applyProcessingFunctional (
-        new TwoPhaseComputeStatistics3D<T,Descriptor>,
-        domain, twoPhaseArgs );
-        */
 }
 
 template<typename T, template<typename U> class Descriptor>
-T computeAverageSphereDensity( std::vector<MultiBlock3D*> const& twoPhaseArgs,
-                               Array<T,3> const& center, T radius, Box3D domain )
+T computeAverageSphereDensity( std::vector<MultiBlock2D*> const& twoPhaseArgs,
+                               Array<T,3> const& center, T radius, Box2D domain )
 {
-    CalculateAverageSphereDensity3D<T,Descriptor> functional(center, radius);
+    CalculateAverageSphereDensity2D<T,Descriptor> functional(center, radius);
     applyProcessingFunctional (
             functional, domain, twoPhaseArgs );
     return functional.getAverageDensity();
@@ -81,5 +55,5 @@ T computeAverageSphereDensity( std::vector<MultiBlock3D*> const& twoPhaseArgs,
 
 }  // namespace plb
 
-#endif  // CREATE_BUBBLES_3D_H
+#endif  // CREATE_BUBBLES_2D_H
 
