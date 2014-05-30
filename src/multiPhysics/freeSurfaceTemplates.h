@@ -22,8 +22,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FREE_SURFACE_TEMPLATES_3D_HH
-#define FREE_SURFACE_TEMPLATES_3D_HH
+#ifndef FREE_SURFACE_TEMPLATES_HH
+#define FREE_SURFACE_TEMPLATES_HH
 
 #include "core/globalDefs.h"
 #include "core/block3D.h"
@@ -247,5 +247,5 @@ struct freeSurfaceTemplates<T, descriptors::ForcedD3Q19Descriptor > {
 
 }  // namespace plb
 
-#endif  // FREE_SURFACE_TEMPLATES_3D_HH
+#endif  // FREE_SURFACE_TEMPLATES_HH
 
