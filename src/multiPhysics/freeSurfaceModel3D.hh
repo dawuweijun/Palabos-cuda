@@ -32,7 +32,7 @@
 #include "atomicBlock/blockLattice3D.h"
 #include "atomicBlock/atomicContainerBlock3D.h"
 #include "multiPhysics/freeSurfaceModel3D.h"
-#include "multiPhysics/freeSurfaceTemplates3D.h"
+#include "multiPhysics/freeSurfaceTemplates.h"
 #include <limits>
 
 namespace plb {

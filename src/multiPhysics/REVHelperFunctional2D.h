@@ -36,9 +36,6 @@ public:
 
     typedef Array<T1,2> Vector2D;
     typedef Array<BoxTensorRotationFunctional2D::Vector2D,2> Matrix2D;
-    /*
-     * TODO:仅仅对张量进行旋转
-     */
     BoxTensorRotationFunctional2D ( const Matrix2D &rawTensor_, const Vector2D &dir_ ) :rawTensor ( rawTensor_ ),rawKDir ( dir_ )
     {
         PLB_PRECONDITION ( std::abs ( rawKDir[0]*rawKDir[0]+rawKDir[1]*rawKDir[1]-1.0 ) <1.e-8 );
