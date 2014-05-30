@@ -40,7 +40,7 @@ namespace plb {
 
 /// Create a parameter-list for most free-surface data processors.
 template< typename T,template<typename U> class Descriptor>
-std::vector<MultiBlock3D*> aggregateFreeSurfaceParams (
+std::vector<MultiBlock3D*> aggregateFreeSurfaceParams3D (
         MultiBlockLattice3D<T,Descriptor>& fluid, MultiScalarField3D<T>& rhoBar,
         MultiTensorField3D<T,3>& j, MultiScalarField3D<T>& mass,
         MultiScalarField3D<T>& volumeFraction, MultiScalarField3D<int>& flag,

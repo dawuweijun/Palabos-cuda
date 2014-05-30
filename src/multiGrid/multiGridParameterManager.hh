@@ -98,7 +98,7 @@ void ConvectiveRefinementParameters<T>::createParameters(){
                 referenceParameters.getLy(),
                 referenceParameters.getLz()
             );
-            putParameter(thisLevelParameters);
+            this->putParameter(thisLevelParameters);
             resolutionAtThisLevel = 2*resolutionAtThisLevel;
         
         }
@@ -137,7 +137,7 @@ void DiffusiveRefinementParameters<T>::createParameters(){
             referenceParameters.getLz()
         );
         
-        putParameter(thisLevelParameters);
+        this->putParameter(thisLevelParameters);
         resolutionAtThisLevel = 2*resolutionAtThisLevel;
     }
     }

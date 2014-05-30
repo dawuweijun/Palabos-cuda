@@ -682,7 +682,7 @@ struct FreeSurfaceFields3D {
             useSurfaceTension = 1;
         }
 
-        twoPhaseArgs = aggregateFreeSurfaceParams(lattice, rhoBar, j, mass, volumeFraction,
+        twoPhaseArgs = aggregateFreeSurfaceParams3D(lattice, rhoBar, j, mass, volumeFraction,
                     flag, normal, helperLists, curvature, outsideDensity);
 
         initializeInterfaceLists3D<T,Descriptor>(helperLists);

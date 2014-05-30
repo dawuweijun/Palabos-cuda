@@ -22,33 +22,33 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef MULTI_FREE_SURFACE_MODEL_3D_H
-#define MULTI_FREE_SURFACE_MODEL_3D_H
+#ifndef MULTI_FREE_SURFACE_MODEL_2D_H
+#define MULTI_FREE_SURFACE_MODEL_2D_H
 
 #include <algorithm>
 #include "core/globalDefs.h"
-#include "atomicBlock/dataProcessingFunctional3D.h"
-#include "multiBlock/defaultMultiBlockPolicy3D.h"
-#include "multiPhysics/freeSurfaceModel3D.h"
-#include "multiPhysics/freeSurfaceUtil3D.h"
-#include "multiPhysics/freeSurfaceInitializer3D.h"
-#include "dataProcessors/dataInitializerWrapper3D.h"
+#include "atomicBlock/dataProcessingFunctional2D.h"
+#include "multiBlock/defaultMultiBlockPolicy2D.h"
+#include "multiPhysics/freeSurfaceModel2D.h"
+#include "multiPhysics/freeSurfaceUtil2D.h"
+#include "multiPhysics/freeSurfaceInitializer2D.h"
+#include "dataProcessors/dataInitializerWrapper2D.h"
 
 namespace plb {
 
 // Couples the velocities of the two fluids. Fluid 1 sees fluid 2, but fluid 2
 // does not see fluid 1.
 template<typename T, template<typename U> class Descriptor>
-class MultiFreeSurfaceOneWayCoupling3D : public BoxProcessingFunctional3D {
+class MultiFreeSurfaceOneWayCoupling2D : public BoxProcessingFunctional2D {
 public:
-    MultiFreeSurfaceOneWayCoupling3D(T interactionStrength_, T rhoDefault1_, T rhoDefault2_)
+    MultiFreeSurfaceOneWayCoupling2D(T interactionStrength_, T rhoDefault1_, T rhoDefault2_)
         : interactionStrength(interactionStrength_),
           rhoDefault1(rhoDefault1_),
           rhoDefault2(rhoDefault2_)
     { }
-    virtual void processGenericBlocks(Box3D domain, std::vector<AtomicBlock3D*> atomicBlocks);
-    virtual MultiFreeSurfaceOneWayCoupling3D<T,Descriptor>* clone() const {
-        return new MultiFreeSurfaceOneWayCoupling3D<T,Descriptor>(*this);
+    virtual void processGenericBlocks(Box2D domain, std::vector<AtomicBlock2D*> atomicBlocks);
+    virtual MultiFreeSurfaceOneWayCoupling2D<T,Descriptor>* clone() const {
+        return new MultiFreeSurfaceOneWayCoupling2D<T,Descriptor>(*this);
     }
     virtual void getTypeOfModification (std::vector<modif::ModifT>& modified) const {
         std::fill(modified.begin(), modified.end(), modif::nothing);
@@ -80,15 +80,15 @@ private:
 };
 
 template<typename T, template<typename U> class Descriptor>
-class MultiFreeSurfaceVelocityContinuityCoupling3D : public BoxProcessingFunctional3D {
+class MultiFreeSurfaceVelocityContinuityCoupling2D : public BoxProcessingFunctional2D {
 public:
-    MultiFreeSurfaceVelocityContinuityCoupling3D(T rhoDefault1_, T rhoDefault2_)
+    MultiFreeSurfaceVelocityContinuityCoupling2D(T rhoDefault1_, T rhoDefault2_)
         : rhoDefault1(rhoDefault1_),
           rhoDefault2(rhoDefault2_)
     { }
-    virtual void processGenericBlocks(Box3D domain, std::vector<AtomicBlock3D*> atomicBlocks);
-    virtual MultiFreeSurfaceVelocityContinuityCoupling3D<T,Descriptor>* clone() const {
-        return new MultiFreeSurfaceVelocityContinuityCoupling3D<T,Descriptor>(*this);
+    virtual void processGenericBlocks(Box2D domain, std::vector<AtomicBlock2D*> atomicBlocks);
+    virtual MultiFreeSurfaceVelocityContinuityCoupling2D<T,Descriptor>* clone() const {
+        return new MultiFreeSurfaceVelocityContinuityCoupling2D<T,Descriptor>(*this);
     }
     virtual void getTypeOfModification (std::vector<modif::ModifT>& modified) const {
         std::fill(modified.begin(), modified.end(), modif::nothing);
@@ -119,16 +119,16 @@ private:
 };
 
 template<typename T, template<typename U> class Descriptor>
-class MultiFreeSurfaceRepellingForceCoupling3D : public BoxProcessingFunctional3D {
+class MultiFreeSurfaceRepellingForceCoupling2D : public BoxProcessingFunctional2D {
 public:
-    MultiFreeSurfaceRepellingForceCoupling3D(T interactionStrength_, T rhoDefault1_, T rhoDefault2_)
+    MultiFreeSurfaceRepellingForceCoupling2D(T interactionStrength_, T rhoDefault1_, T rhoDefault2_)
         : interactionStrength(interactionStrength_),
           rhoDefault1(rhoDefault1_),
           rhoDefault2(rhoDefault2_)
     { }
-    virtual void processGenericBlocks(Box3D domain, std::vector<AtomicBlock3D*> atomicBlocks);
-    virtual MultiFreeSurfaceRepellingForceCoupling3D<T,Descriptor>* clone() const {
-        return new MultiFreeSurfaceRepellingForceCoupling3D<T,Descriptor>(*this);
+    virtual void processGenericBlocks(Box2D domain, std::vector<AtomicBlock2D*> atomicBlocks);
+    virtual MultiFreeSurfaceRepellingForceCoupling2D<T,Descriptor>* clone() const {
+        return new MultiFreeSurfaceRepellingForceCoupling2D<T,Descriptor>(*this);
     }
     virtual void getTypeOfModification (std::vector<modif::ModifT>& modified) const {
         std::fill(modified.begin(), modified.end(), modif::nothing);
@@ -162,16 +162,16 @@ private:
 };
 
 template<typename T, template<typename U> class Descriptor>
-class MultiFreeSurfaceComplexCoupling3D : public BoxProcessingFunctional3D {
+class MultiFreeSurfaceComplexCoupling2D : public BoxProcessingFunctional2D {
 public:
-    MultiFreeSurfaceComplexCoupling3D(T interactionStrength_, T rhoDefault1_, T rhoDefault2_)
+    MultiFreeSurfaceComplexCoupling2D(T interactionStrength_, T rhoDefault1_, T rhoDefault2_)
         : interactionStrength(interactionStrength_),
           rhoDefault1(rhoDefault1_),
           rhoDefault2(rhoDefault2_)
     { }
-    virtual void processGenericBlocks(Box3D domain, std::vector<AtomicBlock3D*> atomicBlocks);
-    virtual MultiFreeSurfaceComplexCoupling3D<T,Descriptor>* clone() const {
-        return new MultiFreeSurfaceComplexCoupling3D<T,Descriptor>(*this);
+    virtual void processGenericBlocks(Box2D domain, std::vector<AtomicBlock2D*> atomicBlocks);
+    virtual MultiFreeSurfaceComplexCoupling2D<T,Descriptor>* clone() const {
+        return new MultiFreeSurfaceComplexCoupling2D<T,Descriptor>(*this);
     }
     virtual void getTypeOfModification (std::vector<modif::ModifT>& modified) const {
         std::fill(modified.begin(), modified.end(), modif::nothing);
@@ -205,17 +205,17 @@ private:
 };
 
 template<typename T, template<typename U> class Descriptor>
-struct MultiFreeSurfaceFields3D {
+struct MultiFreeSurfaceFields2D {
     //static const int envelopeWidth = 2;
     static const int envelopeWidth = 3;
     static const int smallEnvelopeWidth = 1;
 
-    MultiFreeSurfaceFields3D(SparseBlockStructure3D const& blockStructure,
+    MultiFreeSurfaceFields2D(SparseBlockStructure2D const& blockStructure,
                              Dynamics<T,Descriptor> *dynamics1_, Dynamics<T,Descriptor> *dynamics2_,
                              T rhoDefault1_, T rhoDefault2_, T surfaceTension1_, T surfaceTension2_,
-                             T contactAngle1_, T contactAngle2_, Array<T,3> force1_, Array<T,3> force2_,
+                             T contactAngle1_, T contactAngle2_, Array<T,2> force1_, Array<T,2> force2_,
                              T interactionStrength_,
-                             ThreadAttribution* threadAttribution = defaultMultiBlockPolicy3D().getThreadAttribution() )
+                             ThreadAttribution* threadAttribution = defaultMultiBlockPolicy2D().getThreadAttribution() )
         : dynamics1(dynamics1_),
           dynamics2(dynamics2_),
           rhoDefault1(rhoDefault1_),
@@ -227,45 +227,45 @@ struct MultiFreeSurfaceFields3D {
           force1(force1_),
           force2(force2_),
           lattice1 (
-                MultiBlockManagement3D (
+                MultiBlockManagement2D (
                         blockStructure, threadAttribution->clone(), smallEnvelopeWidth ),
-                defaultMultiBlockPolicy3D().getBlockCommunicator(),
-                defaultMultiBlockPolicy3D().getCombinedStatistics(),
-                defaultMultiBlockPolicy3D().getMultiCellAccess<T,Descriptor>(), dynamics1->clone() ),
+                defaultMultiBlockPolicy2D().getBlockCommunicator(),
+                defaultMultiBlockPolicy2D().getCombinedStatistics(),
+                defaultMultiBlockPolicy2D().getMultiCellAccess<T,Descriptor>(), dynamics1->clone() ),
           lattice2 (
-                MultiBlockManagement3D (
+                MultiBlockManagement2D (
                         blockStructure, threadAttribution->clone(), smallEnvelopeWidth ),
-                defaultMultiBlockPolicy3D().getBlockCommunicator(),
-                defaultMultiBlockPolicy3D().getCombinedStatistics(),
-                defaultMultiBlockPolicy3D().getMultiCellAccess<T,Descriptor>(), dynamics2->clone() ),
+                defaultMultiBlockPolicy2D().getBlockCommunicator(),
+                defaultMultiBlockPolicy2D().getCombinedStatistics(),
+                defaultMultiBlockPolicy2D().getMultiCellAccess<T,Descriptor>(), dynamics2->clone() ),
           helperLists1(lattice1),
           helperLists2(lattice2),
           mass1(lattice1),
           mass2(lattice2),
           flag1 (
-                MultiBlockManagement3D (
+                MultiBlockManagement2D (
                         blockStructure, threadAttribution->clone(), envelopeWidth ),
-                defaultMultiBlockPolicy3D().getBlockCommunicator(),
-                defaultMultiBlockPolicy3D().getCombinedStatistics(),
-                defaultMultiBlockPolicy3D().getMultiScalarAccess<int>() ),
+                defaultMultiBlockPolicy2D().getBlockCommunicator(),
+                defaultMultiBlockPolicy2D().getCombinedStatistics(),
+                defaultMultiBlockPolicy2D().getMultiScalarAccess<int>() ),
           flag2 (
-                MultiBlockManagement3D (
+                MultiBlockManagement2D (
                         blockStructure, threadAttribution->clone(), envelopeWidth ),
-                defaultMultiBlockPolicy3D().getBlockCommunicator(),
-                defaultMultiBlockPolicy3D().getCombinedStatistics(),
-                defaultMultiBlockPolicy3D().getMultiScalarAccess<int>() ),
-          volumeFraction1((MultiBlock3D&) flag1),
-          volumeFraction2((MultiBlock3D&) flag2),
-          curvature1((MultiBlock3D&) flag1),
-          curvature2((MultiBlock3D&) flag2),
-          outsideDensity1((MultiBlock3D&) flag1),
-          outsideDensity2((MultiBlock3D&) flag2),
+                defaultMultiBlockPolicy2D().getBlockCommunicator(),
+                defaultMultiBlockPolicy2D().getCombinedStatistics(),
+                defaultMultiBlockPolicy2D().getMultiScalarAccess<int>() ),
+          volumeFraction1((MultiBlock2D&) flag1),
+          volumeFraction2((MultiBlock2D&) flag2),
+          curvature1((MultiBlock2D&) flag1),
+          curvature2((MultiBlock2D&) flag2),
+          outsideDensity1((MultiBlock2D&) flag1),
+          outsideDensity2((MultiBlock2D&) flag2),
           rhoBar1(lattice1),
           rhoBar2(lattice2),
           j1(lattice1),
           j2(lattice2),
-          normal1((MultiBlock3D&) flag1),
-          normal2((MultiBlock3D&) flag2),
+          normal1((MultiBlock2D&) flag1),
+          normal2((MultiBlock2D&) flag2),
           interactionStrength(interactionStrength_)
     {
         delete threadAttribution;
@@ -298,17 +298,17 @@ struct MultiFreeSurfaceFields3D {
             useSurfaceTension2 = 1;
         }
 
-        twoPhaseArgs1 = aggregateFreeSurfaceParams3D(lattice1, rhoBar1, j1, mass1, volumeFraction1,
+        twoPhaseArgs1 = aggregateFreeSurfaceParams2D(lattice1, rhoBar1, j1, mass1, volumeFraction1,
                     flag1, normal1, helperLists1, curvature1, outsideDensity1);
 
-        twoPhaseArgs2 = aggregateFreeSurfaceParams3D(lattice2, rhoBar2, j2, mass2, volumeFraction2,
+        twoPhaseArgs2 = aggregateFreeSurfaceParams2D(lattice2, rhoBar2, j2, mass2, volumeFraction2,
                     flag2, normal2, helperLists2, curvature2, outsideDensity2);
 
         multiFreeSurfaceArgs = twoPhaseArgs1;
         multiFreeSurfaceArgs.insert(multiFreeSurfaceArgs.end(), twoPhaseArgs2.begin(), twoPhaseArgs2.end());
 
-        initializeInterfaceLists3D<T,Descriptor>(helperLists1);
-        initializeInterfaceLists3D<T,Descriptor>(helperLists2);
+        initializeInterfaceLists2D<T,Descriptor>(helperLists1);
+        initializeInterfaceLists2D<T,Descriptor>(helperLists2);
         lattice1.periodicity().toggleAll(true);
         lattice2.periodicity().toggleAll(true);
         mass1.periodicity().toggleAll(true);
@@ -350,7 +350,7 @@ struct MultiFreeSurfaceFields3D {
         freeSurfaceDataProcessors(rhoDefault1, rhoDefault2, force1, force2, *dynamics1, *dynamics2);
     }
 
-    MultiFreeSurfaceFields3D(MultiFreeSurfaceFields3D<T,Descriptor> const& rhs)
+    MultiFreeSurfaceFields2D(MultiFreeSurfaceFields2D<T,Descriptor> const& rhs)
         : dynamics1(rhs.dynamics1->clone()),
           dynamics2(rhs.dynamics2->clone()),
           rhoDefault1(rhs.rhoDefault1),
@@ -391,7 +391,7 @@ struct MultiFreeSurfaceFields3D {
           interactionStrength(rhs.interactionStrength)
     { }
 
-    void swap(MultiFreeSurfaceFields3D<T,Descriptor>& rhs)
+    void swap(MultiFreeSurfaceFields2D<T,Descriptor>& rhs)
     {
         std::swap(dynamics1, rhs.dynamics1);
         std::swap(dynamics2, rhs.dynamics2);
@@ -433,18 +433,18 @@ struct MultiFreeSurfaceFields3D {
         std::swap(interactionStrength, rhs.interactionStrength);
     }
 
-    MultiFreeSurfaceFields3D<T,Descriptor>& operator=(MultiFreeSurfaceFields3D<T,Descriptor> const& rhs)
+    MultiFreeSurfaceFields2D<T,Descriptor>& operator=(MultiFreeSurfaceFields2D<T,Descriptor> const& rhs)
     {
-        MultiFreeSurfaceFields3D<T,Descriptor>(rhs).swap(*this);
+        MultiFreeSurfaceFields2D<T,Descriptor>(rhs).swap(*this);
         return *this;
     }
 
-    MultiFreeSurfaceFields3D<T,Descriptor>* clone() const
+    MultiFreeSurfaceFields2D<T,Descriptor>* clone() const
     {
-        return new MultiFreeSurfaceFields3D<T,Descriptor>(*this);
+        return new MultiFreeSurfaceFields2D<T,Descriptor>(*this);
     }
 
-    ~MultiFreeSurfaceFields3D() {
+    ~MultiFreeSurfaceFields2D() {
         delete dynamics1;
         delete dynamics2;
     }
@@ -497,29 +497,29 @@ struct MultiFreeSurfaceFields3D {
 
     void defaultInitialize() {
         applyProcessingFunctional (
-           new DefaultInitializeFreeSurface3D<T,Descriptor>(dynamics1->clone(), force1, rhoDefault1),
+           new DefaultInitializeFreeSurface2D<T,Descriptor>(dynamics1->clone(), force1, rhoDefault1),
                    lattice1.getBoundingBox(), twoPhaseArgs1 );
 
         applyProcessingFunctional (
-           new DefaultInitializeFreeSurface3D<T,Descriptor>(dynamics2->clone(), force2, rhoDefault2),
+           new DefaultInitializeFreeSurface2D<T,Descriptor>(dynamics2->clone(), force2, rhoDefault2),
                    lattice2.getBoundingBox(), twoPhaseArgs2 );
     }
 
     void partiallyDefaultInitialize() {
         applyProcessingFunctional (
-           new PartiallyDefaultInitializeFreeSurface3D<T,Descriptor>(dynamics1->clone(), force1, rhoDefault1),
+           new PartiallyDefaultInitializeFreeSurface2D<T,Descriptor>(dynamics1->clone(), force1, rhoDefault1),
                    lattice1.getBoundingBox(), twoPhaseArgs1 );
 
         applyProcessingFunctional (
-           new PartiallyDefaultInitializeFreeSurface3D<T,Descriptor>(dynamics2->clone(), force2, rhoDefault2),
+           new PartiallyDefaultInitializeFreeSurface2D<T,Descriptor>(dynamics2->clone(), force2, rhoDefault2),
                    lattice2.getBoundingBox(), twoPhaseArgs2 );
     }
 
-    void freeSurfaceDataProcessors(T rhoDefault1, T rhoDefault2, Array<T,3> force1, Array<T,3> force2,
+    void freeSurfaceDataProcessors(T rhoDefault1, T rhoDefault2, Array<T,2> force1, Array<T,2> force2,
             Dynamics<T,Descriptor>& dynamics1, Dynamics<T,Descriptor>& dynamics2)
     {
-        MultiBlock3D& actor1 = *twoPhaseArgs2[0];
-        MultiBlock3D& actor2 = *twoPhaseArgs2[0];
+        MultiBlock2D& actor1 = *twoPhaseArgs2[0];
+        MultiBlock2D& actor2 = *twoPhaseArgs2[0];
 
         plint pl; // Processor level.
 
@@ -527,17 +527,17 @@ struct MultiFreeSurfaceFields3D {
         pl = 0;
 
         integrateProcessingFunctional (
-                new ExternalRhoJcollideAndStream3D<T,Descriptor>,
+                new ExternalRhoJcollideAndStream2D<T,Descriptor>,
                 lattice1.getBoundingBox(), rhoBarJparam1, pl );
         integrateProcessingFunctional (
-                new ExternalRhoJcollideAndStream3D<T,Descriptor>,
+                new ExternalRhoJcollideAndStream2D<T,Descriptor>,
                 lattice2.getBoundingBox(), rhoBarJparam2, pl );
 
         integrateProcessingFunctional (
-                new TwoPhaseComputeNormals3D<T,Descriptor>,
+                new TwoPhaseComputeNormals2D<T,Descriptor>,
                 lattice1.getBoundingBox(), actor1, twoPhaseArgs1, pl );
         integrateProcessingFunctional (
-                new TwoPhaseComputeNormals3D<T,Descriptor>,
+                new TwoPhaseComputeNormals2D<T,Descriptor>,
                 lattice2.getBoundingBox(), actor2, twoPhaseArgs2, pl );
 
         /***** New level ******/
@@ -545,34 +545,34 @@ struct MultiFreeSurfaceFields3D {
 
         if (useSurfaceTension1) {
             integrateProcessingFunctional (
-                    new TwoPhaseComputeCurvature3D<T,Descriptor>(contactAngle1, lattice1.getBoundingBox()),
+                    new TwoPhaseComputeCurvature2D<T,Descriptor>(contactAngle1, lattice1.getBoundingBox()),
                     lattice1.getBoundingBox(), actor1, twoPhaseArgs1, pl );
         }
         if (useSurfaceTension2) {
             integrateProcessingFunctional (
-                    new TwoPhaseComputeCurvature3D<T,Descriptor>(contactAngle2, lattice2.getBoundingBox()),
+                    new TwoPhaseComputeCurvature2D<T,Descriptor>(contactAngle2, lattice2.getBoundingBox()),
                     lattice2.getBoundingBox(), actor2, twoPhaseArgs2, pl );
         }
 
         integrateProcessingFunctional (
-            new FreeSurfaceMassChange3D<T,Descriptor>, lattice1.getBoundingBox(),
+            new FreeSurfaceMassChange2D<T,Descriptor>, lattice1.getBoundingBox(),
             actor1, twoPhaseArgs1, pl );
         integrateProcessingFunctional (
-            new FreeSurfaceMassChange3D<T,Descriptor>, lattice2.getBoundingBox(),
+            new FreeSurfaceMassChange2D<T,Descriptor>, lattice2.getBoundingBox(),
             actor2, twoPhaseArgs2, pl );
        
         integrateProcessingFunctional (
-            new FreeSurfaceCompletion3D<T,Descriptor>,
+            new FreeSurfaceCompletion2D<T,Descriptor>,
             lattice1.getBoundingBox(), actor1, twoPhaseArgs1, pl );
         integrateProcessingFunctional (
-            new FreeSurfaceCompletion3D<T,Descriptor>,
+            new FreeSurfaceCompletion2D<T,Descriptor>,
             lattice2.getBoundingBox(), actor2, twoPhaseArgs2, pl );
                                     
         integrateProcessingFunctional (
-            new FreeSurfaceMacroscopic3D<T,Descriptor>(rhoDefault1), 
+            new FreeSurfaceMacroscopic2D<T,Descriptor>(rhoDefault1),
             lattice1.getBoundingBox(), actor1, twoPhaseArgs1, pl );
         integrateProcessingFunctional (
-            new FreeSurfaceMacroscopic3D<T,Descriptor>(rhoDefault2), 
+            new FreeSurfaceMacroscopic2D<T,Descriptor>(rhoDefault2),
             lattice2.getBoundingBox(), actor2, twoPhaseArgs2, pl );
 
         /***** New level ******/
@@ -597,19 +597,19 @@ struct MultiFreeSurfaceFields3D {
 
         if (useRepellingForceCoupling) {
             //integrateProcessingFunctional (
-            //    new MultiFreeSurfaceRepellingForceCoupling3D<T,Descriptor>(interactionStrength, rhoDefault1, rhoDefault2),
+            //    new MultiFreeSurfaceRepellingForceCoupling2D<T,Descriptor>(interactionStrength, rhoDefault1, rhoDefault2),
             //    lattice2.getBoundingBox(), actor2, multiFreeSurfaceArgs, pl );
             integrateProcessingFunctional (
-                new MultiFreeSurfaceComplexCoupling3D<T,Descriptor>(interactionStrength, rhoDefault1, rhoDefault2),
+                new MultiFreeSurfaceComplexCoupling2D<T,Descriptor>(interactionStrength, rhoDefault1, rhoDefault2),
                 lattice2.getBoundingBox(), actor2, multiFreeSurfaceArgs, pl );
         } else {
             integrateProcessingFunctional (
-                new MultiFreeSurfaceVelocityContinuityCoupling3D<T,Descriptor>(rhoDefault1, rhoDefault2),
+                new MultiFreeSurfaceVelocityContinuityCoupling2D<T,Descriptor>(rhoDefault1, rhoDefault2),
                 lattice2.getBoundingBox(), actor2, multiFreeSurfaceArgs, pl );
         }
 
         //integrateProcessingFunctional (
-        //    new MultiFreeSurfaceOneWayCoupling3D<T,Descriptor>(interactionStrength,rhoDefault1, rhoDefault2),
+        //    new MultiFreeSurfaceOneWayCoupling2D<T,Descriptor>(interactionStrength,rhoDefault1, rhoDefault2),
         //    lattice2.getBoundingBox(), actor2, multiFreeSurfaceArgs, pl );
 
         /***** New level ******/
@@ -618,12 +618,12 @@ struct MultiFreeSurfaceFields3D {
 
         if (useSurfaceTension1) {
             integrateProcessingFunctional (
-                new TwoPhaseAddSurfaceTension3D<T,Descriptor>(surfaceTension1), 
+                new TwoPhaseAddSurfaceTension2D<T,Descriptor>(surfaceTension1),
                 lattice1.getBoundingBox(), actor1, twoPhaseArgs1, pl );
         }
         if (useSurfaceTension2) {
             integrateProcessingFunctional (
-                new TwoPhaseAddSurfaceTension3D<T,Descriptor>(surfaceTension2), 
+                new TwoPhaseAddSurfaceTension2D<T,Descriptor>(surfaceTension2),
                 lattice2.getBoundingBox(), actor2, twoPhaseArgs2, pl );
         }
 
@@ -631,25 +631,25 @@ struct MultiFreeSurfaceFields3D {
         pl++;
 
         integrateProcessingFunctional (
-            new FreeSurfaceComputeInterfaceLists3D<T,Descriptor>(),
+            new FreeSurfaceComputeInterfaceLists2D<T,Descriptor>(),
             lattice1.getBoundingBox(), actor1, twoPhaseArgs1, pl );
         integrateProcessingFunctional (
-            new FreeSurfaceComputeInterfaceLists3D<T,Descriptor>(),
+            new FreeSurfaceComputeInterfaceLists2D<T,Descriptor>(),
             lattice2.getBoundingBox(), actor2, twoPhaseArgs2, pl );
 
         integrateProcessingFunctional (
-            new FreeSurfaceIniInterfaceToAnyNodes3D<T,Descriptor>(rhoDefault1),
+            new FreeSurfaceIniInterfaceToAnyNodes2D<T,Descriptor>(rhoDefault1),
             lattice1.getBoundingBox(), actor1, twoPhaseArgs1, pl );
         integrateProcessingFunctional (
-            new FreeSurfaceIniInterfaceToAnyNodes3D<T,Descriptor>(rhoDefault2),
+            new FreeSurfaceIniInterfaceToAnyNodes2D<T,Descriptor>(rhoDefault2),
             lattice2.getBoundingBox(), actor2, twoPhaseArgs2, pl );
             
         integrateProcessingFunctional (
-            new FreeSurfaceIniEmptyToInterfaceNodes3D<T,Descriptor>(dynamics1.clone(), force1),
+            new FreeSurfaceIniEmptyToInterfaceNodes2D<T,Descriptor>(dynamics1.clone(), force1),
                                     lattice1.getBoundingBox(),
                                     actor1, twoPhaseArgs1, pl ); 
         integrateProcessingFunctional (
-            new FreeSurfaceIniEmptyToInterfaceNodes3D<T,Descriptor>(dynamics2.clone(), force2),
+            new FreeSurfaceIniEmptyToInterfaceNodes2D<T,Descriptor>(dynamics2.clone(), force2),
                                     lattice2.getBoundingBox(),
                                     actor2, twoPhaseArgs2, pl ); 
 
@@ -657,27 +657,27 @@ struct MultiFreeSurfaceFields3D {
         pl++;
 
         integrateProcessingFunctional (
-            new FreeSurfaceRemoveFalseInterfaceCells3D<T,Descriptor>(rhoDefault1),
+            new FreeSurfaceRemoveFalseInterfaceCells2D<T,Descriptor>(rhoDefault1),
             lattice1.getBoundingBox(), actor1, twoPhaseArgs1, pl);
         integrateProcessingFunctional (
-            new FreeSurfaceRemoveFalseInterfaceCells3D<T,Descriptor>(rhoDefault2),
+            new FreeSurfaceRemoveFalseInterfaceCells2D<T,Descriptor>(rhoDefault2),
             lattice2.getBoundingBox(), actor2, twoPhaseArgs2, pl);
 
         /***** New level ******/
         pl++;
 
         integrateProcessingFunctional (
-            new FreeSurfaceEqualMassExcessReDistribution3D<T,Descriptor>(),
+            new FreeSurfaceEqualMassExcessReDistribution2D<T,Descriptor>(),
             lattice1.getBoundingBox(), actor1, twoPhaseArgs1, pl );
         integrateProcessingFunctional (
-            new FreeSurfaceEqualMassExcessReDistribution3D<T,Descriptor>(),
+            new FreeSurfaceEqualMassExcessReDistribution2D<T,Descriptor>(),
             lattice2.getBoundingBox(), actor2, twoPhaseArgs2, pl );
 
         integrateProcessingFunctional (
-            new TwoPhaseComputeStatistics3D<T,Descriptor>,
+            new TwoPhaseComputeStatistics2D<T,Descriptor>,
             lattice1.getBoundingBox(), actor1, twoPhaseArgs1, pl );
         integrateProcessingFunctional (
-            new TwoPhaseComputeStatistics3D<T,Descriptor>,
+            new TwoPhaseComputeStatistics2D<T,Descriptor>,
             lattice2.getBoundingBox(), actor2, twoPhaseArgs2, pl );
     }
 
@@ -686,24 +686,24 @@ struct MultiFreeSurfaceFields3D {
     T surfaceTension1, surfaceTension2;
     T contactAngle1, contactAngle2;
     int useSurfaceTension1, useSurfaceTension2;
-    Array<T,3> force1, force2;
-    MultiBlockLattice3D<T, Descriptor> lattice1, lattice2;
-    MultiContainerBlock3D helperLists1, helperLists2;
-    MultiScalarField3D<T> mass1, mass2;
-    MultiScalarField3D<int> flag1, flag2;
-    MultiScalarField3D<T> volumeFraction1, volumeFraction2;
-    MultiScalarField3D<T> curvature1, curvature2;
-    MultiScalarField3D<T> outsideDensity1, outsideDensity2;
-    MultiScalarField3D<T> rhoBar1, rhoBar2;
-    MultiTensorField3D<T,3> j1, j2;
-    MultiTensorField3D<T,3> normal1, normal2;
+    Array<T,2> force1, force2;
+    MultiBlockLattice2D<T, Descriptor> lattice1, lattice2;
+    MultiContainerBlock2D helperLists1, helperLists2;
+    MultiScalarField2D<T> mass1, mass2;
+    MultiScalarField2D<int> flag1, flag2;
+    MultiScalarField2D<T> volumeFraction1, volumeFraction2;
+    MultiScalarField2D<T> curvature1, curvature2;
+    MultiScalarField2D<T> outsideDensity1, outsideDensity2;
+    MultiScalarField2D<T> rhoBar1, rhoBar2;
+    MultiTensorField2D<T,2> j1, j2;
+    MultiTensorField2D<T,2> normal1, normal2;
     T interactionStrength;
-    std::vector<MultiBlock3D*> rhoBarJparam1, rhoBarJparam2;
-    std::vector<MultiBlock3D*> twoPhaseArgs1, twoPhaseArgs2, multiFreeSurfaceArgs;
+    std::vector<MultiBlock2D*> rhoBarJparam1, rhoBarJparam2;
+    std::vector<MultiBlock2D*> twoPhaseArgs1, twoPhaseArgs2, multiFreeSurfaceArgs;
 };
 
 
 }  // namespace plb
 
-#endif  // MULTI_FREE_SURFACE_MODEL_3D_H
+#endif  // MULTI_FREE_SURFACE_MODEL_2D_H
 

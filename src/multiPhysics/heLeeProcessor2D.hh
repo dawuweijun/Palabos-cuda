@@ -33,7 +33,7 @@
 #include "heLeeProcessor2D.h"
 #include "latticeBoltzmann/momentTemplates.h"
 #include "latticeBoltzmann/geometricOperationTemplates.h"
-
+#include "latticeBoltzmann/externalForceTemplates.h"
 namespace plb
 {
 
@@ -448,7 +448,6 @@ void HeLeeCollisionProcessor2D<T,Descriptor>::processGenericBlocks (
     }
 }
 
-
 template<typename T, template<typename U> class Descriptor >
 HeLeeCollisionProcessor2D<T,Descriptor>*
 HeLeeCollisionProcessor2D<T,Descriptor>::clone() const
@@ -458,6 +457,166 @@ HeLeeCollisionProcessor2D<T,Descriptor>::clone() const
 
 template<typename T, template<typename U> class Descriptor >
 void HeLeeCollisionProcessor2D<T,Descriptor>::getTypeOfModification (
+    std::vector<modif::ModifT>& modified ) const
+{
+    modified[0] = modif::staticVariables;   // f
+    modified[1] = modif::staticVariables;   // g
+    modified[2] = modif::nothing;  // C
+    modified[3] = modif::nothing;  // rho
+    modified[4] = modif::nothing;  // gradC
+    modified[5] = modif::nothing;  // mu
+    modified[6] = modif::nothing;  // gradMu
+    modified[7] = modif::nothing;  // laplaceMu
+    modified[8] = modif::nothing;  // u
+    modified[9] = modif::nothing;  // p1
+}
+
+/* ****** HeLeeCollisionProcessor for ForcedD2Q9Descriptor ******** */
+
+template<typename T >
+HeLeeCollisionProcessor2D <T,ForcedD2Q9Descriptor>::HeLeeCollisionProcessor2D (
+    T rho_h_, T rho_l_, T tau_h_, T tau_l_, T M_, T RT_,
+    bool initialize_ )
+    : rho_h ( rho_h_ ),
+      rho_l ( rho_l_ ),
+      tau_h ( tau_h_ ),
+      tau_l ( tau_l_ ),
+      M ( M_ ),
+      RT ( RT_ ),
+      initialize ( initialize_ )
+{ }
+
+template<typename T>
+void HeLeeCollisionProcessor2D<T,ForcedD2Q9Descriptor>::computeAdvectionTerms (
+    ScalarField2D<T> const& C, T& adv_gradC, T& bias_adv_gradC,
+    plint iX, plint iY, plint iPop )
+{
+    typedef ForcedD2Q9Descriptor<T> D;
+    T diff_p2 = C.get ( iX+2*D::c[iPop][0], iY+2*D::c[iPop][1] ) -
+                C.get ( iX+D::c[iPop][0], iY+D::c[iPop][1] );
+    T diff_p1 = C.get ( iX+D::c[iPop][0], iY+D::c[iPop][1] ) -
+                C.get ( iX, iY );
+    T diff_p0 = C.get ( iX, iY ) -
+                C.get ( iX-D::c[iPop][0], iY-D::c[iPop][1] );
+    adv_gradC = diff_p1 - 0.5* ( diff_p1-diff_p0 );
+    bias_adv_gradC = diff_p1 - 0.25* ( diff_p2-diff_p0 );
+}
+
+template <typename T>
+void HeLeeCollisionProcessor2D<T,ForcedD2Q9Descriptor>::processGenericBlocks (
+    Box2D domain, std::vector<AtomicBlock2D*> blocks )
+{
+    typedef descriptors::ForcedD2Q9Descriptor<T> D;
+    BlockLattice2D<T,ForcedD2Q9Descriptor>& f = *dynamic_cast<BlockLattice2D<T,ForcedD2Q9Descriptor>*> ( blocks[0] );
+    BlockLattice2D<T,ForcedD2Q9Descriptor>& g = *dynamic_cast<BlockLattice2D<T,ForcedD2Q9Descriptor>*> ( blocks[1] );
+    ScalarField2D<T>& C             = *dynamic_cast<ScalarField2D<T>*> ( blocks[2] );
+    ScalarField2D<T>& rho           = *dynamic_cast<ScalarField2D<T>*> ( blocks[3] );
+    TensorField2D<T,2>& gradC       = *dynamic_cast<TensorField2D<T,2>*> ( blocks[4] );
+    ScalarField2D<T>& mu            = *dynamic_cast<ScalarField2D<T>*> ( blocks[5] );
+    TensorField2D<T,2>& gradMu      = *dynamic_cast<TensorField2D<T,2>*> ( blocks[6] );
+    ScalarField2D<T>& laplaceMu     = *dynamic_cast<ScalarField2D<T>*> ( blocks[7] );
+    TensorField2D<T,2>& u           = *dynamic_cast<TensorField2D<T,2>*> ( blocks[8] );
+    ScalarField2D<T>& p1            = *dynamic_cast<ScalarField2D<T>*> ( blocks[9] );
+
+    for ( plint iX=domain.x0; iX<=domain.x1; ++iX )
+    {
+        for ( plint iY=domain.y0; iY<=domain.y1; ++iY )
+        {
+            Array<T,2>& u_ = u.get ( iX,iY );
+            T& C_ = C.get ( iX,iY );
+            T& rho_ = rho.get ( iX,iY );
+            T& laplaceMu_ = laplaceMu.get ( iX,iY );
+            T& p1_ = p1.get ( iX,iY );
+            Cell<T,ForcedD2Q9Descriptor>& f_ = f.get ( iX,iY );
+            Cell<T,ForcedD2Q9Descriptor>& g_ = g.get ( iX,iY );
+
+            T tau = C_* ( tau_h-tau_l ) + tau_l;
+
+            Array<T,2> biasGradC, biasGradMu, gradP, biasGradP;
+            FiniteDifference2D<T> ( C,iX,iY ).biasedGradient ( biasGradC );
+            FiniteDifference2D<T> ( mu,iX,iY ).biasedGradient ( biasGradMu );
+            FiniteDifference2D<T> ( p1,iX,iY ).centralGradient ( gradP );
+            FiniteDifference2D<T> ( p1,iX,iY ).biasedGradient ( biasGradP );
+
+            T uGradC =
+                VectorTemplateImpl<T,2>::scalarProduct ( u_, gradC.get ( iX,iY ) );
+            T uBiasGradC =
+                VectorTemplateImpl<T,2>::scalarProduct ( u_, biasGradC );
+            T uGradMu =
+                VectorTemplateImpl<T,2>::scalarProduct ( u_, gradMu.get ( iX,iY ) );
+            T uBiasGradMu =
+                VectorTemplateImpl<T,2>::scalarProduct ( u_, biasGradMu );
+            T uGradP =
+                VectorTemplateImpl<T,2>::scalarProduct ( u_, gradP );
+            T uBiasGradP =
+                VectorTemplateImpl<T,2>::scalarProduct ( u_, biasGradP );
+            T uSqr =
+                VectorTemplateImpl<T,2>::normSqr ( u_ );
+            for ( plint iPop=0; iPop<ForcedD2Q9Descriptor<T>::q; ++iPop )
+            {
+                T ci_u = D::c[iPop][0]*u_[0]+D::c[iPop][1]*u_[1];
+                T ti = ForcedD2Q9Descriptor<T>::t[iPop];
+                T gamma0 = ti;
+                T gammaBar = 3.*ci_u + 4.5*ci_u*ci_u - 1.5*uSqr;
+                T gamma = ti* ( 1.+gammaBar );
+
+                T adv_gradC, bias_adv_gradC;
+                computeAdvectionTerms ( C, adv_gradC, bias_adv_gradC, iX,iY,iPop );
+                adv_gradC -= uGradC;
+                bias_adv_gradC -= uBiasGradC;
+
+                T adv_gradP, bias_adv_gradP;
+                computeAdvectionTerms ( p1, adv_gradP, bias_adv_gradP, iX,iY,iPop );
+                adv_gradP -= uGradP;
+                bias_adv_gradP -= uBiasGradP;
+
+                T adv_gradMu, bias_adv_gradMu;
+                computeAdvectionTerms ( mu, adv_gradMu, bias_adv_gradMu, iX,iY,iPop );
+                adv_gradMu -= uGradMu;
+                adv_gradMu *= C_;
+                bias_adv_gradMu -= uBiasGradMu;
+                bias_adv_gradMu *= C_;
+
+                T fieq = ti * C_* ( 1+gammaBar )
+                         - 0.5*gamma* ( adv_gradC-1./RT* ( adv_gradP+adv_gradMu ) *C_/rho_ )
+                         - 0.5*gamma*M*laplaceMu_;
+
+                T gieq = ti* ( p1_+rho_*RT*gammaBar )
+                         - 0.5*RT*adv_gradC* ( rho_h-rho_l ) * ( gamma-gamma0 )
+                         + 0.5*gamma*adv_gradMu;
+                if ( initialize )
+                {
+                    f_[iPop] = fieq;
+                    g_[iPop] = gieq;
+                }
+                else
+                {
+                    f_[iPop] += - ( f_[iPop]-fieq ) * 1./ ( tau+0.5 )
+                                +gamma* (
+                                    bias_adv_gradC- ( bias_adv_gradP+bias_adv_gradMu ) *1./RT*C_/rho_ )
+                                + M*laplaceMu_*gamma;
+                    g_[iPop] += - ( g_[iPop]-gieq ) * 1./ ( tau+0.5 )
+                                + bias_adv_gradC* ( rho_h-rho_l ) *RT* ( gamma-gamma0 )-bias_adv_gradMu*gamma;
+                }
+            }
+            /*
+             * FIXME:不能使用Guo等的作用力处理模型，必须使用另外的处理方式
+             */
+            externalForceTemplates<T,ForcedD2Q9Descriptor>::addGuoForce ( f_, u_, f_.getDynamics().getOmega(), rho_ );
+            externalForceTemplates<T,ForcedD2Q9Descriptor>::addGuoForce ( g_, u_, g_.getDynamics().getOmega(), rho_ );
+        }
+    }
+}
+
+template<typename T>
+HeLeeCollisionProcessor2D<T,ForcedD2Q9Descriptor>*
+HeLeeCollisionProcessor2D<T,ForcedD2Q9Descriptor>::clone() const
+{
+    return new HeLeeCollisionProcessor2D<T,ForcedD2Q9Descriptor> ( *this );
+}
+
+template<typename T>
+void HeLeeCollisionProcessor2D<T,ForcedD2Q9Descriptor>::getTypeOfModification (
     std::vector<modif::ModifT>& modified ) const
 {
     modified[0] = modif::staticVariables;   // f

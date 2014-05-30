@@ -30,7 +30,7 @@
 namespace plb
 {
 template <typename T1,typename T2>
-void BoxLocalInvKFunctional2D<T1,T2>::process ( Box2D domain, TensorField2D<T1,2>& orient,TensorField2D<T2,4>& invKField )
+void BoxTensorRotationFunctional2D<T1,T2>::process ( Box2D domain, TensorField2D<T1,2>& orientTo,TensorField2D<T2,4>& tensorField )
 {
     T1 rmat[2][2];
 
@@ -38,12 +38,12 @@ void BoxLocalInvKFunctional2D<T1,T2>::process ( Box2D domain, TensorField2D<T1,2
     {
         for ( int iY=domain.y0; iY<=domain.y1; iY++ )
         {
-            const Array< T1, 2> &to_B=orient.get ( iX,iY );
+            const Array< T1, 2> &to_B=orientTo.get ( iX,iY );
             double sqrNorm=to_B[0]*to_B[0]+to_B[1]*to_B[1];
 
             PLB_PRECONDITION ( std::abs ( sqrNorm-0.5 ) <0.500001 );
 
-            Array< T2, 4 > &tmpinvk=invKField.get ( iX,iY );
+            Array< T2, 4 > &tmpinvk=tensorField.get ( iX,iY );
             tmpinvk.resetToZero();
 
             if ( sqrNorm!=0. )
@@ -57,10 +57,10 @@ void BoxLocalInvKFunctional2D<T1,T2>::process ( Box2D domain, TensorField2D<T1,2
                 rmat[1][0]=sinTheta;
                 rmat[1][1]=cosTheta;
                 //计算渗透率矩阵的逆矩阵
-                tmpinvk[0]=invK[0][0]*rmat[0][0]+invK[0][1]*rmat[1][0];
-                tmpinvk[1]=invK[0][0]*rmat[0][1]+invK[0][1]*rmat[1][1];
-                tmpinvk[2]=invK[1][0]*rmat[0][0]+invK[1][1]*rmat[1][0];
-                tmpinvk[3]=invK[1][0]*rmat[0][1]+invK[1][1]*rmat[1][1];
+                tmpinvk[0]=rawTensor[0][0]*rmat[0][0]+rawTensor[0][1]*rmat[1][0];
+                tmpinvk[1]=rawTensor[0][0]*rmat[0][1]+rawTensor[0][1]*rmat[1][1];
+                tmpinvk[2]=rawTensor[1][0]*rmat[0][0]+rawTensor[1][1]*rmat[1][0];
+                tmpinvk[3]=rawTensor[1][0]*rmat[0][1]+rawTensor[1][1]*rmat[1][1];
             }
         }
     }

@@ -29,41 +29,21 @@
 namespace plb
 {
 template <typename T1,typename T2=T1>
-class BoxLocalInvKFunctional3D:public BoxProcessingFunctional3D_TT<T1,3,T2,9>
+class BoxTensorRotationFunctional3D:public BoxProcessingFunctional3D_TT<T1,3,T2,9>
 {
 
 public:
     typedef Array< T1, 3  > Vector3D;
-    typedef Array< BoxLocalInvKFunctional3D::Vector3D,3 > Matrix3D;
+    typedef Array< BoxTensorRotationFunctional3D::Vector3D,3 > Matrix3D;
 
-    BoxLocalInvKFunctional3D ( const Matrix3D& K_,const Vector3D& dir_ ) :K ( K_ ),rawKDir ( dir_ )
+    BoxTensorRotationFunctional3D ( const Matrix3D& rawTensor_,const Vector3D& dir_ ) :rawTensor ( rawTensor_ ),rawKDir ( dir_ )
     {
         PLB_PRECONDITION ( rawKDir[0]*rawKDir[0]+rawKDir[1]*rawKDir[1]+rawKDir[2]*rawKDir[2]==1. );
-        //此处计算invK
-        T1 det=K[0][0] * ( K[1][1] * K[2][2] - K[1][2] * K[2][1] ) -
-               K[0][1] * ( K[1][0] * K[2][2] - K[1][2] * K[2][0] ) +
-               K[0][2] * ( K[1][0] * K[2][1] - K[1][1] * K[2][0] );
-
-        PLB_ASSERT ( std::abs ( det ) >0. );
-
-        T1 inv_det =1./std::abs ( det );
-
-
-        invK[0][0] = inv_det * ( K[1][1] * K[2][2] - K[1][2] * K[2][1] );
-        invK[0][1] = inv_det * ( K[0][2] * K[2][1] - K[0][1] * K[2][2] );
-        invK[0][2] = inv_det * ( K[0][1] * K[1][2] - K[0][2] * K[1][1] );
-        invK[1][0] = inv_det * ( K[1][2] * K[2][0] - K[1][0] * K[2][2] );
-        invK[1][1] = inv_det * ( K[0][0] * K[2][2] - K[0][2] * K[2][0] );
-        invK[1][2] = inv_det * ( K[0][2] * K[1][0] - K[0][0] * K[1][2] );
-        invK[2][0] = inv_det * ( K[1][0] * K[2][1] - K[1][1] * K[2][0] );
-        invK[2][1] = inv_det * ( K[0][1] * K[2][0] - K[0][0] * K[2][1] );
-        invK[2][2] = inv_det * ( K[0][0] * K[1][1] - K[0][1] * K[1][0] );
-
     };
     virtual void process ( Box3D domain, TensorField3D<T1,3>& orient,TensorField3D<T2,9>& invKField );
-    virtual BoxLocalInvKFunctional3D* clone() const
+    virtual BoxTensorRotationFunctional3D* clone() const
     {
-        return new BoxLocalInvKFunctional3D ( K,rawKDir );
+        return new BoxTensorRotationFunctional3D ( rawTensor,rawKDir );
     };
 
     void getTypeOfModification ( std::vector<modif::ModifT>& modified ) const
@@ -73,8 +53,7 @@ public:
     };
 
 private:
-    Matrix3D K ;
-    T1 invK[3][3];
+    Matrix3D rawTensor;
     Vector3D rawKDir;
 };
 }//namespace plb

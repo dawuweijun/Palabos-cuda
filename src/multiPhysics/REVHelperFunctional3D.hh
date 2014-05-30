@@ -29,7 +29,7 @@
 namespace plb
 {
 template <typename T1,typename T2>
-void BoxLocalInvKFunctional3D<T1,T2>::process ( Box3D domain, TensorField3D<T1,3>& orient,TensorField3D<T2,9>& invKField )
+void BoxTensorRotationFunctional3D<T1,T2>::process ( Box3D domain, TensorField3D<T1,3>& orient,TensorField3D<T2,9>& tensorField )
 {
     T1 rmat[3][3];
     T2 Axis[3],normAxis[3];
@@ -41,8 +41,8 @@ void BoxLocalInvKFunctional3D<T1,T2>::process ( Box3D domain, TensorField3D<T1,3
             {
                 const Array< T1, 3> &to_B=orient.get ( iX,iY,iZ );
                 double sqrNorm=to_B[0]*to_B[0]+to_B[1]*to_B[1]+to_B[2]*to_B[2];
-                Array< T2, 9 > &tmpinvk=invKField.get ( iX,iY ,iZ );
-                tmpinvk.resetToZero();
+                Array< T2, 9 > &tmpTensor=tensorField.get ( iX,iY ,iZ );
+                tmpTensor.resetToZero();
 
                 PLB_PRECONDITION ( std::abs ( sqrNorm-0.5 ) <0.500001 );
 
@@ -78,15 +78,15 @@ void BoxLocalInvKFunctional3D<T1,T2>::process ( Box3D domain, TensorField3D<T1,3
                     rmat[2][2]=cosTheta + normAxis[2]*normAxis[2]* negCos;
 
                     //计算渗透率矩阵的逆矩阵
-                    tmpinvk[0] = invK[0][0]*rmat[0][0]+invK[0][1]*rmat[1][0]+invK[0][2]*rmat[2][0];
-                    tmpinvk[1] = invK[0][0]*rmat[0][1]+invK[0][1]*rmat[1][1]+invK[0][2]*rmat[2][1];
-                    tmpinvk[2] = invK[0][0]*rmat[0][2]+invK[0][1]*rmat[1][2]+invK[0][2]*rmat[2][2];
-                    tmpinvk[3] = invK[1][0]*rmat[0][0]+invK[1][1]*rmat[1][0]+invK[1][2]*rmat[2][0];
-                    tmpinvk[4] = invK[1][0]*rmat[0][1]+invK[1][1]*rmat[1][1]+invK[1][2]*rmat[2][1];
-                    tmpinvk[5] = invK[1][0]*rmat[0][2]+invK[1][1]*rmat[1][2]+invK[1][2]*rmat[2][2];
-                    tmpinvk[6] = invK[2][0]*rmat[0][0]+invK[2][1]*rmat[1][0]+invK[2][2]*rmat[2][0];
-                    tmpinvk[7] = invK[2][0]*rmat[0][1]+invK[2][1]*rmat[1][1]+invK[2][2]*rmat[2][1];
-                    tmpinvk[8] = invK[2][0]*rmat[0][2]+invK[2][1]*rmat[1][2]+invK[2][2]*rmat[2][2];
+                    tmpTensor[0] = rawTensor[0][0]*rmat[0][0]+rawTensor[0][1]*rmat[1][0]+rawTensor[0][2]*rmat[2][0];
+                    tmpTensor[1] = rawTensor[0][0]*rmat[0][1]+rawTensor[0][1]*rmat[1][1]+rawTensor[0][2]*rmat[2][1];
+                    tmpTensor[2] = rawTensor[0][0]*rmat[0][2]+rawTensor[0][1]*rmat[1][2]+rawTensor[0][2]*rmat[2][2];
+                    tmpTensor[3] = rawTensor[1][0]*rmat[0][0]+rawTensor[1][1]*rmat[1][0]+rawTensor[1][2]*rmat[2][0];
+                    tmpTensor[4] = rawTensor[1][0]*rmat[0][1]+rawTensor[1][1]*rmat[1][1]+rawTensor[1][2]*rmat[2][1];
+                    tmpTensor[5] = rawTensor[1][0]*rmat[0][2]+rawTensor[1][1]*rmat[1][2]+rawTensor[1][2]*rmat[2][2];
+                    tmpTensor[6] = rawTensor[2][0]*rmat[0][0]+rawTensor[2][1]*rmat[1][0]+rawTensor[2][2]*rmat[2][0];
+                    tmpTensor[7] = rawTensor[2][0]*rmat[0][1]+rawTensor[2][1]*rmat[1][1]+rawTensor[2][2]*rmat[2][1];
+                    tmpTensor[8] = rawTensor[2][0]*rmat[0][2]+rawTensor[2][1]*rmat[1][2]+rawTensor[2][2]*rmat[2][2];
                 }
             }
         }

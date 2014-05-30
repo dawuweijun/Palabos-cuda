@@ -46,14 +46,14 @@ void BrinkmanProcessor3D<T1,Descriptor,T2>::process ( Box3D domain, BlockLattice
             for ( plint iZ=domain.z0; iZ<=domain.z1; ++iZ )
             {
 
-                Array< T2, 9 > &localP= negNiuInvsK.get ( offset.x+iX,offset.y+iY,offset.z+iZ );
+                Array< T2, 9 > &negNiuInvsK_= negNiuInvsK.get ( offset.x+iX,offset.y+iY,offset.z+iZ );
                 lattice.get ( iX,iY,iZ ).computeVelocity ( vel );
 
                 force = lattice.get ( iX,iY,iZ ).getExternal ( forceOffset );
 
-                force[0]=localP[0]*vel[0]+localP[1]*vel[1]+localP[2]*vel[2];
-                force[1]=localP[3]*vel[0]+localP[4]*vel[1]+localP[5]*vel[2];
-                force[2]=localP[6]*vel[0]+localP[7]*vel[1]+localP[8]*vel[2];
+                force[0]=negNiuInvsK_[0]*vel[0]+negNiuInvsK_[1]*vel[1]+negNiuInvsK_[2]*vel[2];
+                force[1]=negNiuInvsK_[3]*vel[0]+negNiuInvsK_[4]*vel[1]+negNiuInvsK_[5]*vel[2];
+                force[2]=negNiuInvsK_[6]*vel[0]+negNiuInvsK_[7]*vel[1]+negNiuInvsK_[8]*vel[2];
             }
         }
     }

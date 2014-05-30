@@ -1993,12 +1993,12 @@ void FreeSurfaceRemoveFalseInterfaceCells2D<T,Descriptor>
     for ( pluint i=0; i<interfaceToFluidNodes.size(); ++i )
     {
         Node const& pos = interfaceToFluidNodes[i];
-        param.flag ( pos[0],pos[1],pos[2] ) = fluid;
+        param.flag ( pos[0],pos[1] ) = fluid;
     }
     for ( pluint i=0; i<interfaceToEmptyNodes.size(); ++i )
     {
         Node const& pos = interfaceToEmptyNodes[i];
-        param.flag ( pos[0],pos[1],pos[2] ) = empty;
+        param.flag ( pos[0],pos[1] ) = empty;
     }
 }
 
