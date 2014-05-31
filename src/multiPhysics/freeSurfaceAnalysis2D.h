@@ -136,7 +136,7 @@ private:
     
 
 template<typename T, template<typename U> class Descriptor>
-Array<T,3> freeSurfaceAverageMomentum(std::vector<MultiBlock2D*> twoPhaseArgs, Box2D domain);
+Array<T,2> freeSurfaceAverageMomentum(std::vector<MultiBlock2D*> twoPhaseArgs, Box2D domain);
              
 template<typename T, template<typename U> class Descriptor>
 class FS_AverageMomentumFunctional2D : public PlainReductiveBoxProcessingFunctional2D
@@ -145,7 +145,7 @@ public:
     FS_AverageMomentumFunctional2D();
     virtual void processGenericBlocks(Box2D domain, std::vector<AtomicBlock2D*> atomicBlocks);
     virtual FS_AverageMomentumFunctional2D<T,Descriptor>* clone() const;
-    Array<T,3> getAverageMomentum() const;
+    Array<T,2> getAverageMomentum() const;
     virtual void getTypeOfModification(std::vector<modif::ModifT>& modified) const {
         for (pluint i=0; i<modified.size(); ++i) {
             modified[i] = modif::nothing;

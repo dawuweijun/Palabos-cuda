@@ -73,10 +73,10 @@ private:
     // available bubbles.
     void updateBubbleInformation (
             std::vector<BubbleTransition2D>& bubbleTransitions, std::vector<double> const& bubbleVolume,
-            std::vector<Array<double,3> > const& bubbleCenter, T newBubbleVolumeCorrection, plint iterationStep );
+            std::vector<Array<double,2> > const& bubbleCenter, T newBubbleVolumeCorrection, plint iterationStep );
     void computeNewBubbles (
             std::set<plint>& oldIDs, std::set<plint>& newIDs,
-            std::vector<double> const& bubbleVolume, std::vector<Array<double,3> > const& bubbleCenter,
+            std::vector<double> const& bubbleVolume, std::vector<Array<double,2> > const& bubbleCenter,
             T newBubbleVolumeCorrection, std::map<plint,BubbleInfo2D>& newBubbles, std::map<plint,plint>& newToFinal );
     void updateBubbleLog (
             BubbleTransition2D& bubbleTransition, std::vector<double> const& bubbleVolume, plint iterationStep,
@@ -115,7 +115,7 @@ public:
           currentVolume(0.),
           frozen(false)
     { }
-    BubbleInfo2D(double volume, Array<double,3> const& center_)
+    BubbleInfo2D(double volume, Array<double,2> const& center_)
         : referenceVolume(volume),
           currentVolume(volume),
           center(center_),
@@ -143,12 +143,12 @@ public:
     }
     double getReferenceVolume() const { return referenceVolume; }
     double getVolume() const { return currentVolume; }
-    Array<double,3> const& getCenter() const { return center; }
+    Array<double,2> const& getCenter() const { return center; }
     bool isFrozen() const { return frozen; }
 private:
     double referenceVolume;
     double currentVolume;
-    Array<double,3> center;
+    Array<double,2> center;
     bool frozen;
 };
 

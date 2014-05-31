@@ -315,16 +315,15 @@ FS_AverageMomentumFunctional2D<T,Descriptor>* FS_AverageMomentumFunctional2D<T,D
 }
 
 template<typename T, template<typename U> class Descriptor>
-Array<T,3> FS_AverageMomentumFunctional2D<T,Descriptor>::getAverageMomentum() const
+Array<T,2> FS_AverageMomentumFunctional2D<T,Descriptor>::getAverageMomentum() const
 {
-    return Array<T,3> (
+    return Array<T,2> (
                this->getStatistics().getAverage ( averageMomentumId[0] ),
-               this->getStatistics().getAverage ( averageMomentumId[1] ),
-               this->getStatistics().getAverage ( averageMomentumId[2] ) );
+               this->getStatistics().getAverage ( averageMomentumId[1] ));
 }
 
 template<typename T, template<typename U> class Descriptor>
-Array<T,3> freeSurfaceAverageMomentum ( std::vector<MultiBlock2D*> twoPhaseArgs, Box2D domain )
+Array<T,2> freeSurfaceAverageMomentum ( std::vector<MultiBlock2D*> twoPhaseArgs, Box2D domain )
 {
     FS_AverageMomentumFunctional2D<T,Descriptor> functional;
     applyProcessingFunctional ( functional, domain, twoPhaseArgs );

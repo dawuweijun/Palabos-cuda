@@ -44,7 +44,7 @@ private:
 template< typename T,template<typename U> class Descriptor>
 class PouringLiquid2D : public BoxProcessingFunctional2D {
 public:
-    PouringLiquid2D(Dynamics<T,Descriptor>* dynamicsTemplate_, Array<T,3> injectionVelocity_)
+    PouringLiquid2D(Dynamics<T,Descriptor>* dynamicsTemplate_, Array<T,2> injectionVelocity_)
         : dynamicsTemplate(dynamicsTemplate_), injectionVelocity(injectionVelocity_)
     { }
     PouringLiquid2D(PouringLiquid2D<T,Descriptor> const& rhs)
@@ -79,7 +79,7 @@ public:
     }
 private:
     Dynamics<T,Descriptor>* dynamicsTemplate;
-    Array<T,3> injectionVelocity;
+    Array<T,2> injectionVelocity;
 };
 
 template< typename T,template<typename U> class Descriptor>
