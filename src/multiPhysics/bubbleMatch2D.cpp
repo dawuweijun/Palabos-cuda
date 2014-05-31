@@ -89,7 +89,7 @@ pluint BubbleMatch2D::countAndTagBubbles()
 
 void BubbleMatch2D::computeBubbleData ( pluint numBubbles )
 {
-    std::vector<double> bubbleCenterX ( numBubbles ), bubbleCenterY ( numBubbles ), bubbleCenterZ ( numBubbles );
+    std::vector<double> bubbleCenterX ( numBubbles ), bubbleCenterY ( numBubbles );
     bubbleVolume.resize ( numBubbles );
     bubbleCenter.resize ( numBubbles );
 
@@ -103,7 +103,7 @@ void BubbleMatch2D::computeBubbleData ( pluint numBubbles )
         BubbleAnalysisData2D& data = *pData;
 
         std::vector<double> const& nextVolume = data.bubbleVolume;
-        std::vector<Array<double,3> > const& nextCenter = data.bubbleCenter;
+        std::vector<Array<double,2> > const& nextCenter = data.bubbleCenter;
         PLB_ASSERT ( nextVolume.size() == numBubbles );
         PLB_ASSERT ( nextCenter.size() == numBubbles );
 
@@ -112,7 +112,6 @@ void BubbleMatch2D::computeBubbleData ( pluint numBubbles )
             bubbleVolume[i] += nextVolume[i];
             bubbleCenterX[i] += nextCenter[i][0];
             bubbleCenterY[i] += nextCenter[i][1];
-            bubbleCenterZ[i] += nextCenter[i][2];
         }
     }
 
@@ -120,13 +119,12 @@ void BubbleMatch2D::computeBubbleData ( pluint numBubbles )
     global::mpi().allReduceVect ( bubbleVolume, MPI_SUM );
     global::mpi().allReduceVect ( bubbleCenterX, MPI_SUM );
     global::mpi().allReduceVect ( bubbleCenterY, MPI_SUM );
-    global::mpi().allReduceVect ( bubbleCenterZ, MPI_SUM );
 #endif
 
     static const double epsilon = std::numeric_limits<double>::epsilon() *1.e4;
     for ( pluint i=0; i<numBubbles; ++i )
     {
-        bubbleCenter[i] = Array<double,3> ( bubbleCenterX[i], bubbleCenterY[i], bubbleCenterZ[i] );
+        bubbleCenter[i] = Array<double,2> ( bubbleCenterX[i], bubbleCenterY[i]);
         double volume = bubbleVolume[i];
         if ( volume>epsilon )
         {

@@ -66,7 +66,7 @@ public:
     {
         return bubbleVolume;
     }
-    std::vector<Array<double,3> > const&  getBubbleCenter()
+    std::vector<Array<double,2> > const&  getBubbleCenter()
     {
         return bubbleCenter;
     }
@@ -105,7 +105,7 @@ private:
     BubbleMPIdata2D mpiData;
     MultiScalarField2D<plint> *tagMatrix;
     std::vector<double> bubbleVolume;
-    std::vector<Array<double,3> > bubbleCenter;
+    std::vector<Array<double,2> > bubbleCenter;
     bool matchEmpty;
     static const plint maxNumBubbles = 100000;
 };
@@ -192,7 +192,7 @@ struct BubbleAnalysisData2D : public ContainerBlockData
         return new BubbleAnalysisData2D ( *this );
     }
     std::vector<double> bubbleVolume;
-    std::vector<Array<double,3> > bubbleCenter;
+    std::vector<Array<double,2> > bubbleCenter;
 };
 
 class CountBubbleIteration2D : public PlainReductiveBoxProcessingFunctional2D

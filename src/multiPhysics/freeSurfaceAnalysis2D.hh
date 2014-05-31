@@ -317,10 +317,9 @@ FS_AverageMomentumFunctional2D<T,Descriptor>* FS_AverageMomentumFunctional2D<T,D
 template<typename T, template<typename U> class Descriptor>
 Array<T,2> FS_AverageMomentumFunctional2D<T,Descriptor>::getAverageMomentum() const
 {
-    return Array<T,3> (
+    return Array<T,2> (
                this->getStatistics().getAverage ( averageMomentumId[0] ),
-               this->getStatistics().getAverage ( averageMomentumId[1] ),
-               this->getStatistics().getAverage ( averageMomentumId[2] ) );
+               this->getStatistics().getAverage ( averageMomentumId[1] ));
 }
 
 template<typename T, template<typename U> class Descriptor>
