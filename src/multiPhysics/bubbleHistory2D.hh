@@ -202,7 +202,7 @@ void BubbleHistory2D<T>::matchAndRemapBubbles (
 template<typename T>
 void BubbleHistory2D<T>::updateBubbleInformation (
     std::vector<BubbleTransition2D>& bubbleTransitions,
-    std::vector<double> const& bubbleVolume, std::vector<Array<double,3> > const& bubbleCenter,
+    std::vector<double> const& bubbleVolume, std::vector<Array<double,2> > const& bubbleCenter,
     T newBubbleVolumeCorrection, plint iterationStep )
 {
     std::map<plint,BubbleInfo2D> newBubbles;
@@ -232,7 +232,7 @@ void BubbleHistory2D<T>::updateBubbleInformation (
 template<typename T>
 void BubbleHistory2D<T>::computeNewBubbles (
     std::set<plint>& oldIDs, std::set<plint>& newIDs,
-    std::vector<double> const& bubbleVolume, std::vector<Array<double,3> > const& bubbleCenter,
+    std::vector<double> const& bubbleVolume, std::vector<Array<double,2> > const& bubbleCenter,
     T newBubbleVolumeCorrection, std::map<plint,BubbleInfo2D>& newBubbles, std::map<plint,plint>& newToFinal )
 {
     PLB_ASSERT ( bubbleVolume.size() ==bubbleCenter.size() );

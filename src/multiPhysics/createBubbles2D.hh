@@ -29,13 +29,14 @@
 #include "offLattice/makeSparse2D.h"
 #include "atomicBlock/dataProcessingFunctional2D.h"
 #include "multiPhysics/freeSurfaceUtil2D.h"
+#include "multiPhysics/freeSurfaceInitializer2D.h"
 #include <limits>
 
 
 namespace plb {
 
 template<typename T, template<typename U> class Descriptor>
-void punchSphere( std::vector<MultiBlock2D*> const& twoPhaseArgs, Array<T,3> const& center, T radius,
+void punchSphere( std::vector<MultiBlock2D*> const& twoPhaseArgs, Array<T,2> const& center, T radius,
                   T rhoEmpty, T rho0, Dynamics<T,Descriptor>& dynamics, Box2D domain )
 {
     applyProcessingFunctional (
@@ -45,7 +46,7 @@ void punchSphere( std::vector<MultiBlock2D*> const& twoPhaseArgs, Array<T,3> con
 
 template<typename T, template<typename U> class Descriptor>
 T computeAverageSphereDensity( std::vector<MultiBlock2D*> const& twoPhaseArgs,
-                               Array<T,3> const& center, T radius, Box2D domain )
+                               Array<T,2> const& center, T radius, Box2D domain )
 {
     CalculateAverageSphereDensity2D<T,Descriptor> functional(center, radius);
     applyProcessingFunctional (
