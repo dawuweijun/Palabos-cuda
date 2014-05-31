@@ -26,6 +26,9 @@
 #define FREE_SURFACE_BOUNDARY_CONDITION_2D_HH
 
 #include "multiPhysics/freeSurfaceBoundaryCondition2D.h"
+#include "multiPhysics/freeSurfaceUtil2D.h"
+#include "latticeBoltzmann/momentTemplates.h"
+#include "latticeBoltzmann/indexTemplates.h"
 #include <cmath>
 #include <iostream>
 

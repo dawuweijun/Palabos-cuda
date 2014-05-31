@@ -26,6 +26,9 @@
 #define FREE_SURFACE_BOUNDARY_CONDITION_3D_HH
 
 #include "multiPhysics/freeSurfaceBoundaryCondition3D.h"
+#include "multiPhysics/freeSurfaceUtil3D.h"
+#include "latticeBoltzmann/momentTemplates.h"
+#include "latticeBoltzmann/indexTemplates.h"
 #include <cmath>
 #include <iostream>
 
