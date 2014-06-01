@@ -98,7 +98,7 @@ void RemoveMass2D<T,Descriptor>::processGenericBlocks ( Box2D domain,std::vector
         {
             //param.attributeDynamics(iX,iY, new NoDynamics<T,Descriptor>());
             param.setDensity ( iX,iY, ( T ) 1. );
-            param.setMomentum ( iX,iY,Array<T,3> ( 0.,0.,0. ) );
+            param.setMomentum ( iX,iY,Array<T,2> ( 0.,0.) );
             param.mass ( iX,iY ) = ( T ) 0;
             param.volumeFraction ( iX,iY ) = ( T ) 0;
             //param.flag(iX,iY) = empty;
@@ -124,8 +124,7 @@ void PouringLiquid2D<T,Descriptor>::processGenericBlocks ( Box2D domain, std::ve
         for ( plint iY=domain.y0; iY<=domain.y1; ++iY )
         {
             T iniRho = T ( 1 );
-            param.attributeDynamics (
-                iX,iY, dynamicsTemplate->clone() );
+            param.attributeDynamics (iX,iY, dynamicsTemplate->clone() );
             iniCellAtEquilibrium ( param.cell ( iX,iY ), iniRho, injectionVelocity );
             param.setDensity ( iX,iY, iniRho );
             param.setMomentum ( iX,iY, iniRho*injectionVelocity );
