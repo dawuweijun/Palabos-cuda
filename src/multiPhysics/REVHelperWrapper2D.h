@@ -5,7 +5,7 @@
 #include "atomicBlock/dataField2D.h"
 #include "multiBlock/multiDataField2D.h"
 #include "multiBlock/multiDataProcessorWrapper2D.h"
-#include "auto_ptr.h"
+#include "memory"
 namespace plb
 {
 template <typename T1,typename T2>
