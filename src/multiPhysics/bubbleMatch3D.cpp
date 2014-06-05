@@ -45,6 +45,7 @@
 #include "multiBlock/multiBlockGenerator3D.hh"
 #include "multiBlock/nonLocalTransfer3D.h"
 #include "multiBlock/nonLocalTransfer3D.hh"
+#include "multiBlock/serialMultiDataField3D.hh"
 #include "multiPhysics/freeSurfaceUtil3D.h"
 #include "parallelism/parallelMultiDataField3D.h"
 #include "parallelism/parallelMultiDataField3D.hh"

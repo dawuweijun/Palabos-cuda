@@ -45,6 +45,7 @@
 #include "multiBlock/multiBlockGenerator2D.hh"
 #include "multiBlock/nonLocalTransfer2D.h"
 #include "multiBlock/nonLocalTransfer2D.hh"
+#include "multiBlock/serialMultiDataField2D.hh"
 #include "multiPhysics/freeSurfaceUtil2D.h"
 #include "parallelism/parallelMultiDataField2D.h"
 #include "parallelism/parallelMultiDataField2D.hh"
