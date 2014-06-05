@@ -28,7 +28,7 @@
 #ifndef SERIAL_MULTI_DATA_FIELD_2D_HH
 #define SERIAL_MULTI_DATA_FIELD_2D_HH
 
-#include "serialMultiDataField2D.h"
+#include "multiBlock/serialMultiDataField2D.h"
 
 /* *************** Class SerialScalarAccess2D ************************ */
 

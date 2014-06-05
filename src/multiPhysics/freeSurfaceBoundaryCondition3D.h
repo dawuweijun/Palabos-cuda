@@ -24,6 +24,8 @@
 
 #ifndef FREE_SURFACE_BOUNDARY_CONDITION_3D_H
 #define FREE_SURFACE_BOUNDARY_CONDITION_3D_H
+#include "atomicBlock/dataProcessingFunctional3D.h"
+#include "core/dynamics.h"
 
 namespace plb {
 
