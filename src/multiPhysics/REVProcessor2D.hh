@@ -63,5 +63,29 @@ BrinkmanProcessor2D<T1,Descriptor,T2>:: clone() const
 {
     return new BrinkmanProcessor2D<T1,Descriptor,T2>();
 }
+/****************************************************************************/
+template<typename T, template<typename U> class Descriptor>
+void BrinkmanProcessor2DL<T,Descriptor>::process ( Box2D domain, BlockLattice2D<T,Descriptor>& lattice)
+{
+    enum
+    {
+        forceOffset = Descriptor<T>::ExternalField::forceBeginsAt
+    };
+    Dot2D offset = computeRelativeDisplacement ( lattice, negNiuInvsK );
+    Array< T, 2  > vel;
+    T *force;
+    for ( plint iX=domain.x0; iX<=domain.x1; ++iX )
+    {
+        for ( plint iY=domain.y0; iY<=domain.y1; ++iY )
+        {
+            lattice.get ( iX,iY ).computeVelocity ( vel );
+            force = lattice.get ( iX,iY ).getExternal ( forceOffset );
+
+            force[0]= negNiuInvsK[0]*vel[0]+negNiuInvsK[1]*vel[1];
+            force[1]= negNiuInvsK[2]*vel[0]+negNiuInvsK[3]*vel[1];
+        }
+    }
+}
+
 }// namespace plb
 #endif

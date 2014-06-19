@@ -47,6 +47,22 @@ public:
 
 };
 
+template<typename T, template<typename U> class Descriptor>
+class BrinkmanProcessor2DL: public BoxProcessingFunctional2D_L<T,Descriptor>
+{
+public:
+    BrinkmanProcessor2DL ( Array<T,4> &negNiuInvsK_ ):negNiuInvsK(negNiuInvsK_){};
+    virtual void process ( Box2D domain, BlockLattice2D<T,Descriptor>& lattice);
+    virtual BrinkmanProcessor2DL<T,Descriptor> *clone() const{
+      return new BrinkmanProcessor2DL<T,Descriptor>(negNiuInvsK);
+    };
+    virtual void getTypeOfModification ( std::vector<modif::ModifT>& modified ) const
+    {
+        modified[0] = modif::staticVariables;
+    }
+private:
+    Array<T,4> negNiuInvsK;
+};
 
 } //namespace plb
 
