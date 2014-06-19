@@ -71,7 +71,6 @@ void BrinkmanProcessor2DL<T,Descriptor>::process ( Box2D domain, BlockLattice2D<
     {
         forceOffset = Descriptor<T>::ExternalField::forceBeginsAt
     };
-    Dot2D offset = computeRelativeDisplacement ( lattice, negNiuInvsK );
     Array< T, 2  > vel;
     T *force;
     for ( plint iX=domain.x0; iX<=domain.x1; ++iX )
