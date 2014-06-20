@@ -78,15 +78,15 @@ void BoxTensorRotationFunctional3D<T1,T2>::process ( Box3D domain, TensorField3D
                     rmat[2][2]=cosTheta + normAxis[2]*normAxis[2]* negCos;
 
                     //计算渗透率矩阵的逆矩阵
-                    tmpTensor[0] = rawTensor[0][0]*rmat[0][0]+rawTensor[0][1]*rmat[1][0]+rawTensor[0][2]*rmat[2][0];
-                    tmpTensor[1] = rawTensor[0][0]*rmat[0][1]+rawTensor[0][1]*rmat[1][1]+rawTensor[0][2]*rmat[2][1];
-                    tmpTensor[2] = rawTensor[0][0]*rmat[0][2]+rawTensor[0][1]*rmat[1][2]+rawTensor[0][2]*rmat[2][2];
-                    tmpTensor[3] = rawTensor[1][0]*rmat[0][0]+rawTensor[1][1]*rmat[1][0]+rawTensor[1][2]*rmat[2][0];
-                    tmpTensor[4] = rawTensor[1][0]*rmat[0][1]+rawTensor[1][1]*rmat[1][1]+rawTensor[1][2]*rmat[2][1];
-                    tmpTensor[5] = rawTensor[1][0]*rmat[0][2]+rawTensor[1][1]*rmat[1][2]+rawTensor[1][2]*rmat[2][2];
-                    tmpTensor[6] = rawTensor[2][0]*rmat[0][0]+rawTensor[2][1]*rmat[1][0]+rawTensor[2][2]*rmat[2][0];
-                    tmpTensor[7] = rawTensor[2][0]*rmat[0][1]+rawTensor[2][1]*rmat[1][1]+rawTensor[2][2]*rmat[2][1];
-                    tmpTensor[8] = rawTensor[2][0]*rmat[0][2]+rawTensor[2][1]*rmat[1][2]+rawTensor[2][2]*rmat[2][2];
+                    tmpTensor[0] = rawTensor[0]*rmat[0][0]+rawTensor[1]*rmat[1][0]+rawTensor[2]*rmat[2][0];
+                    tmpTensor[1] = rawTensor[0]*rmat[0][1]+rawTensor[1]*rmat[1][1]+rawTensor[2]*rmat[2][1];
+                    tmpTensor[2] = rawTensor[0]*rmat[0][2]+rawTensor[1]*rmat[1][2]+rawTensor[2]*rmat[2][2];
+                    tmpTensor[3] = rawTensor[3]*rmat[0][0]+rawTensor[4]*rmat[1][0]+rawTensor[5]*rmat[2][0];
+                    tmpTensor[4] = rawTensor[3]*rmat[0][1]+rawTensor[4]*rmat[1][1]+rawTensor[5]*rmat[2][1];
+                    tmpTensor[5] = rawTensor[3]*rmat[0][2]+rawTensor[4]*rmat[1][2]+rawTensor[5]*rmat[2][2];
+                    tmpTensor[6] = rawTensor[6]*rmat[0][0]+rawTensor[7]*rmat[1][0]+rawTensor[8]*rmat[2][0];
+                    tmpTensor[7] = rawTensor[6]*rmat[0][1]+rawTensor[7]*rmat[1][1]+rawTensor[8]*rmat[2][1];
+                    tmpTensor[8] = rawTensor[6]*rmat[0][2]+rawTensor[7]*rmat[1][2]+rawTensor[8]*rmat[2][2];
                 }
             }
         }

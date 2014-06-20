@@ -45,7 +45,6 @@ void BrinkmanProcessor2D<T1,Descriptor,T2>::process ( Box2D domain, BlockLattice
     {
         for ( plint iY=domain.y0; iY<=domain.y1; ++iY )
         {
-
             Array< T2, 4  > &negNiuInvsK_=negNiuInvsK.get ( offset.x+iX,offset.y+iY );
 
             lattice.get ( iX,iY ).computeVelocity ( vel );
@@ -65,7 +64,7 @@ BrinkmanProcessor2D<T1,Descriptor,T2>:: clone() const
 }
 /****************************************************************************/
 template<typename T, template<typename U> class Descriptor>
-void BrinkmanProcessor2DL<T,Descriptor>::process ( Box2D domain, BlockLattice2D<T,Descriptor>& lattice)
+void BrinkmanProcessor2DL<T,Descriptor>::process ( Box2D domain, BlockLattice2D<T,Descriptor>& lattice )
 {
     enum
     {
