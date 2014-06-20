@@ -26,12 +26,12 @@
 #define REV_PROCESSORS_3D_H
 
 #include "core/globalDefs.h"
-#include "core/block2D.h"
+#include "core/block3D.h"
 #include "atomicBlock/dataProcessor3D.h"
 #include "atomicBlock/blockLattice3D.h"
 #include "multiBlock/multiDataField3D.h"
 namespace plb{
-template<typename T1, template<typename U> class Descriptor, typename T2>
+template<typename T1, template<typename U> class Descriptor, typename T2=T1>
 class BrinkmanProcessor3D: public BoxProcessingFunctional3D_LT<T1,Descriptor,T2,9>
 {
 public:
@@ -43,9 +43,23 @@ public:
         modified[0] = modif::staticVariables;
         modified[1] = modif::staticVariables;
     }
-
 };
 
-
+template<typename T, template<typename U> class Descriptor>
+class BrinkmanProcessor3DL: public BoxProcessingFunctional3D_L<T,Descriptor>
+{
+public:
+    BrinkmanProcessor3DL (const Array<T,9> &negNiuInvsK_ ):negNiuInvsK(negNiuInvsK_){};
+    virtual void process ( Box3D domain, BlockLattice3D<T,Descriptor>& lattice);
+    virtual BrinkmanProcessor3DL<T,Descriptor> *clone() const{
+      return new BrinkmanProcessor3DL<T,Descriptor>(negNiuInvsK);
+    };
+    virtual void getTypeOfModification ( std::vector<modif::ModifT>& modified ) const
+    {
+        modified[0] = modif::staticVariables;
+    }
+private:
+    Array<T,9> negNiuInvsK;
+};
 }// namespace plb
 #endif

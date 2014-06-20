@@ -29,7 +29,7 @@
 #include <cmath>
 namespace plb
 {
-template <typename T1 ,typename T2>
+template <typename T1 ,typename T2=T1>
 class BoxTensorRotationFunctional2D:public BoxProcessingFunctional2D_TT<T1,2,T2,4>
 {
 public:

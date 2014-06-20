@@ -66,6 +66,32 @@ BrinkmanProcessor3D<T1,Descriptor,T2>:: clone() const
     return new BrinkmanProcessor3D<T1,Descriptor,T2>();
 }
 
+/****************************************************************************/
+template<typename T, template<typename U> class Descriptor>
+void BrinkmanProcessor3DL<T,Descriptor>::process ( Box3D domain, BlockLattice3D<T,Descriptor>& lattice )
+{
+    enum
+    {
+        forceOffset = Descriptor<T>::ExternalField::forceBeginsAt
+    };
+    Array< T, 3  > vel;
+    T *force;
+    for ( plint iX=domain.x0; iX<=domain.x1; ++iX )
+    {
+        for ( plint iY=domain.y0; iY<=domain.y1; ++iY )
+        {
+            for ( plint iZ=domain.z0; iZ<=domain.z1; ++iZ )
+            {
+                lattice.get ( iX,iY,iZ ).computeVelocity ( vel );
+                force = lattice.get ( iX,iY,iZ ).getExternal ( forceOffset );
+
+                force[0]=negNiuInvsK[0]*vel[0]+negNiuInvsK[1]*vel[1]+negNiuInvsK[2]*vel[2];
+                force[1]=negNiuInvsK[3]*vel[0]+negNiuInvsK[4]*vel[1]+negNiuInvsK[5]*vel[2];
+                force[2]=negNiuInvsK[6]*vel[0]+negNiuInvsK[7]*vel[1]+negNiuInvsK[8]*vel[2];
+            }
+        }
+    }
+}
 
 }// namespace plb
 #endif
