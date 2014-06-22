@@ -27,7 +27,7 @@
 
 #include "core/globalDefs.h"
 #include "offLattice/boundaryShapes2D.h"
-#include "offLattice/triangleSet.h"
+#include "offLattice/SegmentSet.h"
 #include "offLattice/triangularSurfaceMesh.h"
 #include "offLattice/offLatticeBoundaryProfiles2D.h"
 #include "particles/multiParticleField2D.h"
@@ -40,28 +40,28 @@
 namespace plb {
 
 template<typename T>
-class DEFscaledMesh {
+class DEFscaledMesh2D {
 public:
-    DEFscaledMesh(TriangleSet<T> const& triangleSet_);
-    DEFscaledMesh (
-        TriangleSet<T> const& triangleSet_,
+    DEFscaledMesh2D(SegmentSet<T> const& triangleSet_);
+    DEFscaledMesh2D (
+        SegmentSet<T> const& triangleSet_,
         plint resolution_, plint referenceDirection_,
         plint margin_, plint extraLayer );
-    DEFscaledMesh (
-        TriangleSet<T> const& triangleSet_,
+    DEFscaledMesh2D (
+        SegmentSet<T> const& triangleSet_,
         plint resolution_, plint referenceDirection_,
         plint margin_, Dot2D location );
-    DEFscaledMesh(DEFscaledMesh<T> const& rhs);
-    ~DEFscaledMesh();
-    DEFscaledMesh<T>& operator=(DEFscaledMesh<T> const& rhs);
-    void swap(DEFscaledMesh<T>& rhs);
+    DEFscaledMesh2D(DEFscaledMesh2D<T> const& rhs);
+    ~DEFscaledMesh2D();
+    DEFscaledMesh2D<T>& operator=(DEFscaledMesh2D<T> const& rhs);
+    void swap(DEFscaledMesh2D<T>& rhs);
 public: // Mesh usage interface.
     /// Get a reference to the currently active mesh.
     TriangularSurfaceMesh<T>& getMesh();
     /// Get a const reference to the currently active mesh.
     TriangularSurfaceMesh<T> const& getMesh() const;
     plint getMargin() const;
-    std::vector<Array<T,3> > const& getVertexList() const {
+    std::vector<Array<T,2> > const& getVertexList() const {
         return vertexList;
     }
     std::vector<plint> const& getEmanatingEdgeList() const {
@@ -70,13 +70,13 @@ public: // Mesh usage interface.
     std::vector<Edge> const& getEdgeList() const {
             return edgeList;
         }
-    Array<T,3> getPhysicalLocation() const {
+    Array<T,2> getPhysicalLocation() const {
         return physicalLocation;
     }
     T getDx() const {
         return dx;
     }
-    void setPhysicalLocation(Array<T,3> physicalLocation_) {
+    void setPhysicalLocation(Array<T,2> physicalLocation_) {
         physicalLocation = physicalLocation_;
     }
     void setDx(T dx_) {
@@ -84,10 +84,10 @@ public: // Mesh usage interface.
     }
 private:
     void initialize (
-        TriangleSet<T> const& triangleSet_, plint resolution_,
+        SegmentSet<T> const& triangleSet_, plint resolution_,
         plint referenceDirection_, Dot2D location );
 private:
-    std::vector<Array<T,3> > vertexList;
+    std::vector<Array<T,2> > vertexList;
     /// Each vertex has exactly one emanating edge. This is a structural
     ///   information.
     std::vector<plint> emanatingEdgeList;
@@ -95,7 +95,7 @@ private:
     std::vector<Edge> edgeList;
     TriangularSurfaceMesh<T>* mesh;
     plint margin;
-    Array<T,3> physicalLocation;
+    Array<T,2> physicalLocation;
     T dx;
 };
 
@@ -177,8 +177,8 @@ private:
     BoundaryProfile2D<T,SurfaceData>* wallProfile;
     std::map<plint,BoundaryProfile2D<T,SurfaceData>*> profiles;
     std::vector<plint> inletOutletIds;
-    std::vector<Array<T,3> > lidNormal;
-    std::vector<Array<T,3> > lidCenter;
+    std::vector<Array<T,2> > lidNormal;
+    std::vector<Array<T,2> > lidCenter;
     std::vector<T> lidRadius;
 };
 
@@ -186,8 +186,8 @@ template<typename T>
 class TriangleBoundary2D {
 public:
     template<typename TMesh>
-    TriangleBoundary2D(DEFscaledMesh<TMesh> const& defMesh, bool automaticCloseHoles=true);
-    TriangleBoundary2D(DEFscaledMesh<T> const& defMesh, bool automaticCloseHoles=true);
+    TriangleBoundary2D(DEFscaledMesh2D<TMesh> const& defMesh, bool automaticCloseHoles=true);
+    TriangleBoundary2D(DEFscaledMesh2D<T> const& defMesh, bool automaticCloseHoles=true);
     ~TriangleBoundary2D();
     TriangleBoundary2D(TriangleBoundary2D<T> const& rhs);
     TriangleBoundary2D<T>& operator=(TriangleBoundary2D<T> const& rhs);
@@ -219,17 +219,17 @@ public: // Mesh usage interface.
     ///   of success.
     bool intersectSegment (
             plint iTriangle, AtomicBlock2D* boundaryArg,
-            Array<T,3> const& fromPoint, Array<T,3> const& direction,
-            Array<T,3>& locatedPoint, T& distance, Array<T,3>& wallNormal ) const;
+            Array<T,2> const& fromPoint, Array<T,2> const& direction,
+            Array<T,2>& locatedPoint, T& distance, Array<T,2>& wallNormal ) const;
     /// Given a point p on the surface of the shape, determine its "continuous normal".
     ///   If the shape is for example piecewise linear, the normal is adjusted to vary
     ///   continuously over the surface.
-    Array<T,3> computeContinuousNormal (
-            Array<T,3> const& p, plint iTriangle, bool isAreaWeighted = false ) const;
+    Array<T,2> computeContinuousNormal (
+            Array<T,2> const& p, plint iTriangle, bool isAreaWeighted = false ) const;
     /// Create a new set of vertices, and an associated open and closed mesh.
     void cloneVertexSet(plint whichVertexSet);
     /// Coordinates of the lower-left corner in physical units.
-    Array<T,3> getPhysicalLocation() const {
+    Array<T,2> getPhysicalLocation() const {
         return physicalLocation;
     }
     /// Size of a grid spacing.
@@ -246,11 +246,11 @@ public: // Mesh preparation interface.
      **/
     std::vector<Lid> getInletOutlet(plint sortDirection) const;
     template<typename DomainFunctional> plint tagDomain(DomainFunctional functional);
-    template<typename DomainFunctional> plint tagDomain(DomainFunctional functional, Array<T,3> normal, T angleTolerance, plint previousTag=-1);
+    template<typename DomainFunctional> plint tagDomain(DomainFunctional functional, Array<T,2> normal, T angleTolerance, plint previousTag=-1);
     std::vector<plint> getInletOutletIds(plint sortDirection) const;
     void getLidProperties (
-        plint sortDirection, std::vector<Array<T,3> >& normal,
-        std::vector<Array<T,3> >& center, std::vector<T>& radius ) const;
+        plint sortDirection, std::vector<Array<T,2> >& normal,
+        std::vector<Array<T,2> >& center, std::vector<T>& radius ) const;
     /// Define the material property to be used on all vertices contained in
     ///   the domain specified by the domain functional.
     /** Returns the tag which was assigned to the corresponding vertices. **/
@@ -280,7 +280,7 @@ private:
     /// There may exist more than one set of vertices, for example in
     ///   case of a moving wall which has current vertex positions and
     ///   equilibrium vertex positions.
-    std::vector< std::vector<Array<T,3> > > vertexLists;
+    std::vector< std::vector<Array<T,2> > > vertexLists;
     /// Each vertex has exactly one emanating edge. This is a structural
     ///   information which is identical for all sets of vertices.
     std::vector<plint> emanatingEdgeLists[2];
@@ -303,7 +303,7 @@ private:
     /// Inlets and outlets, saved as a collection of triangles.
     std::vector<Lid> lids;
     plint margin;
-    Array<T,3> physicalLocation;
+    Array<T,2> physicalLocation;
     T dx;
     mutable std::stack<plint> topology;
     mutable std::stack<plint> vertexSet;
@@ -317,16 +317,16 @@ public:
             BoundaryProfiles2D<T,SurfaceData> const& profiles_ );
     virtual bool isInside(Dot2D const& location) const;
     virtual bool pointOnSurface (
-            Array<T,3> const& fromPoint, Array<T,3> const& direction,
-            Array<T,3>& locatedPoint, T& distance,
-            Array<T,3>& wallNormal, SurfaceData& surfaceData,
+            Array<T,2> const& fromPoint, Array<T,2> const& direction,
+            Array<T,2>& locatedPoint, T& distance,
+            Array<T,2>& wallNormal, SurfaceData& surfaceData,
             OffBoundary::Type& bdType, plint& id ) const;
-    virtual Array<T,3> computeContinuousNormal (
-            Array<T,3> const& p, plint id, bool isAreaWeighted = false ) const;
+    virtual Array<T,2> computeContinuousNormal (
+            Array<T,2> const& p, plint id, bool isAreaWeighted = false ) const;
     virtual bool intersectsSurface (
-            Array<T,3> const& p1, Array<T,3> const& p2, plint& id ) const;
+            Array<T,2> const& p1, Array<T,2> const& p2, plint& id ) const;
     virtual plint getTag(plint id) const;
-    virtual bool distanceToSurface( Array<T,3> const& point,
+    virtual bool distanceToSurface( Array<T,2> const& point,
                                     T& distance, bool& isBehind ) const;
     virtual TriangleFlowShape2D<T,SurfaceData>* clone() const;
     /// Use this clone function to provide the meshed data to this object.

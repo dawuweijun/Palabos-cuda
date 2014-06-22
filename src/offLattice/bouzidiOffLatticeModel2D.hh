@@ -5,7 +5,7 @@
  * 1010 Lausanne, Switzerland
  * E-mail contact: contact@flowkit.com
  *
- * The most recent release of Palabos can be downloaded at 
+ * The most recent release of Palabos can be downloaded at
  * <http://www.palabos.org/>
  *
  * The library Palabos is free software: you can redistribute it and/or
@@ -32,137 +32,148 @@
 #include <vector>
 #include <cmath>
 
-namespace plb {
+namespace plb
+{
 
 
 template<typename T, template<typename U> class Descriptor>
 BouzidiOffLatticeModel2D<T,Descriptor>::BouzidiOffLatticeModel2D (
-        BoundaryShape2D<T,Array<T,3> >* shape_, int flowType_)
-    : OffLatticeModel2D<T,Array<T,3> >(shape_, flowType_),
-      computeStat(true)
+    BoundaryShape2D<T,Array<T,2> >* shape_, int flowType_ )
+    : OffLatticeModel2D<T,Array<T,2> > ( shape_, flowType_ ),
+      computeStat ( true )
 {
     typedef Descriptor<T> D;
-    invAB.resize(D::q);
+    invAB.resize ( D::q );
     invAB[0] = T();
-    for (plint iPop=1; iPop<D::q; ++iPop) {
-        invAB[iPop] = (T)1 / sqrt(util::sqr(D::c[iPop][0])+util::sqr(D::c[iPop][1])+util::sqr(D::c[iPop][2]));
+    for ( plint iPop=1; iPop<D::q; ++iPop )
+    {
+        invAB[iPop] = ( T ) 1 / sqrt ( util::sqr ( D::c[iPop][0] ) +util::sqr ( D::c[iPop][1] ) +util::sqr ( D::c[iPop][2] ) );
     }
 }
 
 template<typename T, template<typename U> class Descriptor>
-BouzidiOffLatticeModel2D<T,Descriptor>* BouzidiOffLatticeModel2D<T,Descriptor>::clone() const {
-    return new BouzidiOffLatticeModel2D(*this);
+BouzidiOffLatticeModel2D<T,Descriptor>* BouzidiOffLatticeModel2D<T,Descriptor>::clone() const
+{
+    return new BouzidiOffLatticeModel2D ( *this );
 }
 
 template<typename T, template<typename U> class Descriptor>
-plint BouzidiOffLatticeModel2D<T,Descriptor>::getNumNeighbors() const {
+plint BouzidiOffLatticeModel2D<T,Descriptor>::getNumNeighbors() const
+{
     return 1;
 }
 
 template<typename T, template<typename U> class Descriptor>
 void BouzidiOffLatticeModel2D<T,Descriptor>::prepareCell (
-        Dot2D const& cellLocation,
-        AtomicContainerBlock2D& container )
+    Dot2D const& cellLocation,
+    AtomicContainerBlock2D& container )
 {
     typedef Descriptor<T> D;
     Dot2D offset = container.getLocation();
     BouzidiOffLatticeInfo2D* info =
-        dynamic_cast<BouzidiOffLatticeInfo2D*>(container.getData());
-    PLB_ASSERT( info );
+        dynamic_cast<BouzidiOffLatticeInfo2D*> ( container.getData() );
+    PLB_ASSERT ( info );
     std::vector<int> solidDirections;
     std::vector<plint> boundaryIds;
     std::vector<bool> hasFluidNeighbor;
-    if (this->isFluid(cellLocation+offset)) {
-        for (plint iPop=1; iPop<D::q; ++iPop) {
-            Dot2D neighbor(cellLocation.x+D::c[iPop][0], cellLocation.y+D::c[iPop][1], cellLocation.z+D::c[iPop][2]);
-            Dot2D prevNode(cellLocation.x-D::c[iPop][0], cellLocation.y-D::c[iPop][1], cellLocation.z-D::c[iPop][2]);
+    if ( this->isFluid ( cellLocation+offset ) )
+    {
+        for ( plint iPop=1; iPop<D::q; ++iPop )
+        {
+            Dot2D neighbor ( cellLocation.x+D::c[iPop][0], cellLocation.y+D::c[iPop][1] );
+            Dot2D prevNode ( cellLocation.x-D::c[iPop][0], cellLocation.y-D::c[iPop][1] );
             // If the fluid node has a non-fluid neighbor ...
-            if (!this->isFluid(neighbor+offset)) {
+            if ( !this->isFluid ( neighbor+offset ) )
+            {
                 plint iTriangle=-1;
-                global::timer("intersect").start();
-                Array<T,3> locatedPoint;
+                global::timer ( "intersect" ).start();
+                Array<T,2> locatedPoint;
                 T distance;
-                Array<T,3> wallNormal;
-                Array<T,3> surfaceData;
+                Array<T,2> wallNormal;
+                Array<T,2> surfaceData;
                 OffBoundary::Type bdType;
 #ifdef PLB_DEBUG
                 bool ok =
 #endif
                     this->pointOnSurface (
-                            cellLocation+offset, Dot2D(D::c[iPop][0],D::c[iPop][1],D::c[iPop][2]), locatedPoint, distance,
-                            wallNormal, surfaceData, bdType, iTriangle );
+                        cellLocation+offset, Dot2D ( D::c[iPop][0],D::c[iPop][1],D::c[iPop][2] ), locatedPoint, distance,
+                        wallNormal, surfaceData, bdType, iTriangle );
                 // In the following, the importance of directions is sorted wrt. how well they
                 //   are aligned with the wall normal. It is better to take the continuous normal,
                 //   because it is not sensitive to the choice of the triangle when we shoot at
                 //   an edge.
-                global::timer("intersect").stop();
-                PLB_ASSERT( ok );
+                global::timer ( "intersect" ).stop();
+                PLB_ASSERT ( ok );
                 // ... then add this node to the list.
-                solidDirections.push_back(iPop);
-                boundaryIds.push_back(iTriangle);
-                bool prevNodeIsPureFluid = this->isFluid(prevNode+offset);
-                if (prevNodeIsPureFluid) {
-                    hasFluidNeighbor.push_back(true);
+                solidDirections.push_back ( iPop );
+                boundaryIds.push_back ( iTriangle );
+                bool prevNodeIsPureFluid = this->isFluid ( prevNode+offset );
+                if ( prevNodeIsPureFluid )
+                {
+                    hasFluidNeighbor.push_back ( true );
                 }
-                else {
-                    hasFluidNeighbor.push_back(false);
+                else
+                {
+                    hasFluidNeighbor.push_back ( false );
                 }
             }
         }
-        if (!solidDirections.empty()) {
-            info->getBoundaryNodes().push_back(cellLocation);
-            info->getSolidDirections().push_back(solidDirections);
-            info->getBoundaryIds().push_back(boundaryIds);
-            info->getHasFluidNeighbor().push_back(hasFluidNeighbor);
+        if ( !solidDirections.empty() )
+        {
+            info->getBoundaryNodes().push_back ( cellLocation );
+            info->getSolidDirections().push_back ( solidDirections );
+            info->getBoundaryIds().push_back ( boundaryIds );
+            info->getHasFluidNeighbor().push_back ( hasFluidNeighbor );
         }
     }
 }
 
 template<typename T, template<typename U> class Descriptor>
 ContainerBlockData*
-    BouzidiOffLatticeModel2D<T,Descriptor>::generateOffLatticeInfo() const
+BouzidiOffLatticeModel2D<T,Descriptor>::generateOffLatticeInfo() const
 {
     return new BouzidiOffLatticeInfo2D;
 }
 
 template<typename T, template<typename U> class Descriptor>
-Array<T,3> BouzidiOffLatticeModel2D<T,Descriptor>::getLocalForce (
-                AtomicContainerBlock2D& container ) const
+Array<T,2> BouzidiOffLatticeModel2D<T,Descriptor>::getLocalForce (
+    AtomicContainerBlock2D& container ) const
 {
     BouzidiOffLatticeInfo2D* info =
-        dynamic_cast<BouzidiOffLatticeInfo2D*>(container.getData());
-    PLB_ASSERT( info );
+        dynamic_cast<BouzidiOffLatticeInfo2D*> ( container.getData() );
+    PLB_ASSERT ( info );
     return info->getLocalForce();
 }
 
 template<typename T, template<typename U> class Descriptor>
 void BouzidiOffLatticeModel2D<T,Descriptor>::boundaryCompletion (
-        AtomicBlock2D& nonTypeLattice,
-        AtomicContainerBlock2D& container,
-        std::vector<AtomicBlock2D const*> const& args )
+    AtomicBlock2D& nonTypeLattice,
+    AtomicContainerBlock2D& container,
+    std::vector<AtomicBlock2D const*> const& args )
 {
     BlockLattice2D<T,Descriptor>& lattice =
-        dynamic_cast<BlockLattice2D<T,Descriptor>&> (nonTypeLattice);
+        dynamic_cast<BlockLattice2D<T,Descriptor>&> ( nonTypeLattice );
     BouzidiOffLatticeInfo2D* info =
-        dynamic_cast<BouzidiOffLatticeInfo2D*>(container.getData());
-    PLB_ASSERT( info );
+        dynamic_cast<BouzidiOffLatticeInfo2D*> ( container.getData() );
+    PLB_ASSERT ( info );
     std::vector<Dot2D> const&
-        boundaryNodes = info->getBoundaryNodes();
+    boundaryNodes = info->getBoundaryNodes();
     std::vector<std::vector<int> > const&
-        solidDirections = info->getSolidDirections();
+    solidDirections = info->getSolidDirections();
     std::vector<std::vector<plint> > const&
-        boundaryIds = info->getBoundaryIds();
+    boundaryIds = info->getBoundaryIds();
     std::vector<std::vector<bool> > const&
-        hasFluidNeighbor = info->getHasFluidNeighbor();
-    PLB_ASSERT( boundaryNodes.size() == solidDirections.size() );
-    PLB_ASSERT( boundaryNodes.size() == boundaryIds.size() );
-    PLB_ASSERT( boundaryNodes.size() == hasFluidNeighbor.size() );
+    hasFluidNeighbor = info->getHasFluidNeighbor();
+    PLB_ASSERT ( boundaryNodes.size() == solidDirections.size() );
+    PLB_ASSERT ( boundaryNodes.size() == boundaryIds.size() );
+    PLB_ASSERT ( boundaryNodes.size() == hasFluidNeighbor.size() );
 
     Dot2D absoluteOffset = lattice.getLocation();
 
-    Array<T,3>& localForce = info->getLocalForce();
+    Array<T,2>& localForce = info->getLocalForce();
     localForce.resetToZero();
-    for (pluint i=0; i<boundaryNodes.size(); ++i) {
+    for ( pluint i=0; i<boundaryNodes.size(); ++i )
+    {
         cellCompletion (
             lattice, boundaryNodes[i], solidDirections[i],
             boundaryIds[i], hasFluidNeighbor[i], absoluteOffset, localForce, args );
@@ -172,11 +183,11 @@ void BouzidiOffLatticeModel2D<T,Descriptor>::boundaryCompletion (
 
 template<typename T, template<typename U> class Descriptor>
 void BouzidiOffLatticeModel2D<T,Descriptor>::cellCompletion (
-        BlockLattice2D<T,Descriptor>& lattice,
-        Dot2D const& boundaryNode,
-        std::vector<int> const& solidDirections, std::vector<plint> const& boundaryIds,
-        std::vector<bool> const& hasFluidNeighbor, Dot2D const& absoluteOffset,
-        Array<T,3>& localForce, std::vector<AtomicBlock2D const*> const& args )
+    BlockLattice2D<T,Descriptor>& lattice,
+    Dot2D const& boundaryNode,
+    std::vector<int> const& solidDirections, std::vector<plint> const& boundaryIds,
+    std::vector<bool> const& hasFluidNeighbor, Dot2D const& absoluteOffset,
+    Array<T,2>& localForce, std::vector<AtomicBlock2D const*> const& args )
 {
     typedef Descriptor<T> D;
     Array<T,D::d> deltaJ;
@@ -184,72 +195,85 @@ void BouzidiOffLatticeModel2D<T,Descriptor>::cellCompletion (
 
     plint numNeumannNodes=0;
     T neumannDensity = T();
-    Cell<T,Descriptor>& cell = lattice.get(boundaryNode.x,boundaryNode.y,boundaryNode.z);
-    for(pluint i=0; i<solidDirections.size(); ++i) {
+    Cell<T,Descriptor>& cell = lattice.get ( boundaryNode.x,boundaryNode.y );
+    for ( pluint i=0; i<solidDirections.size(); ++i )
+    {
         int iPop = solidDirections[i];
-        int oppPop = indexTemplates::opposite<D>(i);
-        Array<T,3> wallNode, wall_vel;
+        int oppPop = indexTemplates::opposite<D> ( i );
+        Array<T,2> wallNode, wall_vel;
         T AC;
         OffBoundary::Type bdType;
-        Array<T,3> wallNormal;
+        Array<T,2> wallNormal;
         plint id = boundaryIds[i];
 #ifdef PLB_DEBUG
         bool ok =
 #endif
-        this->pointOnSurface (
-                boundaryNode+absoluteOffset, Dot2D(D::c[iPop][0],D::c[iPop][1],D::c[iPop][2]),
+            this->pointOnSurface (
+                boundaryNode+absoluteOffset, Dot2D ( D::c[iPop][0],D::c[iPop][1],D::c[iPop][2] ),
                 wallNode, AC, wallNormal, wall_vel, bdType, id );
-        PLB_ASSERT( ok );
+        PLB_ASSERT ( ok );
         T q = AC * invAB[iPop];
-        Cell<T,Descriptor>& iCell = lattice.get(boundaryNode.x+D::c[iPop][0],boundaryNode.y+D::c[iPop][1],boundaryNode.z+D::c[iPop][2]);
-        Cell<T,Descriptor>& jCell = lattice.get(boundaryNode.x-D::c[iPop][0],boundaryNode.y-D::c[iPop][1],boundaryNode.z-D::c[iPop][2]);
-        if (bdType==OffBoundary::dirichlet) {
+        Cell<T,Descriptor>& iCell = lattice.get ( boundaryNode.x+D::c[iPop][0],boundaryNode.y+D::c[iPop][1] );
+        Cell<T,Descriptor>& jCell = lattice.get ( boundaryNode.x-D::c[iPop][0],boundaryNode.y-D::c[iPop][1] );
+        if ( bdType==OffBoundary::dirichlet )
+        {
             T u_ci = D::c[iPop][0]*wall_vel[0]+D::c[iPop][1]*wall_vel[1]+D::c[iPop][2]*wall_vel[2];
-            if (hasFluidNeighbor[i]) {
-                if (q<(T)0.5) {
-                    cell[oppPop] = 2.*q*iCell[iPop] + (1.-2.*q)*cell[iPop];
+            if ( hasFluidNeighbor[i] )
+            {
+                if ( q< ( T ) 0.5 )
+                {
+                    cell[oppPop] = 2.*q*iCell[iPop] + ( 1.-2.*q ) *cell[iPop];
                     cell[oppPop] += 2.* u_ci*D::t[iPop]*D::invCs2;
                 }
-                else {
-                    cell[oppPop] = 1./(2.*q)*iCell[iPop]+(2.*q-1)/(2.*q)*jCell[oppPop];
+                else
+                {
+                    cell[oppPop] = 1./ ( 2.*q ) *iCell[iPop]+ ( 2.*q-1 ) / ( 2.*q ) *jCell[oppPop];
                     cell[oppPop] += 1./q* u_ci*D::t[iPop]*D::invCs2;
                 }
             }
-            else {
+            else
+            {
                 cell[oppPop] = iCell[iPop]+2.* u_ci*D::t[iPop]*D::invCs2;
             }
         }
-        else if (bdType==OffBoundary::densityNeumann) {
+        else if ( bdType==OffBoundary::densityNeumann )
+        {
             ++numNeumannNodes;
             neumannDensity += wall_vel[0];
-            if (hasFluidNeighbor[i]) {
+            if ( hasFluidNeighbor[i] )
+            {
                 cell[oppPop] = jCell[oppPop];
             }
-            else {
+            else
+            {
                 cell[oppPop] = cell[iPop];
             }
         }
-        else {
+        else
+        {
             // Not implemented yet.
-            PLB_ASSERT( false );
+            PLB_ASSERT ( false );
         }
-        if (computeStat) {
+        if ( computeStat )
+        {
             deltaJ[0] = D::c[iPop][0]*iCell[iPop] - D::c[oppPop][0]*cell[oppPop];
             deltaJ[1] = D::c[iPop][1]*iCell[iPop] - D::c[oppPop][1]*cell[oppPop];
             deltaJ[2] = D::c[iPop][2]*iCell[iPop] - D::c[oppPop][2]*cell[oppPop];
         }
     }
     localForce += deltaJ;
-    if (numNeumannNodes>0) {
+    if ( numNeumannNodes>0 )
+    {
         neumannDensity /= numNeumannNodes;
         T oldRhoBar;
-        Array<T,3> j;
-        momentTemplates<T,Descriptor>::get_rhoBar_j(cell, oldRhoBar, j);
-        T newRhoBar = D::rhoBar(neumannDensity);
-        T jSqr = normSqr(j);
-        for (plint iPop=0; iPop<D::q; ++iPop) {
-            T oldEq = cell.getDynamics().computeEquilibrium(iPop, oldRhoBar, j, jSqr);
-            T newEq = cell.getDynamics().computeEquilibrium(iPop, newRhoBar, j, jSqr);
+        Array<T,2> j;
+        momentTemplates<T,Descriptor>::get_rhoBar_j ( cell, oldRhoBar, j );
+        T newRhoBar = D::rhoBar ( neumannDensity );
+        T jSqr = normSqr ( j );
+        for ( plint iPop=0; iPop<D::q; ++iPop )
+        {
+            T oldEq = cell.getDynamics().computeEquilibrium ( iPop, oldRhoBar, j, jSqr );
+            T newEq = cell.getDynamics().computeEquilibrium ( iPop, newRhoBar, j, jSqr );
             cell[iPop] += newEq - oldEq;
         }
     }

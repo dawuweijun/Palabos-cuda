@@ -301,9 +301,7 @@ void OffLatticePatternFunctional2D<T,SurfaceData>::processGenericBlocks (
 
     for (plint iX=domain.x0; iX<=domain.x1; ++iX) {
         for (plint iY=domain.y0; iY<=domain.y1; ++iY) {
-            for (plint iZ=domain.z0; iZ<=domain.z1; ++iZ) {
-                offLatticeModel->prepareCell(Dot2D(iX,iY,iZ), *container);
-            }
+                offLatticeModel->prepareCell(Dot2D(iX,iY), *container);
         }
     }
 }

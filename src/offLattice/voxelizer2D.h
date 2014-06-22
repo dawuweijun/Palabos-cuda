@@ -89,11 +89,11 @@ public:
 private:
     bool checkIfFacetsCrossed (
             AtomicContainerBlock2D& hashContainer,
-            Array<T,3> const& point1, Array<T,3> const& point2,
+            Array<T,2> const& point1, Array<T,2> const& point2,
             T& distance, plint& whichTriangle );
     bool distanceToSurface (
             AtomicContainerBlock2D& hashContainer,
-            Array<T,3> const& point, T& distance, bool& isBehind ) const;
+            Array<T,2> const& point, T& distance, bool& isBehind ) const;
     bool createVoxelizationRange (
             Box2D const& domain, ScalarField2D<int>& voxels,
             Array<plint,2>& xRange, Array<plint,2>& yRange, Array<plint,2>& zRange );

@@ -71,7 +71,7 @@ void BoundaryShapeIntersection2D<T,SurfaceData>::addComponent(BoundaryShape2D<T,
 }
 
 template<typename T, class SurfaceData>
-bool BoundaryShapeIntersection2D<T,SurfaceData>::isInside(Array<T,3> const& location) const {
+bool BoundaryShapeIntersection2D<T,SurfaceData>::isInside(Array<T,2> const& location) const {
     bool isInside = true;
     for (pluint iComponent=0; iComponent<components.size(); ++iComponent) {
         if (! components[iComponent]->isInside(location) ) {
@@ -82,7 +82,7 @@ bool BoundaryShapeIntersection2D<T,SurfaceData>::isInside(Array<T,3> const& loca
 }
 
 template<typename T, class SurfaceData>
-bool BoundaryShapeIntersection2D<T,SurfaceData>::isInside(Array<T,3> const& location, T epsilon) const
+bool BoundaryShapeIntersection2D<T,SurfaceData>::isInside(Array<T,2> const& location, T epsilon) const
 {
     bool isInside = true;
     for (pluint iComponent=0; iComponent<components.size(); ++iComponent) {
@@ -95,16 +95,16 @@ bool BoundaryShapeIntersection2D<T,SurfaceData>::isInside(Array<T,3> const& loca
 
 template<typename T, class SurfaceData>
 bool BoundaryShapeIntersection2D<T,SurfaceData>::pointOnSurface (
-        Array<T,3> const& fromPoint, Array<T,3> const& direction,
-        Array<T,3>& locatedPoint, T& distance,
-        Array<T,3>& wallNormal, SurfaceData& surfaceData,
+        Array<T,2> const& fromPoint, Array<T,2> const& direction,
+        Array<T,2>& locatedPoint, T& distance,
+        Array<T,2>& wallNormal, SurfaceData& surfaceData,
         OffBoundary::Type& bdType, plint& id ) const
 {
     bool doesIntersect = false;
     for (pluint iComponent=0; iComponent<components.size(); ++iComponent) {
-        Array<T,3> positionOnWall;
+        Array<T,2> positionOnWall;
         T newDistance;
-        Array<T,3> newWallNormal;
+        Array<T,2> newWallNormal;
         SurfaceData newSurfaceData;
         OffBoundary::Type newBdType;
         if( components[iComponent]->pointOnSurface (
@@ -127,13 +127,13 @@ bool BoundaryShapeIntersection2D<T,SurfaceData>::pointOnSurface (
 
 template<typename T, class SurfaceData>
 bool BoundaryShapeIntersection2D<T,SurfaceData>::intersectsSurface (
-        Array<T,3> const& p1, Array<T,3> const& p2, plint& id ) const
+        Array<T,2> const& p1, Array<T,2> const& p2, plint& id ) const
 {
     bool doesIntersect = false;
     for (pluint iComponent=0; iComponent<components.size(); ++iComponent) {
-        Array<T,3> positionOnWall;
+        Array<T,2> positionOnWall;
         T newDistance;
-        Array<T,3> newWallNormal;
+        Array<T,2> newWallNormal;
         SurfaceData newSurfaceData;
         OffBoundary::Type newBdType;
         if( components[iComponent]->pointOnSurface (
@@ -148,7 +148,7 @@ bool BoundaryShapeIntersection2D<T,SurfaceData>::intersectsSurface (
 
 template<typename T, class SurfaceData>
 bool BoundaryShapeIntersection2D<T,SurfaceData>::distanceToSurface (
-        Array<T,3> const& point, T& distance, bool& isBehind ) const
+        Array<T,2> const& point, T& distance, bool& isBehind ) const
 {
     bool surfaceFound = false;
     for (pluint iComponent=0; iComponent<components.size(); ++iComponent) {

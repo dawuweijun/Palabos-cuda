@@ -31,10 +31,10 @@
 namespace plb {
 
 template<typename T, template<typename U> class Descriptor>
-class BouzidiOffLatticeModel2D : public OffLatticeModel2D<T,Array<T,3> >
+class BouzidiOffLatticeModel2D : public OffLatticeModel2D<T,Array<T,2> >
 {
 public:
-    BouzidiOffLatticeModel2D(BoundaryShape2D<T,Array<T,3> >* shape_, int flowType_);
+    BouzidiOffLatticeModel2D(BoundaryShape2D<T,Array<T,2> >* shape_, int flowType_);
     virtual BouzidiOffLatticeModel2D<T,Descriptor>* clone() const;
     virtual plint getNumNeighbors() const;
     virtual void prepareCell (
@@ -47,9 +47,9 @@ public:
             Dot2D const& boundaryNode,
             std::vector<int> const& solidDirections, std::vector<plint> const& boundaryIds,
             std::vector<bool> const& hasFluidNeighbor, Dot2D const& absoluteOffset,
-            Array<T,3>& localForce, std::vector<AtomicBlock2D const*> const& args );
+            Array<T,2>& localForce, std::vector<AtomicBlock2D const*> const& args );
     virtual ContainerBlockData* generateOffLatticeInfo() const;
-    virtual Array<T,3> getLocalForce(AtomicContainerBlock2D& container) const;
+    virtual Array<T,2> getLocalForce(AtomicContainerBlock2D& container) const;
     void selectComputeStat(bool flag) { computeStat = flag; }
     bool computesStat() const { return computeStat; }
 private:
@@ -76,9 +76,9 @@ private:
         { return hasFluidNeighbor; }
         std::vector<std::vector<bool> >&        getHasFluidNeighbor()
         { return hasFluidNeighbor; }
-        Array<T,3> const&                       getLocalForce() const
+        Array<T,2> const&                       getLocalForce() const
         { return localForce; }
-        Array<T,3>&                             getLocalForce()
+        Array<T,2>&                             getLocalForce()
         { return localForce; }
         virtual BouzidiOffLatticeInfo2D* clone() const {
             return new BouzidiOffLatticeInfo2D(*this);
@@ -88,7 +88,7 @@ private:
         std::vector<std::vector<int> >   solidDirections;
         std::vector<std::vector<plint> > boundaryIds;
         std::vector<std::vector<bool> >  hasFluidNeighbor;
-        Array<T,3>                       localForce;
+        Array<T,2>                       localForce;
     };
 };
 
