@@ -28,7 +28,7 @@
 #include "core/globalDefs.h"
 #include "offLattice/boundaryShapes2D.h"
 #include "offLattice/segmentSet.h"
-#include "offLattice/triangularSurfaceMesh.h"
+#include "offLattice/segmentPolygonMesh2D.h"
 #include "offLattice/offLatticeBoundaryProfiles2D.h"
 #include "particles/multiParticleField2D.h"
 #include "multiBlock/redistribution2D.h"
@@ -57,9 +57,9 @@ public:
     void swap(DEFscaledMesh2D<T>& rhs);
 public: // Mesh usage interface.
     /// Get a reference to the currently active mesh.
-    TriangularSurfaceMesh<T>& getMesh();
+    SegmentPolygonMesh2D<T>& getMesh();
     /// Get a const reference to the currently active mesh.
-    TriangularSurfaceMesh<T> const& getMesh() const;
+    SegmentPolygonMesh2D<T> const& getMesh() const;
     plint getMargin() const;
     std::vector<Array<T,2> > const& getVertexList() const {
         return vertexList;
@@ -93,7 +93,7 @@ private:
     std::vector<plint> emanatingEdgeList;
     /// Edges are a structural information.
     std::vector<Edge> edgeList;
-    TriangularSurfaceMesh<T>* mesh;
+    SegmentPolygonMesh2D<T>* mesh;
     plint margin;
     Array<T,2> physicalLocation;
     T dx;
@@ -147,7 +147,7 @@ bool isWall(VertexProperty2D<T> const* property) {
     }
 }
 
-template<typename T> class TriangleBoundary2D;
+template<typename T> class SegmentBoundary2D;
 
 template<typename T, class SurfaceData>
 class BoundaryProfiles2D {
@@ -159,7 +159,7 @@ public:
     void swap(BoundaryProfiles2D<T,SurfaceData>& rhs);
     void defineProfile(plint tag, BoundaryProfile2D<T,SurfaceData>* profile);
     void resetProfiles(std::map<plint,BoundaryProfile2D<T,SurfaceData>*> profiles_);
-    void defineInletOutletTags(TriangleBoundary2D<T> const& boundary, plint sortDirection);
+    void defineInletOutletTags(SegmentBoundary2D<T> const& boundary, plint sortDirection);
     void setWallProfile(BoundaryProfile2D<T,SurfaceData>* wallProfile_);
     void setInletOutlet( std::vector<BoundaryProfile2D<T,SurfaceData>*> inletOutlets );
     void setInletOutlet( BoundaryProfile2D<T,SurfaceData>* profile1, BoundaryProfile2D<T,SurfaceData>* profile2 );
@@ -167,9 +167,9 @@ public:
                          BoundaryProfile2D<T,SurfaceData>* profile3 );
     void setInletOutlet( BoundaryProfile2D<T,SurfaceData>* profile1, BoundaryProfile2D<T,SurfaceData>* profile2,
                          BoundaryProfile2D<T,SurfaceData>* profile3, BoundaryProfile2D<T,SurfaceData>* profile4 );
-    void adjustInletOutlet(TriangleBoundary2D<T> const& boundary, plint sortDirection);
+    void adjustInletOutlet(SegmentBoundary2D<T> const& boundary, plint sortDirection);
     BoundaryProfile2D<T,SurfaceData> const& getProfile (
-            TriangleBoundary2D<T> const& boundary, plint iTriangle ) const;
+            SegmentBoundary2D<T> const& boundary, plint iTriangle ) const;
 private:
     void replaceProfile(plint id, BoundaryProfile2D<T,SurfaceData>* newProfile);
     void clearProfiles();
@@ -183,33 +183,33 @@ private:
 };
 
 template<typename T>
-class TriangleBoundary2D {
+class SegmentBoundary2D {
 public:
     template<typename TMesh>
-    TriangleBoundary2D(DEFscaledMesh2D<TMesh> const& defMesh, bool automaticCloseHoles=true);
-    TriangleBoundary2D(DEFscaledMesh2D<T> const& defMesh, bool automaticCloseHoles=true);
-    ~TriangleBoundary2D();
-    TriangleBoundary2D(TriangleBoundary2D<T> const& rhs);
-    TriangleBoundary2D<T>& operator=(TriangleBoundary2D<T> const& rhs);
-    void swap(TriangleBoundary2D<T>& rhs);
+    SegmentBoundary2D(DEFscaledMesh2D<TMesh> const& defMesh, bool automaticCloseHoles=true);
+    SegmentBoundary2D(DEFscaledMesh2D<T> const& defMesh, bool automaticCloseHoles=true);
+    ~SegmentBoundary2D();
+    SegmentBoundary2D(SegmentBoundary2D<T> const& rhs);
+    SegmentBoundary2D<T>& operator=(SegmentBoundary2D<T> const& rhs);
+    void swap(SegmentBoundary2D<T>& rhs);
 public: // Mesh usage interface.
     /// Select the mesh which is subsequently being referred to in calls to
     ///   the methods of this class.
-    TriangleBoundary2D<T> const& select (
+    SegmentBoundary2D<T> const& select (
             plint whichTopology, plint whichVertices ) const;
     /// Select the mesh which is subsequently being referred to in calls to
     ///   the methods of this class. Save the previous selection, which
     ///   can be recovered through a call to popSelect.
-    TriangleBoundary2D<T> const& pushSelect (
+    SegmentBoundary2D<T> const& pushSelect (
             plint whichTopology, plint whichVertices ) const;
     /// Recover the previous selection of the mesh, stored through a
     ///   call to pushSelect.
-    TriangleBoundary2D<T> const& popSelect() const;
+    SegmentBoundary2D<T> const& popSelect() const;
     void getSelection(plint& whichTopology, plint& whichVertices) const;
     /// Get a reference to the currently active mesh.
-    TriangularSurfaceMesh<T>& getMesh();
+    SegmentPolygonMesh2D<T>& getMesh();
     /// Get a const reference to the currently active mesh.
-    TriangularSurfaceMesh<T> const& getMesh() const;
+    SegmentPolygonMesh2D<T> const& getMesh() const;
     /// Get the material property (for example the elasticity constants)
     ///   implemented on a given vertex (the answer is independent of the
     ///   currently active mesh).
@@ -290,7 +290,7 @@ private:
     /// For each set of vertices there is a mesh, with a reference to the
     ///   given vertices (individual to each mesh) and to the
     ///   emanatingEdgeList and edgeList (same for all meshes).
-    std::vector<TriangularSurfaceMesh<T> > meshes;
+    std::vector<SegmentPolygonMesh2D<T> > meshes;
     /// The triangle type is an indirect index which links to the boundary
     ///   condition implemented by each triangle and defined in boundaryProfiles.
     std::vector<plint> triangleTagList;
@@ -313,7 +313,7 @@ template< typename T, class SurfaceData >
 class TriangleFlowShape2D : public BoundaryShape2D<T,SurfaceData> {
 public:
     TriangleFlowShape2D (
-            TriangleBoundary2D<T> const& boundary_,
+            SegmentBoundary2D<T> const& boundary_,
             BoundaryProfiles2D<T,SurfaceData> const& profiles_ );
     virtual bool isInside(Dot2D const& location) const;
     virtual bool pointOnSurface (
@@ -340,7 +340,7 @@ public:
     virtual TriangleFlowShape2D<T,SurfaceData>*
                 clone(std::vector<AtomicBlock2D*> args) const;
 private:
-    TriangleBoundary2D<T> const& boundary;
+    SegmentBoundary2D<T> const& boundary;
     BoundaryProfiles2D<T,SurfaceData> const& profiles;
     /// Data from previous voxelization.
     ScalarField2D<int>* voxelFlags;
@@ -353,15 +353,15 @@ private:
 template<typename T>
 class VoxelizedDomain2D {
 public:
-    VoxelizedDomain2D(TriangleBoundary2D<T> const& boundary_,
+    VoxelizedDomain2D(SegmentBoundary2D<T> const& boundary_,
                       int flowType_, plint extraLayer_, plint borderWidth_,
                       plint envelopeWidth_, plint blockSize_,
                       plint gridLevel_=0, bool dynamicMesh_ = false);
-    VoxelizedDomain2D(TriangleBoundary2D<T> const& boundary_,
+    VoxelizedDomain2D(SegmentBoundary2D<T> const& boundary_,
                       int flowType_, Box2D const& boundingBox, plint borderWidth_,
                       plint envelopeWidth_, plint blockSize_,
                       plint gridLevel_=0, bool dynamicMesh_ = false);
-    VoxelizedDomain2D(TriangleBoundary2D<T> const& boundary_,
+    VoxelizedDomain2D(SegmentBoundary2D<T> const& boundary_,
                       int flowType_, Box2D const& boundingBox, plint borderWidth_,
                       plint envelopeWidth_, plint blockSize_,
                       Box2D const& seed,
@@ -375,7 +375,7 @@ public:
     template<class ParticleFieldT>
     void adjustVoxelization(MultiParticleField2D<ParticleFieldT>& particles, bool dynamicMesh);
     void reparallelize(MultiBlockRedistribute2D const& redistribute);
-    TriangleBoundary2D<T> const& getBoundary() const { return boundary; }
+    SegmentBoundary2D<T> const& getBoundary() const { return boundary; }
     int getFlowType() const { return flowType; }
 private:
     VoxelizedDomain2D<T>& operator=(VoxelizedDomain2D<T> const& rhs) { }
@@ -394,7 +394,7 @@ private:
 private:
     int flowType;
     plint borderWidth;
-    TriangleBoundary2D<T> const& boundary;
+    SegmentBoundary2D<T> const& boundary;
     MultiScalarField2D<int>* voxelMatrix;
     MultiContainerBlock2D* triangleHash;
 };
