@@ -347,6 +347,35 @@ inline void adjustEqualSize(Box2D& fromDomain, Box2D& toDomain)
     toDomain = intersection.shift(-deltaX,-deltaY);
 }
 
+/// Definition of a 2D unbounded line.
+template<typename T>
+struct Line {
+    Line(Array<T,2> point_, Array<T,2> normal_)
+        : point(point_),
+          normal(normal_)
+    { }
+    Line() {
+        point.resetToZero();
+        normal.resetToZero();
+    }
+    Array<T,2> point;
+    Array<T,2> normal;
+};
+/// Definition of a 2D cuboid (rectangular parallelepiped).
+template<typename T>
+struct Cuboid2D {
+    Cuboid2D(Array<T,2> lowerLeftCorner_, Array<T,2> upperRightCorner_)
+        : lowerLeftCorner(lowerLeftCorner_),
+          upperRightCorner(upperRightCorner_)
+    { }
+    Cuboid2D() {
+        lowerLeftCorner.resetToZero();
+        upperRightCorner.resetToZero();
+    }
+    Array<T,2> lowerLeftCorner;
+    Array<T,2> upperRightCorner;
+};
+
 } // namespace plb
 
 #endif  // GEOMETRY_2D_H

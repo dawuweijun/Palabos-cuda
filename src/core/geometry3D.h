@@ -405,14 +405,14 @@ struct Plane {
     Array<T,3> normal;
 };
 
-/// Definition of a cuboid (rectangular parallelepiped).
+/// Definition of a 3D cuboid (rectangular parallelepiped).
 template<typename T>
-struct Cuboid {
-    Cuboid(Array<T,3> lowerLeftCorner_, Array<T,3> upperRightCorner_)
+struct Cuboid3D {
+    Cuboid3D(Array<T,3> lowerLeftCorner_, Array<T,3> upperRightCorner_)
         : lowerLeftCorner(lowerLeftCorner_),
           upperRightCorner(upperRightCorner_)
     { }
-    Cuboid() {
+    Cuboid3D() {
         lowerLeftCorner.resetToZero();
         upperRightCorner.resetToZero();
     }

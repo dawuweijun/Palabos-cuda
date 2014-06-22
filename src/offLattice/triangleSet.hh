@@ -496,7 +496,7 @@ void TriangleSet<T>::merge(std::vector<TriangleSet<T>*> meshes)
         minEdgeLength = std::min(minEdgeLength, meshes[i]->getMinEdgeLength());
         maxEdgeLength = std::max(maxEdgeLength, meshes[i]->getMaxEdgeLength());
 
-        Cuboid<T> bcuboid = meshes[i]->getBoundingCuboid();
+        Cuboid3D<T> bcuboid = meshes[i]->getBoundingCuboid();
         for (plint j = 0; j < 3; j++) {
             boundingCuboid.lowerLeftCorner[j]  = std::min(boundingCuboid.lowerLeftCorner[j],
                                                           bcuboid.lowerLeftCorner[j]);
@@ -513,7 +513,7 @@ void TriangleSet<T>::append(TriangleSet<T> const& mesh)
     minEdgeLength = std::min(minEdgeLength, mesh.getMinEdgeLength());
     maxEdgeLength = std::max(maxEdgeLength, mesh.getMaxEdgeLength());
 
-    Cuboid<T> bcuboid = mesh.getBoundingCuboid();
+    Cuboid3D<T> bcuboid = mesh.getBoundingCuboid();
     for (plint j = 0; j < 3; j++) {
         boundingCuboid.lowerLeftCorner[j]  = std::min(boundingCuboid.lowerLeftCorner[j],
                                                       bcuboid.lowerLeftCorner[j]);
@@ -832,7 +832,7 @@ int TriangleSet<T>::cutWithPlane(Plane<T> const& plane, TriangleSet<T>& newTrian
 
 template<typename T>
 int TriangleSet<T>::cutWithPlane (
-        Plane<T> const& plane, Cuboid<T> const& cuboid, TriangleSet<T>& newTriangleSet ) const
+        Plane<T> const& plane, Cuboid3D<T> const& cuboid, TriangleSet<T>& newTriangleSet ) const
 {
     T epsilon = getEpsilon<T>(precision);
 
