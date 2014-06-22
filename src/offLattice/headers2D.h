@@ -41,7 +41,7 @@
 // #include "offLattice/triangleBoundary2D.h"
 #include "offLattice/offLatticeModel2D.h"
 #include "offLattice/guoOffLatticeModel2D.h"
-// #include "offLattice/bouzidiOffLatticeModel2D.h"
+#include "offLattice/bouzidiOffLatticeModel2D.h"
 // #include "offLattice/guoAdvDiffOffLatticeModel2D.h"
 #include "offLattice/triangleSetGenerator.h"
 // #include "offLattice/immersedWalls2D.h"

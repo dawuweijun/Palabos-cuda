@@ -34,6 +34,7 @@
 #include "latticeBoltzmann/dynamicsTemplates.h"
 #include "latticeBoltzmann/momentTemplates.h"
 #include "core/latticeStatistics.h"
+#include "complexDynamics/mrtDynamics.h"
 #include <algorithm>
 #include <limits>
 
