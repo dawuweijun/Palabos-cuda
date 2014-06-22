@@ -38,7 +38,7 @@
 #include "offLattice/offLatticeBoundaryProfiles2D.hh"
 #include "offLattice/offLatticeBoundaryCondition2D.hh"
 #include "offLattice/boundaryShapes2D.hh"
-#include "offLattice/triangleBoundary2D.hh"
+#include "offLattice/segmentBoundary2D.hh"
 #include "offLattice/offLatticeModel2D.hh"
 #include "offLattice/guoOffLatticeModel2D.hh"
 #include "offLattice/bouzidiOffLatticeModel2D.hh"

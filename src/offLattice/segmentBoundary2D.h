@@ -27,7 +27,7 @@
 
 #include "core/globalDefs.h"
 #include "offLattice/boundaryShapes2D.h"
-#include "offLattice/SegmentSet.h"
+#include "offLattice/segmentSet.h"
 #include "offLattice/triangularSurfaceMesh.h"
 #include "offLattice/offLatticeBoundaryProfiles2D.h"
 #include "particles/multiParticleField2D.h"

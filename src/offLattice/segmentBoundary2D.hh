@@ -26,7 +26,7 @@
 #define INNER_FLOW_BOUNDARY_2D_HH
 
 #include "core/globalDefs.h"
-#include "offLattice/triangleBoundary2D.h"
+#include "offLattice/segmentBoundary2D.h"
 #include "offLattice/triangularSurfaceMesh.h"
 #include "offLattice/offLatticeBoundaryProfiles2D.h"
 #include "offLattice/triangleToDef.h"
