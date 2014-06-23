@@ -99,23 +99,22 @@ inline bool outsideFlag ( int arg )
 
 template<typename T>
 std::auto_ptr<MultiScalarField2D<int> > voxelize (
-    TriangularSurfaceMesh<T> const& mesh,
+    SegmentPolygonMesh2D<T> const& mesh,
     plint symmetricLayer, plint borderWidth )
 {
-    Array<T,2> xRange, yRange, zRange;
-    mesh.computeBoundingBox ( xRange, yRange, zRange );
+    Array<T,2> xRange, yRange;
+    mesh.computeBoundingBox ( xRange, yRange );
     // Creation of the multi-scalar field. The +1 is because if the resolution is N,
     //   the number of nodes is N+1.
     plint nx = ( plint ) ( xRange[1] - xRange[0] ) + 1 + 2*symmetricLayer;
     plint ny = ( plint ) ( yRange[1] - yRange[0] ) + 1 + 2*symmetricLayer;
-    plint nz = ( plint ) ( zRange[1] - zRange[0] ) + 1 + 2*symmetricLayer;
 
-    return voxelize ( mesh, Box2D ( 0,nx-1, 0,ny-1, 0,nz-1 ), borderWidth );
+    return voxelize ( mesh, Box2D ( 0,nx-1, 0,ny-1 ), borderWidth );
 }
 
 template<typename T>
 std::auto_ptr<MultiScalarField2D<int> > voxelize (
-    TriangularSurfaceMesh<T> const& mesh,
+    SegmentPolygonMesh2D<T> const& mesh,
     Box2D const& domain, plint borderWidth )
 {
     // As initial seed, a one-cell layer around the outer boundary is tagged
@@ -130,7 +129,7 @@ std::auto_ptr<MultiScalarField2D<int> > voxelize (
     std::vector<MultiBlock2D*> container_arg;
     container_arg.push_back ( &hashContainer );
     applyProcessingFunctional (
-        new CreateTriangleHash<T> ( mesh ),
+        new CreateSegmentHash<T> ( mesh ),
         hashContainer.getBoundingBox(), container_arg );
 
     std::vector<MultiBlock2D*> flag_hash_arg;
@@ -152,7 +151,7 @@ std::auto_ptr<MultiScalarField2D<int> > voxelize (
 
 template<typename T>
 std::auto_ptr<MultiScalarField2D<int> > voxelize (
-    TriangularSurfaceMesh<T> const& mesh,
+    SegmentPolygonMesh2D<T> const& mesh,
     Box2D const& domain, plint borderWidth, Box2D seed )
 {
     // As initial seed, a one-cell layer around the outer boundary is tagged
@@ -167,7 +166,7 @@ std::auto_ptr<MultiScalarField2D<int> > voxelize (
     std::vector<MultiBlock2D*> container_arg;
     container_arg.push_back ( &hashContainer );
     applyProcessingFunctional (
-        new CreateTriangleHash<T> ( mesh ),
+        new CreateSegmentHash<T> ( mesh ),
         hashContainer.getBoundingBox(), container_arg );
 
     std::vector<MultiBlock2D*> flag_hash_arg;
@@ -197,7 +196,7 @@ std::auto_ptr<MultiScalarField2D<int> > voxelize (
 
 template<typename T>
 std::auto_ptr<MultiScalarField2D<int> > revoxelize (
-    TriangularSurfaceMesh<T> const& mesh,
+    SegmentPolygonMesh2D<T> const& mesh,
     MultiScalarField2D<int>& oldVoxelMatrix,
     MultiContainerBlock2D& hashContainer, plint borderWidth )
 {
@@ -232,7 +231,7 @@ std::auto_ptr<MultiScalarField2D<int> > revoxelize (
 
 template<typename T>
 VoxelizeMeshFunctional2D<T>::VoxelizeMeshFunctional2D (
-    TriangularSurfaceMesh<T> const& mesh_ )
+    SegmentPolygonMesh2D<T> const& mesh_ )
     : mesh ( mesh_ )
 { }
 
@@ -244,35 +243,34 @@ bool VoxelizeMeshFunctional2D<T>::distanceToSurface (
     T maxDistance = sqrt ( 3 );
     Array<T,2> xRange ( point[0]-maxDistance, point[0]+maxDistance );
     Array<T,2> yRange ( point[1]-maxDistance, point[1]+maxDistance );
-    Array<T,2> zRange ( point[2]-maxDistance, point[2]+maxDistance );
-    TriangleHash<T> triangleHash ( hashContainer );
-    std::vector<plint> possibleTriangles;
-    triangleHash.getTriangles ( xRange, yRange, zRange, possibleTriangles );
+    SegmentHash<T> segmentHash ( hashContainer );
+    std::vector<plint> possibleSegments;
+    segmentHash.getSegments ( xRange, yRange, possibleSegments );
 
     T    tmpDistance;
     bool tmpIsBehind;
-    bool triangleFound = false;
+    bool segmentFound = false;
 
-    for ( pluint iPossible=0; iPossible<possibleTriangles.size(); ++iPossible )
+    for ( pluint iPossible=0; iPossible<possibleSegments.size(); ++iPossible )
     {
-        plint iTriangle = possibleTriangles[iPossible];
-        mesh.distanceToTriangle (
-            point, iTriangle, tmpDistance, tmpIsBehind );
-        if ( !triangleFound || tmpDistance<distance )
+        plint iSegment = possibleSegments[iPossible];
+        mesh.distanceToSegment (
+            point, iSegment, tmpDistance, tmpIsBehind );
+        if ( !segmentFound || tmpDistance<distance )
         {
             distance = tmpDistance;
             isBehind = tmpIsBehind;
-            triangleFound = true;
+            segmentFound = true;
         }
     }
-    return triangleFound;
+    return segmentFound;
 }
 
 template<typename T>
 bool VoxelizeMeshFunctional2D<T>::checkIfFacetsCrossed (
     AtomicContainerBlock2D& hashContainer,
     Array<T,2> const& point1, Array<T,2> const& point2,
-    T& distance, plint& whichTriangle )
+    T& distance, plint& whichSegment )
 {
     Array<T,2> xRange (
         std::min ( point1[0], point2[0] ),
@@ -280,12 +278,9 @@ bool VoxelizeMeshFunctional2D<T>::checkIfFacetsCrossed (
     Array<T,2> yRange (
         std::min ( point1[1], point2[1] ),
         std::max ( point1[1], point2[1] ) );
-    Array<T,2> zRange (
-        std::min ( point1[2], point2[2] ),
-        std::max ( point1[2], point2[2] ) );
-    TriangleHash<T> triangleHash ( hashContainer );
-    std::vector<plint> possibleTriangles;
-    triangleHash.getTriangles ( xRange, yRange, zRange, possibleTriangles );
+    SegmentHash<T> segmentHash ( hashContainer );
+    std::vector<plint> possibleSegments;
+    segmentHash.getSegments ( xRange, yRange, possibleSegments );
 
     int flag = 0; // Check for crossings inside the point1-point2 segment.
     Array<T,2> intersection; // Dummy variable.
@@ -297,20 +292,20 @@ bool VoxelizeMeshFunctional2D<T>::checkIfFacetsCrossed (
         std::cout << "{";
     }
     std::vector<T> crossings;
-    for ( pluint iPossible=0; iPossible<possibleTriangles.size(); ++iPossible )
+    for ( pluint iPossible=0; iPossible<possibleSegments.size(); ++iPossible )
     {
-        plint iTriangle = possibleTriangles[iPossible];
-        if ( mesh.pointOnTriangle ( point1, point2, flag, iTriangle, intersection, normal, tmpDistance ) ==1 )
+        plint iSegment = possibleSegments[iPossible];
+        if ( mesh.pointOnSegment ( point1, point2, flag, iSegment, intersection, normal, tmpDistance ) ==1 )
         {
             if ( global::counter ( "voxelizer-debug" ).getCount() ==1 )
             {
-                std::cout << "(" << iTriangle << ";" << tmpDistance << ")";
+                std::cout << "(" << iSegment << ";" << tmpDistance << ")";
             }
             crossings.push_back ( tmpDistance );
             if ( crossings.size() ==1 || tmpDistance<distance )
             {
                 distance = tmpDistance;
-                whichTriangle = iTriangle;
+                whichSegment = iSegment;
             }
         }
     }
@@ -343,7 +338,7 @@ bool VoxelizeMeshFunctional2D<T>::checkIfFacetsCrossed (
 template<typename T>
 bool VoxelizeMeshFunctional2D<T>::createVoxelizationRange (
     Box2D const& domain, ScalarField2D<int>& voxels,
-    Array<plint,2>& xRange, Array<plint,2>& yRange, Array<plint,2>& zRange )
+    Array<plint,2>& xRange, Array<plint,2>& yRange )
 {
     // The purpose of the first three loops is to locate the eight
     //   corners of the cube. One voxel per corner would be insufficient
@@ -384,7 +379,7 @@ void VoxelizeMeshFunctional2D<T>::printOffender (
     AtomicContainerBlock2D& hashContainer,
     Dot2D pos )
 {
-    std::set<plint> triangles;
+    std::set<plint> segments;
     Dot2D offset = voxels.getLocation();
     Dot2D pos_ = pos+offset;
     std::cout << "Position (" << pos_.x << "," << pos_.y << ")" << std::endl;
@@ -392,46 +387,43 @@ void VoxelizeMeshFunctional2D<T>::printOffender (
     {
         for ( plint dy=-1; dy<=+1; ++dy )
         {
-            for ( plint dz=-1; dz<=+1; ++dz )
+            if ( ! ( dx==0 && dy==0 ) )
             {
-                if ( ! ( dx==0 && dy==0 && dz==0 ) )
+                Dot2D neigh = pos+offset+Dot2D ( dx,dy );
+                int typeOfNeighbor = voxels.get ( pos.x+dx,pos.y+dy );
+                if ( typeOfNeighbor!=voxelFlag::undetermined )
                 {
-                    Dot2D neigh = pos+offset+Dot2D ( dx,dy,dz );
-                    int typeOfNeighbor = voxels.get ( pos.x+dx,pos.y+dy );
-                    if ( typeOfNeighbor!=voxelFlag::undetermined )
+                    T distance;
+                    plint whichSegment;
+                    Array<T,2> p1 ( pos_.x,pos_.y );
+                    Array<T,2> p2 ( neigh.x,neigh.y );
+                    global::counter ( "voxelizer-debug" ).increment ( 1 );
+                    bool crossed = checkIfFacetsCrossed (
+                                       hashContainer, p1, p2, distance, whichSegment );
+                    global::counter ( "voxelizer-debug" ).reset();
+                    std::cout << "Neighbor ("
+                              << dx << "," << dy
+                              << "); is "
+                              << ( voxelFlag::insideFlag ( typeOfNeighbor ) ? "inside" : "outside" );
+                    if ( crossed )
                     {
-                        T distance;
-                        plint whichTriangle;
-                        Array<T,2> p1 ( pos_.x,pos_.y );
-                        Array<T,2> p2 ( neigh.x,neigh.y );
-                        global::counter ( "voxelizer-debug" ).increment ( 1 );
-                        bool crossed = checkIfFacetsCrossed (
-                                           hashContainer, p1, p2, distance, whichTriangle );
-                        global::counter ( "voxelizer-debug" ).reset();
-                        std::cout << "Neighbor ("
-                                  << dx << "," << dy << "," << dz
-                                  << "); is "
-                                  << ( voxelFlag::insideFlag ( typeOfNeighbor ) ? "inside" : "outside" );
-                        if ( crossed )
-                        {
-                            triangles.insert ( whichTriangle );
-                            std::cout
-                                    << " inters. at distance " << distance
-                                    << " with triangle " << whichTriangle << std::endl;
-                        }
-                        else
-                        {
-                            std::cout << " no inters." << std::endl;
-                        }
+                        segments.insert ( whichSegment );
+                        std::cout
+                                << " inters. at distance " << distance
+                                << " with segment " << whichSegment << std::endl;
+                    }
+                    else
+                    {
+                        std::cout << " no inters." << std::endl;
                     }
                 }
             }
         }
     }
-    std::set<plint>::iterator it = triangles.begin();
-    for ( ; it!=triangles.end(); ++it )
+    std::set<plint>::iterator it = segments.begin();
+    for ( ; it!=segments.end(); ++it )
     {
-        std::cout << "Triangle " << *it << " [" << std::flush;
+        std::cout << "Segment " << *it << " [" << std::flush;
         Array<T,2> p0 = mesh.getVertex ( *it, 0 );
         Array<T,2> p1 = mesh.getVertex ( *it, 1 );
         Array<T,2> p2 = mesh.getVertex ( *it, 2 );
@@ -470,8 +462,8 @@ bool VoxelizeMeshFunctional2D<T>::voxelizeFromNeighbor (
     int newVoxelType = voxelFlag::undetermined;
     T distance1, distance2, distance3, distance4;
     bool isBehind1, isBehind2;
-    plint whichTriangle1, whichTriangle2;
-    if ( checkIfFacetsCrossed ( hashContainer, point1, point2, distance1, whichTriangle1 ) )
+    plint whichSegment1, whichSegment2;
+    if ( checkIfFacetsCrossed ( hashContainer, point1, point2, distance1, whichSegment1 ) )
     {
         newVoxelType = voxelFlag::invert ( typeOfNeighbor );
         // Additional consistency checks only at the ultimate level of verification.
@@ -479,9 +471,9 @@ bool VoxelizeMeshFunctional2D<T>::voxelizeFromNeighbor (
         {
             PLB_ASSERT ( distance1 < sqrt ( ( T ) 3 ) + ( T ) 0.0001 );
 #ifdef PLB_DEBUG
-            bool ok = checkIfFacetsCrossed ( hashContainer, point2, point1, distance2, whichTriangle2 );
+            bool ok = checkIfFacetsCrossed ( hashContainer, point2, point1, distance2, whichSegment2 );
 #else
-            ( void ) checkIfFacetsCrossed ( hashContainer, point2, point1, distance2, whichTriangle2 );
+            ( void ) checkIfFacetsCrossed ( hashContainer, point2, point1, distance2, whichSegment2 );
 #endif
             PLB_ASSERT ( ok );
             PLB_ASSERT ( distance2 < sqrt ( ( T ) 3 ) + ( T ) 0.0001 );

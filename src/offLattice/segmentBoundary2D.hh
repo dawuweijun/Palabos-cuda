@@ -27,9 +27,9 @@
 
 #include "core/globalDefs.h"
 #include "offLattice/segmentBoundary2D.h"
-#include "offLattice/triangularSurfaceMesh.h"
+#include "offLattice/segmentPolygonMesh2D.h"
 #include "offLattice/offLatticeBoundaryProfiles2D.h"
-#include "offLattice/triangleToDef.h"
+#include "offLattice/segmentToDef.h"
 #include "multiBlock/nonLocalTransfer2D.h"
 #include "offLattice/makeSparse2D.h"
 #include <cmath>
@@ -201,11 +201,11 @@ void BoundaryProfiles2D<T,SurfaceData>::defineProfile (
 
 template<typename T, class SurfaceData>
 BoundaryProfile2D<T,SurfaceData> const& BoundaryProfiles2D<T,SurfaceData>::getProfile (
-    SegmentBoundary2D<T> const& boundary, plint iTriangle ) const
+    SegmentBoundary2D<T> const& boundary, plint iSegment ) const
 {
-    PLB_ASSERT ( iTriangle < ( plint ) boundary.getTriangleTags().size() );
-    plint triangleTag = boundary.getTriangleTags() [iTriangle];
-    typename std::map<plint,BoundaryProfile2D<T,SurfaceData>*>::const_iterator it = profiles.find ( triangleTag );
+    PLB_ASSERT ( iSegment < ( plint ) boundary.getSegmentTags().size() );
+    plint segmentTag = boundary.getSegmentTags() [iSegment];
+    typename std::map<plint,BoundaryProfile2D<T,SurfaceData>*>::const_iterator it = profiles.find ( segmentTag );
     if ( it==profiles.end() )
     {
         PLB_ASSERT ( wallProfile );
@@ -245,31 +245,31 @@ void BoundaryProfiles2D<T,SurfaceData>::clearProfiles()
 
 template<typename T>
 DEFscaledMesh2D<T>::DEFscaledMesh2D (
-    SegmentSet<T> const& triangleSet_ )
+    SegmentSet<T> const& segmentSet_ )
     : margin ( 0 )
 {
-    initialize ( triangleSet_, 0, 0, Dot2D() );
+    initialize ( segmentSet_, 0, 0, Dot2D() );
 }
 
 template<typename T>
 DEFscaledMesh2D<T>::DEFscaledMesh2D (
-    SegmentSet<T> const& triangleSet_,
+    SegmentSet<T> const& segmentSet_,
     plint resolution_, plint referenceDirection_,
     plint margin_, Dot2D location )
     : margin ( margin_ )
 {
-    initialize ( triangleSet_, resolution_, referenceDirection_, location );
+    initialize ( segmentSet_, resolution_, referenceDirection_, location );
 }
 
 template<typename T>
 DEFscaledMesh2D<T>::DEFscaledMesh2D (
-    SegmentSet<T> const& triangleSet_,
+    SegmentSet<T> const& segmentSet_,
     plint resolution_, plint referenceDirection_,
     plint margin_, plint extraLayer )
     : margin ( margin_ )
 {
     plint layer = margin+extraLayer;
-    initialize ( triangleSet_, resolution_, referenceDirection_,
+    initialize ( segmentSet_, resolution_, referenceDirection_,
                  Dot2D ( layer,layer,layer ) );
 }
 
@@ -281,15 +281,15 @@ DEFscaledMesh2D<T>::~DEFscaledMesh2D()
 
 template<typename T>
 void DEFscaledMesh2D<T>::initialize (
-    SegmentSet<T> const& triangleSet_, plint resolution_,
+    SegmentSet<T> const& segmentSet_, plint resolution_,
     plint referenceDirection_, Dot2D location )
 {
-    T eps = getEpsilon<T> ( triangleSet_.getPrecision() );
+    T eps = getEpsilon<T> ( segmentSet_.getPrecision() );
 
     constructSurfaceMesh<T> (
-        triangleSet_.getTriangles(),
+        segmentSet_.getSegments(),
         vertexList, emanatingEdgeList, edgeList, eps );
-    mesh = new TriangularSurfaceMesh<T> ( vertexList, emanatingEdgeList, edgeList );
+    mesh = new SegmentPolygonMesh2D<T> ( vertexList, emanatingEdgeList, edgeList );
 
     if ( resolution_!=0 )
     {
@@ -311,7 +311,7 @@ DEFscaledMesh2D<T>::DEFscaledMesh2D (
       edgeList ( rhs.edgeList ),
       margin ( rhs.margin )
 {
-    mesh = new TriangularSurfaceMesh<T> ( vertexList, emanatingEdgeList, edgeList );
+    mesh = new SegmentPolygonMesh2D<T> ( vertexList, emanatingEdgeList, edgeList );
 }
 
 template<typename T>
@@ -335,13 +335,13 @@ void DEFscaledMesh2D<T>::swap ( DEFscaledMesh2D<T>& rhs )
 }
 
 template<typename T>
-TriangularSurfaceMesh<T> const& DEFscaledMesh2D<T>::getMesh() const
+SegmentPolygonMesh2D<T> const& DEFscaledMesh2D<T>::getMesh() const
 {
     return *mesh;
 }
 
 template<typename T>
-TriangularSurfaceMesh<T>& DEFscaledMesh2D<T>::getMesh()
+SegmentPolygonMesh2D<T>& DEFscaledMesh2D<T>::getMesh()
 {
     return *mesh;
 }
@@ -375,16 +375,16 @@ SegmentBoundary2D<T>::SegmentBoundary2D (
     emanatingEdgeLists[1] = emanatingEdgeLists[0];
     edgeLists[1] = edgeLists[0];
 
-    meshes.push_back ( TriangularSurfaceMesh<T> (
+    meshes.push_back ( SegmentPolygonMesh2D<T> (
                            vertexLists[0], emanatingEdgeLists[0], edgeLists[0] ) );
-    meshes.push_back ( TriangularSurfaceMesh<T> (
+    meshes.push_back ( SegmentPolygonMesh2D<T> (
                            vertexLists[0], emanatingEdgeLists[1], edgeLists[1] ) );
 
-    // Prepare the vector "triangle type", which later on will inform on
-    //   the type of boundary condition implemented by a given triangle.
+    // Prepare the vector "segment type", which later on will inform on
+    //   the type of boundary condition implemented by a given segment.
     //   The default, 0, stands for no-slip.
-    triangleTagList.resize ( meshes[1].getNumTriangles() );
-    std::fill ( triangleTagList.begin(), triangleTagList.end(), 0 );
+    segmentTagList.resize ( meshes[1].getNumSegments() );
+    std::fill ( segmentTagList.begin(), segmentTagList.end(), 0 );
 
     if ( automaticCloseHoles )
     {
@@ -419,16 +419,16 @@ SegmentBoundary2D<T>::SegmentBoundary2D (
     emanatingEdgeLists[1] = emanatingEdgeLists[0];
     edgeLists[1] = edgeLists[0];
 
-    meshes.push_back ( TriangularSurfaceMesh<T> (
+    meshes.push_back ( SegmentPolygonMesh2D<T> (
                            vertexLists[0], emanatingEdgeLists[0], edgeLists[0] ) );
-    meshes.push_back ( TriangularSurfaceMesh<T> (
+    meshes.push_back ( SegmentPolygonMesh2D<T> (
                            vertexLists[0], emanatingEdgeLists[1], edgeLists[1] ) );
 
-    // Prepare the vector "triangle type", which later on will inform on
-    //   the type of boundary condition implemented by a given triangle.
+    // Prepare the vector "segment type", which later on will inform on
+    //   the type of boundary condition implemented by a given segment.
     //   The default, 0, stands for no-slip.
-    triangleTagList.resize ( meshes[1].getNumTriangles() );
-    std::fill ( triangleTagList.begin(), triangleTagList.end(), 0 );
+    segmentTagList.resize ( meshes[1].getNumSegments() );
+    std::fill ( segmentTagList.begin(), segmentTagList.end(), 0 );
 
     if ( automaticCloseHoles )
     {
@@ -440,15 +440,15 @@ template<typename T>
 void SegmentBoundary2D<T>::closeHoles()
 {
     // Close the holes and assign inlets/outlets.
-    std::vector<Lid> newlids
+    std::vector<Lid2D> newlids
         = meshes[1].closeHoles();
 
-    // Prepare the vector "triangle type", which later on will inform on
-    //   the type of boundary condition implemented by a given triangle.
+    // Prepare the vector "segment type", which later on will inform on
+    //   the type of boundary condition implemented by a given segment.
     //   The default, 0, stands for no-slip.
-    pluint oldNumTriangles = triangleTagList.size();
-    triangleTagList.resize ( meshes[1].getNumTriangles() );
-    std::fill ( triangleTagList.begin() +oldNumTriangles, triangleTagList.end(), 0 );
+    pluint oldNumSegments = segmentTagList.size();
+    segmentTagList.resize ( meshes[1].getNumSegments() );
+    std::fill ( segmentTagList.begin() +oldNumSegments, segmentTagList.end(), 0 );
 
     // Assign default functions to inlet/outlets to avoid undefined state.
     tagInletOutlet ( newlids );
@@ -471,7 +471,7 @@ SegmentBoundary2D<T>::SegmentBoundary2D (
     : vertexLists ( rhs.vertexLists ),
       emanatingEdgeLists ( rhs.emanatingEdgeLists ),
       edgeLists ( rhs.edgeLists ),
-      triangleTagList ( rhs.triangleTagList ),
+      segmentTagList ( rhs.segmentTagList ),
       currentTagNum ( rhs.currentTagNum ),
       vertexTagList ( rhs.vertexTagList ),
       vertexProperties ( rhs.vertexProperties.size() ),
@@ -493,9 +493,9 @@ void SegmentBoundary2D<T>::defineMeshes()
     meshes.clear();
     for ( pluint iVertices=0; iVertices<vertexLists.size(); ++iVertices )
     {
-        meshes.push_back ( TriangularSurfaceMesh<T> (
+        meshes.push_back ( SegmentPolygonMesh2D<T> (
                                vertexLists[iVertices], emanatingEdgeLists[0], edgeLists[0] ) );
-        meshes.push_back ( TriangularSurfaceMesh<T> (
+        meshes.push_back ( SegmentPolygonMesh2D<T> (
                                vertexLists[iVertices], emanatingEdgeLists[1], edgeLists[1] ) );
     }
 }
@@ -516,7 +516,7 @@ void SegmentBoundary2D<T>::swap ( SegmentBoundary2D<T>& rhs )
     emanatingEdgeLists[1].swap ( rhs.emanatingEdgeLists[1] );
     edgeLists[0].swap ( rhs.edgeLists[0] );
     edgeLists[1].swap ( rhs.edgeLists[1] );
-    triangleTagList.swap ( rhs.triangleTagList );
+    segmentTagList.swap ( rhs.segmentTagList );
     std::swap ( currentTagNum, rhs.currentTagNum );
     vertexTagList.swap ( rhs.vertexTagList );
     vertexProperties.swap ( rhs.vertexProperties );
@@ -577,13 +577,13 @@ plint SegmentBoundary2D<T>::currentMesh() const
 }
 
 template<typename T>
-TriangularSurfaceMesh<T> const& SegmentBoundary2D<T>::getMesh() const
+SegmentPolygonMesh2D<T> const& SegmentBoundary2D<T>::getMesh() const
 {
     return meshes[currentMesh()];
 }
 
 template<typename T>
-TriangularSurfaceMesh<T>& SegmentBoundary2D<T>::getMesh()
+SegmentPolygonMesh2D<T>& SegmentBoundary2D<T>::getMesh()
 {
     return meshes[currentMesh()];
 }
@@ -595,10 +595,10 @@ plint SegmentBoundary2D<T>::getMargin() const
 }
 
 template<typename T>
-plint SegmentBoundary2D<T>::getTag ( plint iTriangle ) const
+plint SegmentBoundary2D<T>::getTag ( plint iSegment ) const
 {
-    PLB_ASSERT ( iTriangle< ( plint ) triangleTagList.size() );
-    return triangleTagList[iTriangle];
+    PLB_ASSERT ( iSegment< ( plint ) segmentTagList.size() );
+    return segmentTagList[iSegment];
 }
 
 template<typename T>
@@ -615,23 +615,23 @@ SegmentBoundary2D<T>::getVertexProperty ( plint iVertex ) const
 
 template<typename T>
 bool SegmentBoundary2D<T>::intersectSegment (
-    plint iTriangle, AtomicBlock2D* boundaryArg,
+    plint iSegment, AtomicBlock2D* boundaryArg,
     Array<T,2> const& fromPoint, Array<T,2> const& direction,
     Array<T,2>& locatedPoint, T& distance, Array<T,2>& wallNormal ) const
 {
     int flag = 0; // Intersection with line segment.
     Array<T,2> point2 ( fromPoint+direction );
     bool doesIntersect =
-        getMesh().pointOnTriangle ( fromPoint, point2, flag, iTriangle,
+        getMesh().pointOnSegment ( fromPoint, point2, flag, iSegment,
                                     locatedPoint, wallNormal, distance ) == 1;
     return doesIntersect;
 }
 
 template<typename T>
 Array<T,2> SegmentBoundary2D<T>::computeContinuousNormal (
-    Array<T,2> const& p, plint iTriangle, bool isAreaWeighted ) const
+    Array<T,2> const& p, plint iSegment, bool isAreaWeighted ) const
 {
-    return getMesh().computeContinuousNormal ( p, iTriangle, isAreaWeighted );
+    return getMesh().computeContinuousNormal ( p, iSegment, isAreaWeighted );
 }
 
 template<typename T>
@@ -646,14 +646,14 @@ void SegmentBoundary2D<T>::cloneVertexSet ( plint whichVertexSet )
     {
         numVertexOpen -= lids[iLid].numAddedVertices;
     }
-    meshes.push_back ( TriangularSurfaceMesh<T> (
+    meshes.push_back ( SegmentPolygonMesh2D<T> (
                            vertexLists[newVertexSet], emanatingEdgeLists[0], edgeLists[0], numVertexOpen ) );
-    meshes.push_back ( TriangularSurfaceMesh<T> (
+    meshes.push_back ( SegmentPolygonMesh2D<T> (
                            vertexLists[newVertexSet], emanatingEdgeLists[1], edgeLists[1] ) );
 }
 
 template<typename T>
-std::vector<Lid> const&
+std::vector<Lid2D> const&
 SegmentBoundary2D<T>::getInletOutlet() const
 {
     PLB_PRECONDITION ( topology.top() ==1 );
@@ -661,11 +661,11 @@ SegmentBoundary2D<T>::getInletOutlet() const
 }
 
 template<typename T>
-std::vector<Lid>
+std::vector<Lid2D>
 SegmentBoundary2D<T>::getInletOutlet ( plint sortDirection ) const
 {
     PLB_PRECONDITION ( topology.top() ==1 );
-    std::vector<Lid> lids_copy ( lids );
+    std::vector<Lid2D> lids_copy ( lids );
     std::sort ( lids_copy.begin(), lids_copy.end(), LidLessThan<T> ( sortDirection, getMesh() ) );
     return lids_copy;
 }
@@ -673,17 +673,17 @@ SegmentBoundary2D<T>::getInletOutlet ( plint sortDirection ) const
 template<typename T>
 std::vector<plint> SegmentBoundary2D<T>::getInletOutletIds ( plint sortDirection ) const
 {
-    std::map<plint,plint> triangleToOriginalLid;
+    std::map<plint,plint> segmentToOriginalLid;
     for ( pluint iLid=0; iLid<lids.size(); ++iLid )
     {
-        triangleToOriginalLid[lids[iLid].firstTriangle] = iLid;
+        segmentToOriginalLid[lids[iLid].firstSegment] = iLid;
     }
-    std::vector<Lid> tmpLids ( lids );
+    std::vector<Lid2D> tmpLids ( lids );
     std::sort ( tmpLids.begin(), tmpLids.end(), LidLessThan<T> ( sortDirection, getMesh() ) );
     std::vector<plint> ids ( tmpLids.size() );
     for ( pluint iLid=0; iLid<tmpLids.size(); ++iLid )
     {
-        plint originalId = triangleToOriginalLid[tmpLids[iLid].firstTriangle];
+        plint originalId = segmentToOriginalLid[tmpLids[iLid].firstSegment];
         ids[iLid] = originalId+1;
     }
     return ids;
@@ -696,7 +696,7 @@ void SegmentBoundary2D<T>::getLidProperties (
 {
     // Lid properties can only be computed in a closed mesh, by definition.
     PLB_PRECONDITION ( topology.top() ==1 );
-    std::vector<Lid> tmpLids ( lids );
+    std::vector<Lid2D> tmpLids ( lids );
     std::sort ( tmpLids.begin(), tmpLids.end(), LidLessThan<T> ( sortDirection, getMesh() ) );
     normal.resize ( tmpLids.size() );
     center.resize ( tmpLids.size() );
@@ -713,7 +713,7 @@ void SegmentBoundary2D<T>::getLidProperties (
 
 template<typename T>
 void SegmentBoundary2D<T>::tagInletOutlet (
-    std::vector<Lid> const& newLids )
+    std::vector<Lid2D> const& newLids )
 {
     // Inlet/Outlet can only be set for a closed mesh, by definition.
     PLB_PRECONDITION ( topology.top() ==1 );
@@ -721,11 +721,11 @@ void SegmentBoundary2D<T>::tagInletOutlet (
     for ( pluint iLid=0; iLid<newLids.size(); ++iLid )
     {
         ++currentTagNum; // Tag 0 is for default wall portions.
-        plint firstTriangle = newLids[iLid].firstTriangle;
-        plint numTriangles = newLids[iLid].numTriangles;
-        for ( plint iTriangle = firstTriangle; iTriangle<firstTriangle+numTriangles; ++iTriangle )
+        plint firstSegment = newLids[iLid].firstSegment;
+        plint numSegments = newLids[iLid].numSegments;
+        for ( plint iSegment = firstSegment; iSegment<firstSegment+numSegments; ++iSegment )
         {
-            triangleTagList[iTriangle] = currentTagNum;
+            segmentTagList[iSegment] = currentTagNum;
         }
     }
 }
@@ -738,12 +738,12 @@ plint SegmentBoundary2D<T>::tagDomain ( DomainFunctional functional )
     PLB_PRECONDITION ( topology.top() ==1 );
     ++currentTagNum;
     plint newTag = currentTagNum;
-    for ( plint iTriangle=0; iTriangle<getMesh().getNumTriangles(); ++iTriangle )
+    for ( plint iSegment=0; iSegment<getMesh().getNumSegments(); ++iSegment )
     {
         bool isInside = true;
         for ( plint iVertex=0; iVertex<3; ++iVertex )
         {
-            Array<T,2> vertex = getMesh().getVertex ( iTriangle, iVertex );
+            Array<T,2> vertex = getMesh().getVertex ( iSegment, iVertex );
             if ( !functional ( vertex ) )
             {
                 isInside = false;
@@ -752,7 +752,7 @@ plint SegmentBoundary2D<T>::tagDomain ( DomainFunctional functional )
         }
         if ( isInside )
         {
-            triangleTagList[iTriangle] = newTag;
+            segmentTagList[iSegment] = newTag;
         }
     }
     return newTag;
@@ -766,14 +766,14 @@ plint SegmentBoundary2D<T>::tagDomain ( DomainFunctional functional, Array<T,2> 
     PLB_PRECONDITION ( topology.top() ==1 );
     ++currentTagNum;
     plint newTag = currentTagNum;
-    for ( plint iTriangle=0; iTriangle<getMesh().getNumTriangles(); ++iTriangle )
+    for ( plint iSegment=0; iSegment<getMesh().getNumSegments(); ++iSegment )
     {
-        if ( previousTag<0 || triangleTagList[iTriangle]==previousTag )
+        if ( previousTag<0 || segmentTagList[iSegment]==previousTag )
         {
             bool isInside = true;
             for ( plint iVertex=0; iVertex<3; ++iVertex )
             {
-                Array<T,2> vertex = getMesh().getVertex ( iTriangle, iVertex );
+                Array<T,2> vertex = getMesh().getVertex ( iSegment, iVertex );
                 if ( !functional ( vertex ) )
                 {
                     isInside = false;
@@ -782,10 +782,10 @@ plint SegmentBoundary2D<T>::tagDomain ( DomainFunctional functional, Array<T,2> 
             }
             if ( isInside )
             {
-                Array<T,2> triangleNormal = getMesh().computeTriangleNormal ( iTriangle );
-                if ( fabs ( angleBetweenVectors ( normal,triangleNormal ) <angleTolerance ) )
+                Array<T,2> segmentNormal = getMesh().computeSegmentNormal ( iSegment );
+                if ( fabs ( angleBetweenVectors ( normal,segmentNormal ) <angleTolerance ) )
                 {
-                    triangleTagList[iTriangle] = newTag;
+                    segmentTagList[iSegment] = newTag;
                 }
             }
         }
@@ -826,7 +826,7 @@ void SegmentBoundary2D<T>::assignLidVertexProperty()
 {
     // Make sure we're working with the closed mesh.
     PLB_PRECONDITION ( topology.top() ==1 );
-    std::vector<Lid> const& lids = getInletOutlet();
+    std::vector<Lid2D> const& lids = getInletOutlet();
     if ( lids.empty() ) return;
 
     if ( vertexTagList.empty() )
@@ -847,10 +847,10 @@ void SegmentBoundary2D<T>::assignLidVertexProperty()
 }
 
 
-/******** class TriangleFlowShape2D ****************************************/
+/******** class SegmentFlowShape2D ****************************************/
 
 template< typename T, class SurfaceData >
-TriangleFlowShape2D<T,SurfaceData>::TriangleFlowShape2D (
+SegmentFlowShape2D<T,SurfaceData>::SegmentFlowShape2D (
     SegmentBoundary2D<T> const& boundary_,
     BoundaryProfiles2D<T,SurfaceData> const& profiles_ )
     : boundary ( boundary_ ),
@@ -859,7 +859,7 @@ TriangleFlowShape2D<T,SurfaceData>::TriangleFlowShape2D (
 { }
 
 template< typename T, class SurfaceData >
-bool TriangleFlowShape2D<T,SurfaceData>::isInside (
+bool SegmentFlowShape2D<T,SurfaceData>::isInside (
     Dot2D const& location ) const
 {
     PLB_PRECONDITION ( voxelFlags );
@@ -868,7 +868,7 @@ bool TriangleFlowShape2D<T,SurfaceData>::isInside (
 }
 
 template< typename T, class SurfaceData >
-bool TriangleFlowShape2D<T,SurfaceData>::pointOnSurface (
+bool SegmentFlowShape2D<T,SurfaceData>::pointOnSurface (
     Array<T,2> const& fromPoint, Array<T,2> const& direction,
     Array<T,2>& locatedPoint, T& distance,
     Array<T,2>& wallNormal, SurfaceData& surfaceData,
@@ -880,47 +880,46 @@ bool TriangleFlowShape2D<T,SurfaceData>::pointOnSurface (
     static const T maxDistance = sqrt ( 3 );
     Array<T,2> xRange ( fromPoint[0]-maxDistance, fromPoint[0]+maxDistance );
     Array<T,2> yRange ( fromPoint[1]-maxDistance, fromPoint[1]+maxDistance );
-    Array<T,2> zRange ( fromPoint[2]-maxDistance, fromPoint[2]+maxDistance );
-    TriangleHash<T> triangleHash ( *hashContainer );
-    std::vector<plint> possibleTriangles;
-    if ( id>=0 && id<boundary.getMesh().getNumTriangles() )
+    SegmentHash<T> segmentHash ( *hashContainer );
+    std::vector<plint> possibleSegments;
+    if ( id>=0 && id<boundary.getMesh().getNumSegments() )
     {
-        possibleTriangles.push_back ( id );
+        possibleSegments.push_back ( id );
     }
     else
     {
-        triangleHash.getTriangles ( xRange, yRange, zRange, possibleTriangles );
+        segmentHash.getSegments ( xRange, yRange, possibleSegments );
     }
 
     Array<T,2>  tmpLocatedPoint;
     T           tmpDistance;
     Array<T,2>  tmpNormal;
     T shortestDistance = T();
-    plint locatedTriangle = -1;
+    plint locatedSegment = -1;
 
-    for ( pluint iPossible=0; iPossible<possibleTriangles.size(); ++iPossible )
+    for ( pluint iPossible=0; iPossible<possibleSegments.size(); ++iPossible )
     {
-        plint iTriangle = possibleTriangles[iPossible];
+        plint iSegment = possibleSegments[iPossible];
         if ( boundary.intersectSegment (
-                    iTriangle, boundaryArg,
+                    iSegment, boundaryArg,
                     fromPoint, direction,
                     tmpLocatedPoint, tmpDistance, tmpNormal ) )
         {
-            if ( locatedTriangle==-1 || tmpDistance<shortestDistance )
+            if ( locatedSegment==-1 || tmpDistance<shortestDistance )
             {
                 shortestDistance = tmpDistance;
-                locatedTriangle = iTriangle;
+                locatedSegment = iSegment;
                 locatedPoint = tmpLocatedPoint;
                 distance = tmpDistance;
                 wallNormal = tmpNormal;
-                profiles.getProfile ( boundary, iTriangle ).getData (
-                    locatedPoint, iTriangle, boundaryArg, surfaceData, bdType );
+                profiles.getProfile ( boundary, iSegment ).getData (
+                    locatedPoint, iSegment, boundaryArg, surfaceData, bdType );
             }
         }
     }
-    if ( locatedTriangle != -1 )
+    if ( locatedSegment != -1 )
     {
-        id = locatedTriangle;
+        id = locatedSegment;
         return true;
     }
     else
@@ -930,14 +929,14 @@ bool TriangleFlowShape2D<T,SurfaceData>::pointOnSurface (
 }
 
 template<typename T, class SurfaceData>
-Array<T,2> TriangleFlowShape2D<T,SurfaceData>::computeContinuousNormal (
+Array<T,2> SegmentFlowShape2D<T,SurfaceData>::computeContinuousNormal (
     Array<T,2> const& p, plint id, bool isAreaWeighted ) const
 {
     return boundary.computeContinuousNormal ( p, id, isAreaWeighted );
 }
 
 template<typename T, class SurfaceData>
-bool TriangleFlowShape2D<T,SurfaceData>::intersectsSurface (
+bool SegmentFlowShape2D<T,SurfaceData>::intersectsSurface (
     Array<T,2> const& p1, Array<T,2> const& p2, plint& id ) const
 {
     PLB_PRECONDITION ( hashContainer ); // Make sure these arguments have
@@ -946,28 +945,27 @@ bool TriangleFlowShape2D<T,SurfaceData>::intersectsSurface (
     static const T maxDistance = sqrt ( 3 );
     Array<T,2> xRange ( p1[0]-maxDistance, p1[0]+maxDistance );
     Array<T,2> yRange ( p1[1]-maxDistance, p1[1]+maxDistance );
-    Array<T,2> zRange ( p1[2]-maxDistance, p1[2]+maxDistance );
-    TriangleHash<T> triangleHash ( *hashContainer );
-    std::vector<plint> possibleTriangles;
-    if ( id>=0 && id<boundary.getMesh().getNumTriangles() )
+    SegmentHash<T> segmentHash ( *hashContainer );
+    std::vector<plint> possibleSegments;
+    if ( id>=0 && id<boundary.getMesh().getNumSegments() )
     {
-        possibleTriangles.push_back ( id );
+        possibleSegments.push_back ( id );
     }
     else
     {
-        triangleHash.getTriangles ( xRange, yRange, zRange, possibleTriangles );
+        segmentHash.getSegments ( xRange, yRange, possibleSegments );
     }
 
     std::vector<plint> selection;
-    for ( pluint iPossible=0; iPossible<possibleTriangles.size(); ++iPossible )
+    for ( pluint iPossible=0; iPossible<possibleSegments.size(); ++iPossible )
     {
-        plint iTriangle = possibleTriangles[iPossible];
+        plint iSegment = possibleSegments[iPossible];
         int flag = 0;
         Array<T,2> intersection, normal;
         T distance;
-        if ( boundary.getMesh().pointOnTriangle ( p1, p2, flag, iTriangle, intersection, normal, distance ) )
+        if ( boundary.getMesh().pointOnSegment ( p1, p2, flag, iSegment, intersection, normal, distance ) )
         {
-            selection.push_back ( iTriangle );
+            selection.push_back ( iSegment );
         }
     }
     if ( selection.empty() )
@@ -991,13 +989,13 @@ bool TriangleFlowShape2D<T,SurfaceData>::intersectsSurface (
 }
 
 template< typename T, class SurfaceData >
-plint TriangleFlowShape2D<T,SurfaceData>::getTag ( plint id ) const
+plint SegmentFlowShape2D<T,SurfaceData>::getTag ( plint id ) const
 {
     return boundary.getTag ( id );
 }
 
 template< typename T, class SurfaceData >
-bool TriangleFlowShape2D<T,SurfaceData>::distanceToSurface (
+bool SegmentFlowShape2D<T,SurfaceData>::distanceToSurface (
     Array<T,2> const& point, T& distance, bool& isBehind ) const
 {
     PLB_PRECONDITION ( hashContainer ); // Make sure these arguments have
@@ -1006,45 +1004,44 @@ bool TriangleFlowShape2D<T,SurfaceData>::distanceToSurface (
     T maxDistance = sqrt ( 3 );
     Array<T,2> xRange ( point[0]-maxDistance, point[0]+maxDistance );
     Array<T,2> yRange ( point[1]-maxDistance, point[1]+maxDistance );
-    Array<T,2> zRange ( point[2]-maxDistance, point[2]+maxDistance );
-    TriangleHash<T> triangleHash ( *hashContainer );
-    std::vector<plint> possibleTriangles;
-    triangleHash.getTriangles ( xRange, yRange, zRange, possibleTriangles );
+    SegmentHash<T> segmentHash ( *hashContainer );
+    std::vector<plint> possibleSegments;
+    segmentHash.getSegments ( xRange, yRange, possibleSegments );
 
     T    tmpDistance;
     bool tmpIsBehind;
-    bool triangleFound = false;
+    bool segmentFound = false;
 
-    for ( pluint iPossible=0; iPossible<possibleTriangles.size(); ++iPossible )
+    for ( pluint iPossible=0; iPossible<possibleSegments.size(); ++iPossible )
     {
-        plint iTriangle = possibleTriangles[iPossible];
-        boundary.getMesh().distanceToTriangle (
-            point, iTriangle, tmpDistance, tmpIsBehind );
-        if ( !triangleFound || tmpDistance<distance )
+        plint iSegment = possibleSegments[iPossible];
+        boundary.getMesh().distanceToSegment (
+            point, iSegment, tmpDistance, tmpIsBehind );
+        if ( !segmentFound || tmpDistance<distance )
         {
             distance = tmpDistance;
             isBehind = tmpIsBehind;
-            triangleFound = true;
+            segmentFound = true;
         }
     }
-    return triangleFound;
+    return segmentFound;
 }
 
 template< typename T, class SurfaceData >
-TriangleFlowShape2D<T,SurfaceData>*
-TriangleFlowShape2D<T,SurfaceData>::clone() const
+SegmentFlowShape2D<T,SurfaceData>*
+SegmentFlowShape2D<T,SurfaceData>::clone() const
 {
-    return new TriangleFlowShape2D<T,SurfaceData> ( *this );
+    return new SegmentFlowShape2D<T,SurfaceData> ( *this );
 }
 
 template< typename T, class SurfaceData >
-TriangleFlowShape2D<T,SurfaceData>*
-TriangleFlowShape2D<T,SurfaceData>::clone (
+SegmentFlowShape2D<T,SurfaceData>*
+SegmentFlowShape2D<T,SurfaceData>::clone (
     std::vector<AtomicBlock2D*> args ) const
 {
     PLB_PRECONDITION ( args.size() ==3 );
-    TriangleFlowShape2D<T,SurfaceData>*
-    newShape = new TriangleFlowShape2D<T,SurfaceData> ( *this );
+    SegmentFlowShape2D<T,SurfaceData>*
+    newShape = new SegmentFlowShape2D<T,SurfaceData> ( *this );
     newShape->voxelFlags = dynamic_cast<ScalarField2D<int>*> ( args[0] );
     newShape->hashContainer = dynamic_cast<AtomicContainerBlock2D*> ( args[1] );
     newShape->boundaryArg = args[2];
@@ -1081,7 +1078,7 @@ VoxelizedDomain2D<T>::VoxelizedDomain2D (
                    boundary.getMargin() +extraLayer_, borderWidth ) );
     fullVoxelMatrix->setRefinementLevel ( gridLevel_ );
     createSparseVoxelMatrix ( *fullVoxelMatrix, blockSize_, envelopeWidth_ );
-    createTriangleHash();
+    createSegmentHash();
     boundary.popSelect();
 }
 
@@ -1108,7 +1105,7 @@ VoxelizedDomain2D<T>::VoxelizedDomain2D (
         voxelize ( boundary.getMesh(), boundingBox, borderWidth ) );
     fullVoxelMatrix->setRefinementLevel ( gridLevel_ );
     createSparseVoxelMatrix ( *fullVoxelMatrix, blockSize_, envelopeWidth_ );
-    createTriangleHash();
+    createSegmentHash();
     boundary.popSelect();
 }
 
@@ -1135,7 +1132,7 @@ VoxelizedDomain2D<T>::VoxelizedDomain2D (
         voxelize ( boundary.getMesh(), boundingBox, borderWidth, seed ) );
     fullVoxelMatrix->setRefinementLevel ( gridLevel_ );
     createSparseVoxelMatrix ( *fullVoxelMatrix, blockSize_, envelopeWidth_ );
-    createTriangleHash();
+    createSegmentHash();
     boundary.popSelect();
 }
 
@@ -1162,14 +1159,14 @@ VoxelizedDomain2D<T>::VoxelizedDomain2D (
     VoxelizedDomain2D<T> const& rhs )
     : boundary ( rhs.boundary ),
       voxelMatrix ( new MultiScalarField2D<int> ( *rhs.voxelMatrix ) ),
-      triangleHash ( new MultiContainerBlock2D ( *rhs.triangleHash ) )
+      segmentHash ( new MultiContainerBlock2D ( *rhs.segmentHash ) )
 { }
 
 template<typename T>
 VoxelizedDomain2D<T>::~VoxelizedDomain2D()
 {
     delete voxelMatrix;
-    delete triangleHash;
+    delete segmentHash;
 }
 
 
@@ -1189,9 +1186,9 @@ VoxelizedDomain2D<T>::getVoxelMatrix() const
 
 template<typename T>
 MultiContainerBlock2D&
-VoxelizedDomain2D<T>::getTriangleHash()
+VoxelizedDomain2D<T>::getSegmentHash()
 {
-    return *triangleHash;
+    return *segmentHash;
 }
 
 template<typename T>
@@ -1207,9 +1204,9 @@ void VoxelizedDomain2D<T>::adjustVoxelization (
     {
         boundary.pushSelect ( 1,0 ); // Closed, Static.
     }
-    reCreateTriangleHash ( particles );
+    reCreateSegmentHash ( particles );
     MultiScalarField2D<int>* newVoxelMatrix =
-        revoxelize ( boundary.getMesh(), *voxelMatrix, *triangleHash, borderWidth ).release();
+        revoxelize ( boundary.getMesh(), *voxelMatrix, *segmentHash, borderWidth ).release();
     std::swap ( voxelMatrix, newVoxelMatrix );
     delete newVoxelMatrix;
     boundary.popSelect();
@@ -1228,8 +1225,8 @@ void VoxelizedDomain2D<T>::reparallelize ( MultiBlockRedistribute2D const& redis
     copyNonLocal ( *voxelMatrix, *newVoxelMatrix, voxelMatrix->getBoundingBox() );
     std::swap ( voxelMatrix, newVoxelMatrix );
     delete newVoxelMatrix;
-    delete triangleHash;
-    createTriangleHash();
+    delete segmentHash;
+    createSegmentHash();
 }
 
 template<typename T>
@@ -1287,27 +1284,27 @@ void VoxelizedDomain2D<T>::extendEnvelopeWidth (
 }
 
 template<typename T>
-void VoxelizedDomain2D<T>::createTriangleHash()
+void VoxelizedDomain2D<T>::createSegmentHash()
 {
-    triangleHash = new MultiContainerBlock2D ( *voxelMatrix );
+    segmentHash = new MultiContainerBlock2D ( *voxelMatrix );
     std::vector<MultiBlock2D*> hashArg;
-    hashArg.push_back ( triangleHash );
+    hashArg.push_back ( segmentHash );
     applyProcessingFunctional (
-        new CreateTriangleHash<T> ( boundary.getMesh() ),
-        triangleHash->getBoundingBox(), hashArg );
+        new CreateSegmentHash<T> ( boundary.getMesh() ),
+        segmentHash->getBoundingBox(), hashArg );
 }
 
 template<typename T>
 template<class ParticleFieldT>
-void VoxelizedDomain2D<T>::reCreateTriangleHash (
+void VoxelizedDomain2D<T>::reCreateSegmentHash (
     MultiParticleField2D<ParticleFieldT>& particles )
 {
     // The lids are non-parallel, an info which must be provided
     //   to the hash algorithm by means of a list of barycenters.
     //   This is a necessary and sufficient information because
-    //   all triangles connected to the barycenters are non-parallel,
-    //   and all non-parallel triangles are connected to a barycenter.
-    std::vector<Lid> const& lids = boundary.getInletOutlet();
+    //   all segments connected to the barycenters are non-parallel,
+    //   and all non-parallel segments are connected to a barycenter.
+    std::vector<Lid2D> const& lids = boundary.getInletOutlet();
     plint numLids = ( plint ) lids.size();
     std::vector<plint> lidBaryCenters ( numLids );
     for ( plint iLid=0; iLid<numLids; ++iLid )
@@ -1316,11 +1313,11 @@ void VoxelizedDomain2D<T>::reCreateTriangleHash (
     }
 
     std::vector<MultiBlock2D*> hashParticleArg;
-    hashParticleArg.push_back ( triangleHash );
+    hashParticleArg.push_back ( segmentHash );
     hashParticleArg.push_back ( &particles );
     applyProcessingFunctional (
-        new ReAssignTriangleHash<T,ParticleFieldT> ( boundary.getMesh(),lidBaryCenters ),
-        triangleHash->getBoundingBox(), hashParticleArg );
+        new ReAssignSegmentHash<T,ParticleFieldT> ( boundary.getMesh(),lidBaryCenters ),
+        segmentHash->getBoundingBox(), hashParticleArg );
 }
 
 

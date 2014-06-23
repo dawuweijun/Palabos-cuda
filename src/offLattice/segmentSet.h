@@ -39,7 +39,7 @@ namespace plb {
 template<typename T>
 class SegmentSet {
 public:
-    typedef Array<T,2> Segment;
+    typedef Array<Array<T, 2>,2> Segment;
 public:
     SegmentSet(Precision precision_ = FLT);
     SegmentSet(std::vector<Segment> const& segments_, Precision precision_ = FLT);
@@ -49,7 +49,7 @@ public:
     void setPrecision(Precision precision_);
 
     /// Translate the triangle set surface mesh.
-    void translate(Array<T,3> const& vector);
+    void translate(Array<T,2> const& vector);
     /// Scale the triangle set surface mesh.
     void scale(T alpha);
     /// Rotate the triangle set surface mesh.
@@ -61,7 +61,7 @@ public:
     ///       the new x-axis,
     ///   3.] The third rotation is by an angle psi about the new z-axis.
     void rotate(T phi, T theta, T psi);
-    void rotateAtOrigin(Array<T,3> const& normedAxis, T theta);
+    void rotateAtOrigin(Array<T,2> const& normedAxis, T theta);
 
     /// Erase the current triangle set surface mesh, and merge into it the new meshes.
     ///   This function currently does not check for duplicate
@@ -133,8 +133,8 @@ private:
     void readSTL(std::string fname);
     void readAsciiSTL(FILE* fp);
     void readBinarySTL(FILE* fp);
-    void check(Segment& triangle, Array<T,3> const& n);
-    bool checkNoAbort(Segment& triangle, Array<T,3> const& n);
+    void check(Segment& triangle, Array<T,2> const& n);
+    bool checkNoAbort(Segment& triangle, Array<T,2> const& n);
     void computeMinMaxEdge(pluint iSegment, T& minEdge, T& maxEdge) const;
     void computeMinMaxEdges();
     void computeBoundingCuboid();

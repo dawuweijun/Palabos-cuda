@@ -95,6 +95,40 @@ public:
     virtual BlockDomain::DomainT appliesTo() const;
 };
 
+/// Outflow boundary condition that works with external rhoBar and J from the previous time step.
+///     Caution is necessary with the usage of this data processor. The rhoBar and J provided,
+///     must contain the values of the fields at the previous time step. This means that if
+///     the "external-rhoBar-J-collide-and-stream" is used at a processor level 0, then
+///     this data processor must be integrated at processor level 1, and the data processor
+///     to recompute the new rhoBar and J should be integrated at processor level 2.
+template<typename T, template<typename U> class Descriptor>
+class VirtualOutlet2D : public BoxProcessingFunctional2D
+{
+public:
+    /* Type 0: Close to FluidPressureOutlet2D (imposes a strict pressure).
+     * Type 1: Laplacian filter / extrapolation on the pressure.
+     **/
+    VirtualOutlet2D(T outsideDensity_, Box2D globalDomain_, int type_=1);
+    virtual void processGenericBlocks(Box2D domain, std::vector<AtomicBlock2D*> blocks);
+    virtual VirtualOutlet2D<T,Descriptor>* clone() const
+    {
+        return new VirtualOutlet2D<T,Descriptor>(*this);
+    }
+    virtual void getTypeOfModification(std::vector<modif::ModifT>& modified) const
+    {
+        modified[0] = modif::staticVariables; // Block lattice.
+        modified[1] = modif::nothing;         // RhoBar.
+        modified[2] = modif::nothing;         // J.
+    }
+private:
+    T outsideDensity;   // Boundary condition for the density (usually 1.0).
+    Box2D globalDomain; // The globalDomain must be at most as big as the whole simulation
+                        // domain for non-periodic problems, and bigger than the whole simulation
+                        // domain plus the envelope (per periodic direction) for periodic problems.
+    int type;           // If type = 0 then this is very close to FluidPressureOutlet2D.
+                        // If type = 1 some times gives the best results.
+};
+
 }  // namespace plb
 
 #endif  // NEUMANN_CONDITION_2D_H

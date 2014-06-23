@@ -131,17 +131,17 @@ public:
 ///     this data processor must be integrated at processor level 1, and the data processor
 ///     to recompute the new rhoBar and J should be integrated at processor level 2.
 template<typename T, template<typename U> class Descriptor>
-class VirtualOutlet : public BoxProcessingFunctional3D
+class VirtualOutlet3D : public BoxProcessingFunctional3D
 {
 public:
     /* Type 0: Close to FluidPressureOutlet3D (imposes a strict pressure).
      * Type 1: Laplacian filter / extrapolation on the pressure.
      **/
-    VirtualOutlet(T outsideDensity_, Box3D globalDomain_, int type_=1);
+    VirtualOutlet3D(T outsideDensity_, Box3D globalDomain_, int type_=1);
     virtual void processGenericBlocks(Box3D domain, std::vector<AtomicBlock3D*> blocks);
-    virtual VirtualOutlet<T,Descriptor>* clone() const
+    virtual VirtualOutlet3D<T,Descriptor>* clone() const
     {
-        return new VirtualOutlet<T,Descriptor>(*this);
+        return new VirtualOutlet3D<T,Descriptor>(*this);
     }
     virtual void getTypeOfModification(std::vector<modif::ModifT>& modified) const
     {

@@ -331,7 +331,7 @@ void CopyUnknown3D<T,Descriptor,direction,orientation>::process (
 
 
 template<typename T, template<typename U> class Descriptor>
-VirtualOutlet<T,Descriptor>::VirtualOutlet(T outsideDensity_, Box3D globalDomain_, int type_)
+VirtualOutlet3D<T,Descriptor>::VirtualOutlet3D(T outsideDensity_, Box3D globalDomain_, int type_)
         : outsideDensity(outsideDensity_),
           globalDomain(globalDomain_),
           type(type_)
@@ -340,7 +340,7 @@ VirtualOutlet<T,Descriptor>::VirtualOutlet(T outsideDensity_, Box3D globalDomain
 }
 
 template<typename T, template<typename U> class Descriptor>
-void VirtualOutlet<T,Descriptor>::processGenericBlocks(Box3D domain, std::vector<AtomicBlock3D*> blocks)
+void VirtualOutlet3D<T,Descriptor>::processGenericBlocks(Box3D domain, std::vector<AtomicBlock3D*> blocks)
 {
     PLB_ASSERT(blocks.size() == 3);
     BlockLattice3D<T,Descriptor> *lattice = dynamic_cast<BlockLattice3D<T,Descriptor>*>(blocks[0]);

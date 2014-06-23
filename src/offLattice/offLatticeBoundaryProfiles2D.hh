@@ -31,34 +31,34 @@
 namespace plb {
 
 template<typename T>
-struct DefaultWallProfile2D<T, Array<T,3> > {
-    BoundaryProfile2D<T,Array<T,3> >* generate() {
+struct DefaultWallProfile2D<T, Array<T,2> > {
+    BoundaryProfile2D<T,Array<T,2> >* generate() {
         return new NoSlipProfile2D<T>();
     }
 };
-
+#if 0
 template<typename T>
 struct DefaultWallProfile2D<T, Array<T,2> > {
     BoundaryProfile2D<T, Array<T,2> >* generate() {
         return new ScalarNeumannProfile2D<T>();
     }
 };
-
+#endif
 
 /********** NoSlipProfile2D ********************************************/
 
 template<typename T>
-void NoSlipProfile2D<T>::setNormal(Array<T,3> const& normal_)
+void NoSlipProfile2D<T>::setNormal(Array<T,2> const& normal_)
 { }
 
 template<typename T>
-void NoSlipProfile2D<T>::defineCircularShape(Array<T,3> const& center_, T radius_)
+void NoSlipProfile2D<T>::defineCircularShape(Array<T,2> const& center_, T radius_)
 { }
 
 template<typename T>
 void NoSlipProfile2D<T>::getData (
-        Array<T,3> const& pos, plint id, AtomicBlock2D const* argument,
-        Array<T,3>& data, OffBoundary::Type& bdType ) const
+        Array<T,2> const& pos, plint id, AtomicBlock2D const* argument,
+        Array<T,2>& data, OffBoundary::Type& bdType ) const
 {
     data.resetToZero();
     bdType = OffBoundary::dirichlet;
@@ -75,17 +75,17 @@ NoSlipProfile2D<T>*
 /********** FreeSlipProfile2D ********************************************/
 
 template<typename T>
-void FreeSlipProfile2D<T>::setNormal(Array<T,3> const& normal_)
+void FreeSlipProfile2D<T>::setNormal(Array<T,2> const& normal_)
 { }
 
 template<typename T>
-void FreeSlipProfile2D<T>::defineCircularShape(Array<T,3> const& center_, T radius_)
+void FreeSlipProfile2D<T>::defineCircularShape(Array<T,2> const& center_, T radius_)
 { }
 
 template<typename T>
 void FreeSlipProfile2D<T>::getData (
-        Array<T,3> const& pos, plint id, AtomicBlock2D const* argument,
-        Array<T,3>& data, OffBoundary::Type& bdType ) const
+        Array<T,2> const& pos, plint id, AtomicBlock2D const* argument,
+        Array<T,2>& data, OffBoundary::Type& bdType ) const
 {
     data.resetToZero();
     bdType = OffBoundary::freeSlip;
@@ -110,12 +110,12 @@ PoiseuilleProfile2D<T>::PoiseuilleProfile2D(T uAverage_)
 { }
 
 template<typename T>
-void PoiseuilleProfile2D<T>::setNormal(Array<T,3> const& normal_) {
+void PoiseuilleProfile2D<T>::setNormal(Array<T,2> const& normal_) {
     normal = normal_;
 }
 
 template<typename T>
-void PoiseuilleProfile2D<T>::defineCircularShape(Array<T,3> const& center_, T radius_)
+void PoiseuilleProfile2D<T>::defineCircularShape(Array<T,2> const& center_, T radius_)
 {
     center = center_;
     radius = radius_;
@@ -123,11 +123,11 @@ void PoiseuilleProfile2D<T>::defineCircularShape(Array<T,3> const& center_, T ra
 
 template<typename T>
 void PoiseuilleProfile2D<T>::getData (
-        Array<T,3> const& pos, plint id, AtomicBlock2D const* argument,
-        Array<T,3>& data, OffBoundary::Type& bdType ) const
+        Array<T,2> const& pos, plint id, AtomicBlock2D const* argument,
+        Array<T,2>& data, OffBoundary::Type& bdType ) const
 {
     bdType = OffBoundary::dirichlet;
-    Array<T,3> radial = pos-center;
+    Array<T,2> radial = pos-center;
     T r = norm(radial) / radius;
     if (r<=(T)1.) {
         data = 2*uAverage*(1-r*r)*(-normal);
@@ -158,13 +158,13 @@ IncreasingPoiseuilleProfile2D<T,Descriptor>::IncreasingPoiseuilleProfile2D (
 { }
 
 template< typename T, template<typename U> class Descriptor>
-void IncreasingPoiseuilleProfile2D<T,Descriptor>::setNormal(Array<T,3> const& normal_) {
+void IncreasingPoiseuilleProfile2D<T,Descriptor>::setNormal(Array<T,2> const& normal_) {
     normal = normal_;
 }
 
 template< typename T, template<typename U> class Descriptor>
 void IncreasingPoiseuilleProfile2D<T,Descriptor>::defineCircularShape (
-        Array<T,3> const& center_, T radius_ )
+        Array<T,2> const& center_, T radius_ )
 {
     center = center_;
     radius = radius_;
@@ -172,8 +172,8 @@ void IncreasingPoiseuilleProfile2D<T,Descriptor>::defineCircularShape (
 
 template< typename T, template<typename U> class Descriptor>
 void IncreasingPoiseuilleProfile2D<T,Descriptor>::getData (
-        Array<T,3> const& pos, plint id, AtomicBlock2D const* argument,
-        Array<T,3>& data, OffBoundary::Type& bdType ) const
+        Array<T,2> const& pos, plint id, AtomicBlock2D const* argument,
+        Array<T,2>& data, OffBoundary::Type& bdType ) const
 {
     bdType = OffBoundary::dirichlet;
     BlockLattice2D<T,Descriptor> const* lattice =
@@ -186,7 +186,7 @@ void IncreasingPoiseuilleProfile2D<T,Descriptor>::getData (
     else {
         signal = (T)1;
     }
-    Array<T,3> radial = pos-center;
+    Array<T,2> radial = pos-center;
     T r = norm(radial) / radius;
     if (r<=(T)1.) {
         data = signal*2*uAverage*(1-r*r)*(-normal);
@@ -208,24 +208,24 @@ IncreasingPoiseuilleProfile2D<T,Descriptor>*
 
 template< typename T, template<typename U> class Descriptor>
 IncreasingVelocityProfile2D<T,Descriptor>::IncreasingVelocityProfile2D (
-        Array<T,3> const& u_, plint maxT_ )
+        Array<T,2> const& u_, plint maxT_ )
     : u(u_),
       maxT(maxT_)
 { }
 
 template< typename T, template<typename U> class Descriptor>
-void IncreasingVelocityProfile2D<T,Descriptor>::setNormal(Array<T,3> const& normal_)
+void IncreasingVelocityProfile2D<T,Descriptor>::setNormal(Array<T,2> const& normal_)
 { }
 
 template< typename T, template<typename U> class Descriptor>
 void IncreasingVelocityProfile2D<T,Descriptor>::defineCircularShape (
-        Array<T,3> const& center_, T radius_ )
+        Array<T,2> const& center_, T radius_ )
 { }
 
 template< typename T, template<typename U> class Descriptor>
 void IncreasingVelocityProfile2D<T,Descriptor>::getData (
-        Array<T,3> const& pos, plint id, AtomicBlock2D const* argument,
-        Array<T,3>& data, OffBoundary::Type& bdType ) const
+        Array<T,2> const& pos, plint id, AtomicBlock2D const* argument,
+        Array<T,2>& data, OffBoundary::Type& bdType ) const
 {
     bdType = OffBoundary::dirichlet;
     BlockLattice2D<T,Descriptor> const* lattice =
@@ -253,7 +253,7 @@ IncreasingVelocityProfile2D<T,Descriptor>*
 
 template< typename T, template<typename U> class Descriptor>
 TimeDependentVelocityProfile2D<T,Descriptor>::TimeDependentVelocityProfile2D (
-        util::TimeDependentFunction<T,3>* velocity_)
+        util::TimeDependentFunction<T,2>* velocity_)
     : velocity(velocity_)
 { }
 
@@ -277,18 +277,18 @@ void TimeDependentVelocityProfile2D<T,Descriptor>::swap(TimeDependentVelocityPro
 }
 
 template< typename T, template<typename U> class Descriptor>
-void TimeDependentVelocityProfile2D<T,Descriptor>::setNormal(Array<T,3> const& normal_)
+void TimeDependentVelocityProfile2D<T,Descriptor>::setNormal(Array<T,2> const& normal_)
 { }
 
 template< typename T, template<typename U> class Descriptor>
 void TimeDependentVelocityProfile2D<T,Descriptor>::defineCircularShape (
-        Array<T,3> const& center_, T radius_ )
+        Array<T,2> const& center_, T radius_ )
 { }
 
 template< typename T, template<typename U> class Descriptor>
 void TimeDependentVelocityProfile2D<T,Descriptor>::getData (
-        Array<T,3> const& pos, plint id, AtomicBlock2D const* argument,
-        Array<T,3>& data, OffBoundary::Type& bdType ) const
+        Array<T,2> const& pos, plint id, AtomicBlock2D const* argument,
+        Array<T,2>& data, OffBoundary::Type& bdType ) const
 {
     bdType = OffBoundary::dirichlet;
     BlockLattice2D<T,Descriptor> const* lattice =
@@ -319,14 +319,14 @@ OscillatingPoiseuilleProfile2D<T,Descriptor>::OscillatingPoiseuilleProfile2D (
 { }
 
 template< typename T, template<typename U> class Descriptor>
-void OscillatingPoiseuilleProfile2D<T,Descriptor>::setNormal(Array<T,3> const& normal_)
+void OscillatingPoiseuilleProfile2D<T,Descriptor>::setNormal(Array<T,2> const& normal_)
 {
     normal = normal_;
 }
 
 template< typename T, template<typename U> class Descriptor>
 void OscillatingPoiseuilleProfile2D<T,Descriptor>::defineCircularShape (
-        Array<T,3> const& center_, T radius_ )
+        Array<T,2> const& center_, T radius_ )
 {
     center = center_;
     radius = radius_;
@@ -334,8 +334,8 @@ void OscillatingPoiseuilleProfile2D<T,Descriptor>::defineCircularShape (
 
 template< typename T, template<typename U> class Descriptor>
 void OscillatingPoiseuilleProfile2D<T,Descriptor>::getData (
-        Array<T,3> const& pos, plint id, AtomicBlock2D const* argument,
-        Array<T,3>& data, OffBoundary::Type& bdType ) const
+        Array<T,2> const& pos, plint id, AtomicBlock2D const* argument,
+        Array<T,2>& data, OffBoundary::Type& bdType ) const
 {
     bdType = OffBoundary::dirichlet;
     static const T pi = (T)4.*atan(1.);
@@ -345,7 +345,7 @@ void OscillatingPoiseuilleProfile2D<T,Descriptor>::getData (
     T t = (T) lattice->getTimeCounter().getTime();
     T signal = (sin((T)2.*pi*t/period)+(T)1.)*(T)0.5;
 
-    Array<T,3> radial = pos-center;
+    Array<T,2> radial = pos-center;
     T r = norm(radial) / radius;
     if (r<=(T)1.) {
         data = ( minUave+(maxUave-minUave)*signal* (T)2*((T)1-r*r) ) * (-normal);
@@ -366,22 +366,22 @@ OscillatingPoiseuilleProfile2D<T,Descriptor>*
 /********** ConstantVelocityProfile2D ********************************************/
 
 template<typename T>
-ConstantVelocityProfile2D<T>::ConstantVelocityProfile2D(Array<T,3> const& u_)
+ConstantVelocityProfile2D<T>::ConstantVelocityProfile2D(Array<T,2> const& u_)
     : u(u_)
 { }
 
 template<typename T>
-void ConstantVelocityProfile2D<T>::setNormal(Array<T,3> const& normal_)
+void ConstantVelocityProfile2D<T>::setNormal(Array<T,2> const& normal_)
 { }
 
 template<typename T>
-void ConstantVelocityProfile2D<T>::defineCircularShape(Array<T,3> const& center_, T radius_)
+void ConstantVelocityProfile2D<T>::defineCircularShape(Array<T,2> const& center_, T radius_)
 { }
 
 template<typename T>
 void ConstantVelocityProfile2D<T>::getData (
-        Array<T,3> const& pos, plint id, AtomicBlock2D const* argument,
-        Array<T,3>& data, OffBoundary::Type& bdType ) const
+        Array<T,2> const& pos, plint id, AtomicBlock2D const* argument,
+        Array<T,2>& data, OffBoundary::Type& bdType ) const
 {
     bdType = OffBoundary::dirichlet;
     data = u;
@@ -404,18 +404,18 @@ VelocityPlugProfile2D<T>::VelocityPlugProfile2D(T uMax_)
 { }
 
 template<typename T>
-void VelocityPlugProfile2D<T>::setNormal(Array<T,3> const& normal_) {
+void VelocityPlugProfile2D<T>::setNormal(Array<T,2> const& normal_) {
     normal = normal_;
 }
 
 template<typename T>
-void VelocityPlugProfile2D<T>::defineCircularShape(Array<T,3> const& center_, T radius_)
+void VelocityPlugProfile2D<T>::defineCircularShape(Array<T,2> const& center_, T radius_)
 { }
 
 template<typename T>
 void VelocityPlugProfile2D<T>::getData (
-        Array<T,3> const& pos, plint id, AtomicBlock2D const* argument,
-        Array<T,3>& data, OffBoundary::Type& bdType ) const
+        Array<T,2> const& pos, plint id, AtomicBlock2D const* argument,
+        Array<T,2>& data, OffBoundary::Type& bdType ) const
 {
     bdType = OffBoundary::dirichlet;
     data = -uMax*normal;
@@ -432,20 +432,20 @@ VelocityPlugProfile2D<T>*
 /********** NeumannBoundaryProfile2D ******************************************/
 
 template<typename T>
-void NeumannBoundaryProfile2D<T>::setNormal(Array<T,3> const& normal_)
+void NeumannBoundaryProfile2D<T>::setNormal(Array<T,2> const& normal_)
 {
     normal = normal_;
 }
 
 template<typename T>
 void NeumannBoundaryProfile2D<T>::defineCircularShape (
-        Array<T,3> const& center_, T radius_ )
+        Array<T,2> const& center_, T radius_ )
 { }
 
 template<typename T>
 void NeumannBoundaryProfile2D<T>::getData (
-        Array<T,3> const& pos, plint id, AtomicBlock2D const* argument,
-        Array<T,3>& data, OffBoundary::Type& bdType ) const
+        Array<T,2> const& pos, plint id, AtomicBlock2D const* argument,
+        Array<T,2>& data, OffBoundary::Type& bdType ) const
 {
     bdType = OffBoundary::neumann;
     // In a Neumann condition, the velocity will need to be
@@ -470,20 +470,20 @@ DensityNeumannBoundaryProfile2D<T>::DensityNeumannBoundaryProfile2D(T rho_)
 { }
 
 template<typename T>
-void DensityNeumannBoundaryProfile2D<T>::setNormal(Array<T,3> const& normal_)
+void DensityNeumannBoundaryProfile2D<T>::setNormal(Array<T,2> const& normal_)
 {
     normal = normal_;
 }
 
 template<typename T>
 void DensityNeumannBoundaryProfile2D<T>::defineCircularShape (
-        Array<T,3> const& center_, T radius_ )
+        Array<T,2> const& center_, T radius_ )
 { }
 
 template<typename T>
 void DensityNeumannBoundaryProfile2D<T>::getData (
-        Array<T,3> const& pos, plint id, AtomicBlock2D const* argument,
-        Array<T,3>& data, OffBoundary::Type& bdType ) const
+        Array<T,2> const& pos, plint id, AtomicBlock2D const* argument,
+        Array<T,2>& data, OffBoundary::Type& bdType ) const
 {
     bdType = OffBoundary::densityNeumann;
     // In a Neumann condition, the velocity will need to be
@@ -508,17 +508,17 @@ ScalarDirichletProfile2D<T>::ScalarDirichletProfile2D(T value_)
 { }
 
 template<typename T>
-void ScalarDirichletProfile2D<T>::setNormal(Array<T,3> const& normal_)
+void ScalarDirichletProfile2D<T>::setNormal(Array<T,2> const& normal_)
 { }
 
 template<typename T>
 void ScalarDirichletProfile2D<T>::defineCircularShape (
-        Array<T,3> const& center_, T radius_ )
+        Array<T,2> const& center_, T radius_ )
 { }
 
 template<typename T>
 void ScalarDirichletProfile2D<T>::getData (
-        Array<T,3> const& pos, plint id, AtomicBlock2D const* argument,
+        Array<T,2> const& pos, plint id, AtomicBlock2D const* argument,
         Array<T,2>& data, OffBoundary::Type& bdType ) const
 {
     bdType = OffBoundary::dirichlet;
@@ -537,19 +537,19 @@ ScalarDirichletProfile2D<T>*
 /********** ScalarNeumannProfile2D ******************************************/
 
 template<typename T>
-void ScalarNeumannProfile2D<T>::setNormal(Array<T,3> const& normal_)
+void ScalarNeumannProfile2D<T>::setNormal(Array<T,2> const& normal_)
 {
     normal = normal_;
 }
 
 template<typename T>
 void ScalarNeumannProfile2D<T>::defineCircularShape (
-        Array<T,3> const& center_, T radius_ )
+        Array<T,2> const& center_, T radius_ )
 { }
 
 template<typename T>
 void ScalarNeumannProfile2D<T>::getData (
-        Array<T,3> const& pos, plint id, AtomicBlock2D const* argument,
+        Array<T,2> const& pos, plint id, AtomicBlock2D const* argument,
         Array<T,2>& data, OffBoundary::Type& bdType ) const
 {
     bdType = OffBoundary::neumann;
@@ -575,19 +575,19 @@ ScalarFluxProfile2D<T>::ScalarFluxProfile2D(T gradVal_)
 { }
 
 template<typename T>
-void ScalarFluxProfile2D<T>::setNormal(Array<T,3> const& normal_)
+void ScalarFluxProfile2D<T>::setNormal(Array<T,2> const& normal_)
 {
     normal = normal_;
 }
 
 template<typename T>
 void ScalarFluxProfile2D<T>::defineCircularShape (
-        Array<T,3> const& center_, T radius_ )
+        Array<T,2> const& center_, T radius_ )
 { }
 
 template<typename T>
 void ScalarFluxProfile2D<T>::getData (
-        Array<T,3> const& pos, plint id, AtomicBlock2D const* argument,
+        Array<T,2> const& pos, plint id, AtomicBlock2D const* argument,
         Array<T,2>& data, OffBoundary::Type& bdType ) const
 {
     bdType = OffBoundary::flux;
@@ -613,19 +613,19 @@ ScalarIsolationProfile2D<T>::ScalarIsolationProfile2D(T asymptoticRho_, T kappa_
 { }
 
 template<typename T>
-void ScalarIsolationProfile2D<T>::setNormal(Array<T,3> const& normal_)
+void ScalarIsolationProfile2D<T>::setNormal(Array<T,2> const& normal_)
 {
     normal = normal_;
 }
 
 template<typename T>
 void ScalarIsolationProfile2D<T>::defineCircularShape (
-        Array<T,3> const& center_, T radius_ )
+        Array<T,2> const& center_, T radius_ )
 { }
 
 template<typename T>
 void ScalarIsolationProfile2D<T>::getData (
-        Array<T,3> const& pos, plint id, AtomicBlock2D const* argument,
+        Array<T,2> const& pos, plint id, AtomicBlock2D const* argument,
         Array<T,2>& data, OffBoundary::Type& bdType ) const
 {
     bdType = OffBoundary::isolation;

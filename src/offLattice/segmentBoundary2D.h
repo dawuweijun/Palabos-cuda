@@ -42,13 +42,13 @@ namespace plb {
 template<typename T>
 class DEFscaledMesh2D {
 public:
-    DEFscaledMesh2D(SegmentSet<T> const& triangleSet_);
+    DEFscaledMesh2D(SegmentSet<T> const& segmentSet_);
     DEFscaledMesh2D (
-        SegmentSet<T> const& triangleSet_,
+        SegmentSet<T> const& segmentSet_,
         plint resolution_, plint referenceDirection_,
         plint margin_, plint extraLayer );
     DEFscaledMesh2D (
-        SegmentSet<T> const& triangleSet_,
+        SegmentSet<T> const& segmentSet_,
         plint resolution_, plint referenceDirection_,
         plint margin_, Dot2D location );
     DEFscaledMesh2D(DEFscaledMesh2D<T> const& rhs);
@@ -67,7 +67,7 @@ public: // Mesh usage interface.
     std::vector<plint> const& getEmanatingEdgeList() const {
         return emanatingEdgeList;
     }
-    std::vector<Edge> const& getEdgeList() const {
+    std::vector<Edge2D> const& getEdgeList() const {
             return edgeList;
         }
     Array<T,2> getPhysicalLocation() const {
@@ -84,7 +84,7 @@ public: // Mesh usage interface.
     }
 private:
     void initialize (
-        SegmentSet<T> const& triangleSet_, plint resolution_,
+        SegmentSet<T> const& segmentSet_, plint resolution_,
         plint referenceDirection_, Dot2D location );
 private:
     std::vector<Array<T,2> > vertexList;
@@ -92,7 +92,7 @@ private:
     ///   information.
     std::vector<plint> emanatingEdgeList;
     /// Edges are a structural information.
-    std::vector<Edge> edgeList;
+    std::vector<Edge2D> edgeList;
     SegmentPolygonMesh2D<T>* mesh;
     plint margin;
     Array<T,2> physicalLocation;
@@ -169,7 +169,7 @@ public:
                          BoundaryProfile2D<T,SurfaceData>* profile3, BoundaryProfile2D<T,SurfaceData>* profile4 );
     void adjustInletOutlet(SegmentBoundary2D<T> const& boundary, plint sortDirection);
     BoundaryProfile2D<T,SurfaceData> const& getProfile (
-            SegmentBoundary2D<T> const& boundary, plint iTriangle ) const;
+            SegmentBoundary2D<T> const& boundary, plint iSegment ) const;
 private:
     void replaceProfile(plint id, BoundaryProfile2D<T,SurfaceData>* newProfile);
     void clearProfiles();
@@ -215,17 +215,17 @@ public: // Mesh usage interface.
     ///   currently active mesh).
     VertexProperty2D<T> const* getVertexProperty(plint iVertex) const;
     /// Get intersection between a line segment (fromPoint,fromPoint+direction)
-    ///   and a given triangle in the currently active mesh; return true incase
+    ///   and a given segment in the currently active mesh; return true incase
     ///   of success.
     bool intersectSegment (
-            plint iTriangle, AtomicBlock2D* boundaryArg,
+            plint iSegment, AtomicBlock2D* boundaryArg,
             Array<T,2> const& fromPoint, Array<T,2> const& direction,
             Array<T,2>& locatedPoint, T& distance, Array<T,2>& wallNormal ) const;
     /// Given a point p on the surface of the shape, determine its "continuous normal".
     ///   If the shape is for example piecewise linear, the normal is adjusted to vary
     ///   continuously over the surface.
     Array<T,2> computeContinuousNormal (
-            Array<T,2> const& p, plint iTriangle, bool isAreaWeighted = false ) const;
+            Array<T,2> const& p, plint iSegment, bool isAreaWeighted = false ) const;
     /// Create a new set of vertices, and an associated open and closed mesh.
     void cloneVertexSet(plint whichVertexSet);
     /// Coordinates of the lower-left corner in physical units.
@@ -238,13 +238,13 @@ public: // Mesh usage interface.
     }
 public: // Mesh preparation interface.
     /// Get a list of all inlets and outlets (no specific sorting order).
-    std::vector<Lid> const& getInletOutlet() const;
+    std::vector<Lid2D> const& getInletOutlet() const;
     /// Get a list of all inlets and outlets, sorted along a given direction.
     /** This information can be used as a hint to select the boundary condition
      *    associated to each inlet/outlet. Access the variable lid.baryCenter 
      *    to know the location of a given inlet/outlet.
      **/
-    std::vector<Lid> getInletOutlet(plint sortDirection) const;
+    std::vector<Lid2D> getInletOutlet(plint sortDirection) const;
     template<typename DomainFunctional> plint tagDomain(DomainFunctional functional);
     template<typename DomainFunctional> plint tagDomain(DomainFunctional functional, Array<T,2> normal, T angleTolerance, plint previousTag=-1);
     std::vector<plint> getInletOutletIds(plint sortDirection) const;
@@ -259,9 +259,9 @@ public: // Mesh preparation interface.
             VertexProperty2D<T> const& property, DomainFunctional functional );
     plint getMargin() const;
     /// Return the tag (id of boundary-portion with specific boundary condition)
-    ///   of a triangle.
-    plint getTag(plint iTriangle) const;
-    std::vector<plint> const& getTriangleTags() const { return triangleTagList; }
+    ///   of a segment.
+    plint getTag(plint iSegment) const;
+    std::vector<plint> const& getSegmentTags() const { return segmentTagList; }
     std::vector<plint> const& getVertexTags() const { return vertexTagList; }
 private:
     plint currentMesh() const;
@@ -272,11 +272,11 @@ private:
     void closeHoles();
     void assignLidVertexProperty();
 private:
-    /// Assign a new tag to all triangles corresponding to one of the provided inlets/outlets.
+    /// Assign a new tag to all segments corresponding to one of the provided inlets/outlets.
     ///   The tag is taken in increasing integer value according to a sorting
     ///   or the inlets/outlets along the given space direction.
     void tagInletOutlet (
-        std::vector<Lid> const& newLids );
+        std::vector<Lid2D> const& newLids );
     /// There may exist more than one set of vertices, for example in
     ///   case of a moving wall which has current vertex positions and
     ///   equilibrium vertex positions.
@@ -286,22 +286,22 @@ private:
     std::vector<plint> emanatingEdgeLists[2];
     /// Edges are a structural information which is shared by all sets
     ///   of vertices.
-    std::vector<Edge> edgeLists[2];
+    std::vector<Edge2D> edgeLists[2];
     /// For each set of vertices there is a mesh, with a reference to the
     ///   given vertices (individual to each mesh) and to the
     ///   emanatingEdgeList and edgeList (same for all meshes).
     std::vector<SegmentPolygonMesh2D<T> > meshes;
-    /// The triangle type is an indirect index which links to the boundary
-    ///   condition implemented by each triangle and defined in boundaryProfiles.
-    std::vector<plint> triangleTagList;
+    /// The segment type is an indirect index which links to the boundary
+    ///   condition implemented by each segment and defined in boundaryProfiles.
+    std::vector<plint> segmentTagList;
     plint currentTagNum;
     /// The vertex type is an indirect index which links to generic material
     ///   properties implemented at that vertex and defined in vertexProperties.
     std::vector<plint> vertexTagList;
     /// Vertex properties, indexed by the vertex type in vertexTagList.
     std::vector<VertexProperty2D<T>*> vertexProperties;
-    /// Inlets and outlets, saved as a collection of triangles.
-    std::vector<Lid> lids;
+    /// Inlets and outlets, saved as a collection of segments.
+    std::vector<Lid2D> lids;
     plint margin;
     Array<T,2> physicalLocation;
     T dx;
@@ -310,9 +310,9 @@ private:
 };
 
 template< typename T, class SurfaceData >
-class TriangleFlowShape2D : public BoundaryShape2D<T,SurfaceData> {
+class SegmentFlowShape2D : public BoundaryShape2D<T,SurfaceData> {
 public:
-    TriangleFlowShape2D (
+    SegmentFlowShape2D (
             SegmentBoundary2D<T> const& boundary_,
             BoundaryProfiles2D<T,SurfaceData> const& profiles_ );
     virtual bool isInside(Dot2D const& location) const;
@@ -328,7 +328,7 @@ public:
     virtual plint getTag(plint id) const;
     virtual bool distanceToSurface( Array<T,2> const& point,
                                     T& distance, bool& isBehind ) const;
-    virtual TriangleFlowShape2D<T,SurfaceData>* clone() const;
+    virtual SegmentFlowShape2D<T,SurfaceData>* clone() const;
     /// Use this clone function to provide the meshed data to this object.
     /** The arguments are:
      *  0: The voxel flags (ScalarField2D<T>),
@@ -337,7 +337,7 @@ public:
      *     in order to compute the boundary condition. In dynamic walls this is for
      *     example often a MultiParticleField, used to determined the wall velocity.
      **/
-    virtual TriangleFlowShape2D<T,SurfaceData>*
+    virtual SegmentFlowShape2D<T,SurfaceData>*
                 clone(std::vector<AtomicBlock2D*> args) const;
 private:
     SegmentBoundary2D<T> const& boundary;
@@ -370,7 +370,7 @@ public:
     ~VoxelizedDomain2D();
     MultiScalarField2D<int>& getVoxelMatrix();
     MultiScalarField2D<int> const& getVoxelMatrix() const;
-    MultiContainerBlock2D& getTriangleHash();
+    MultiContainerBlock2D& getSegmentHash();
     MultiBlockManagement2D const& getMultiBlockManagement() const;
     template<class ParticleFieldT>
     void adjustVoxelization(MultiParticleField2D<ParticleFieldT>& particles, bool dynamicMesh);
@@ -387,16 +387,16 @@ private:
             plint blockSize, plint envelopeWidth );
     void extendEnvelopeWidth (
             MultiScalarField2D<int>& fullVoxelMatrix, plint envelopeWidth );
-    void createTriangleHash();
+    void createSegmentHash();
     template<class ParticleFieldT>
-    void reCreateTriangleHash(MultiParticleField2D<ParticleFieldT>& particles);
+    void reCreateSegmentHash(MultiParticleField2D<ParticleFieldT>& particles);
     void computeOuterMask();
 private:
     int flowType;
     plint borderWidth;
     SegmentBoundary2D<T> const& boundary;
     MultiScalarField2D<int>* voxelMatrix;
-    MultiContainerBlock2D* triangleHash;
+    MultiContainerBlock2D* segmentHash;
 };
 
 template<typename T>

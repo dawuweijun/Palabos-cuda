@@ -27,13 +27,13 @@
  */
 
 #include "offLattice/marchingCube.hh"
-#include "offLattice/triangleSet.hh"
+#include "offLattice/segmentSet.hh"
 #include "offLattice/nextNeighbors2D.hh"
-#include "offLattice/triangleToDef.hh"
-#include "offLattice/triangularSurfaceMesh.hh"
+#include "offLattice/segmentToDef.hh"
+#include "offLattice/segmentPolygonMesh2D.hh"
 #include "offLattice/voxelizer2D.hh"
 #include "offLattice/makeSparse2D.hh"
-#include "offLattice/triangleHash.hh"
+#include "offLattice/segmentHash.hh"
 #include "offLattice/offLatticeBoundaryProcessor2D.hh"
 #include "offLattice/offLatticeBoundaryProfiles2D.hh"
 #include "offLattice/offLatticeBoundaryCondition2D.hh"
@@ -43,10 +43,10 @@
 #include "offLattice/guoOffLatticeModel2D.hh"
 #include "offLattice/bouzidiOffLatticeModel2D.hh"
 // #include "offLattice/guoAdvDiffOffLatticeModel2D.hh"
-#include "offLattice/triangleSetGenerator.hh"
-// #include "offLattice/immersedWalls2D.hh"
-// #include "offLattice/filippovaHaenel2D.hh"
+#include "offLattice/segmentSetGenerator.hh"
+#include "offLattice/immersedWalls2D.hh"
+#include "offLattice/filippovaHaenel2D.hh"
 
 #ifndef PLB_BGP
-// #include "offLattice/generalizedOffLatticeModel2D.hh"
+#include "offLattice/generalizedOffLatticeModel2D.hh"
 #endif

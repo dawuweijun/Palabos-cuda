@@ -291,7 +291,7 @@ void DenseParticleField2D<T,Descriptor>::swap(DenseParticleField2D<T,Descriptor>
 template<typename T, template<typename U> class Descriptor>
 void DenseParticleField2D<T,Descriptor>::addParticle(Box2D domain, Particle2D<T,Descriptor>* particle) {
     plint iX, iY;
-    computeGridPosition(particle->getPosition(), iX, iY);
+    this->computeGridPosition(particle->getPosition(), iX, iY);
     Box2D finalDomain;
     if( intersect(domain, particleGrid.getBoundingBox(), finalDomain) &&
         contained(iX,iY, finalDomain) )

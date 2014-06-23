@@ -47,31 +47,31 @@
 namespace plb {
 
 template<typename T>
-const T TriangularSurfaceMesh<T>::eps0 = std::numeric_limits<T>::epsilon();
+const T SegmentPolygonMesh2D<T>::eps0 = std::numeric_limits<T>::epsilon();
 
 template<typename T>
-const T TriangularSurfaceMesh<T>::eps1 =
+const T SegmentPolygonMesh2D<T>::eps1 =
         (sizeof(T) == sizeof(float)) ?
              std::numeric_limits<float>::epsilon() :
              (T) 100.0 * std::numeric_limits<T>::epsilon();
 
 template<typename T>
-TriangularSurfaceMesh<T>::TriangularSurfaceMesh (
-            std::vector<Array<T,3> >& vertexList_,
+SegmentPolygonMesh2D<T>::SegmentPolygonMesh2D (
+            std::vector<Array<T,2> >& vertexList_,
             std::vector<plint>& emanatingEdgeList_,
-            std::vector<Edge>& edgeList_,
+            std::vector<Edge2D>& edgeList_,
             plint numVertices_ )
       : vertexList(&vertexList_),
         emanatingEdgeList(&emanatingEdgeList_),
         edgeList(&edgeList_),
-        numTriangles((plint)edges().size()/(plint)3),
+        numSegments((plint)edges().size()/(plint)3),
         numVertices(numVertices_>=0 ? numVertices_ : ( (plint)vertices().size() ) )
 {
     avoidIntegerPositions();
 }
 
 template<typename T>
-void TriangularSurfaceMesh<T>::replaceVertex(plint iVertex, Array<T,3> const& newPosition)
+void SegmentPolygonMesh2D<T>::replaceVertex(plint iVertex, Array<T,2> const& newPosition)
 {
     PLB_PRECONDITION( iVertex<getNumVertices() );
     (*vertexList)[iVertex] = newPosition;
@@ -79,7 +79,7 @@ void TriangularSurfaceMesh<T>::replaceVertex(plint iVertex, Array<T,3> const& ne
 }
 
 template<typename T>
-void TriangularSurfaceMesh<T>::resetVertices(Array<T,3> const& defaultVertex)
+void SegmentPolygonMesh2D<T>::resetVertices(Array<T,2> const& defaultVertex)
 {
     for (plint iVertex=0; iVertex<getNumVertices(); ++iVertex) {
         vertices()[iVertex] = defaultVertex;
@@ -87,7 +87,7 @@ void TriangularSurfaceMesh<T>::resetVertices(Array<T,3> const& defaultVertex)
 }
 
 template<typename T>
-inline void TriangularSurfaceMesh<T>::assertVertex(Array<T,3> const& vertex) const
+inline void SegmentPolygonMesh2D<T>::assertVertex(Array<T,2> const& vertex) const
 {
 #ifdef PLB_DEBUG
     if (global::IOpolicy().stlFilesHaveLowerBound()) {
@@ -98,39 +98,39 @@ inline void TriangularSurfaceMesh<T>::assertVertex(Array<T,3> const& vertex) con
 }
 
 template<typename T>
-inline Array<T,3> const& TriangularSurfaceMesh<T>::getVertex (
-        plint iTriangle, int localVertex) const
+inline Array<T,2> const& SegmentPolygonMesh2D<T>::getVertex (
+        plint iSegment, int localVertex) const
 {
-    PLB_ASSERT(iTriangle >= 0 && iTriangle < numTriangles &&
-               (localVertex == 0 || localVertex == 1 || localVertex == 2));
-    Array<T,3> const& vertex (
-            vertices()[ edges()[ 3*iTriangle + ((localVertex == 0) ? 2 : localVertex-1) ].pv ] );
+    PLB_ASSERT(iSegment >= 0 && iSegment < numSegments &&
+               (localVertex == 0 || localVertex == 1));
+    Array<T,2> const& vertex (
+            vertices()[ edges()[ 3*iSegment + ((localVertex == 0) ? 2 : localVertex-1) ].pv ] );
     assertVertex(vertex);
     return vertex;
 }
 
 template<typename T>
-inline Array<T,3>& TriangularSurfaceMesh<T>::getVertex (
-        plint iTriangle, int localVertex )
+inline Array<T,2>& SegmentPolygonMesh2D<T>::getVertex (
+        plint iSegment, int localVertex )
 {
-    PLB_ASSERT(iTriangle >= 0 && iTriangle < numTriangles &&
-               (localVertex == 0 || localVertex == 1 || localVertex == 2));
-    Array<T,3>& vertex (
-            vertices()[ edges()[ 3*iTriangle + ((localVertex == 0) ? 2 : localVertex-1) ].pv ] );
+    PLB_ASSERT(iSegment >= 0 && iSegment < numSegments &&
+               (localVertex == 0 || localVertex == 1));
+    Array<T,2>& vertex (
+            vertices()[ edges()[ 3*iSegment + ((localVertex == 0) ? 2 : localVertex-1) ].pv ] );
     assertVertex(vertex);
     return vertex;
 }
 
 template<typename T>
-bool TriangularSurfaceMesh<T>::isValidVertex (
-        plint iTriangle, int localVertex) const
+bool SegmentPolygonMesh2D<T>::isValidVertex (
+        plint iSegment, int localVertex) const
 {
-    PLB_ASSERT(iTriangle >= 0 && iTriangle < numTriangles &&
-               (localVertex == 0 || localVertex == 1 || localVertex == 2));
+    PLB_ASSERT(iSegment >= 0 && iSegment < numSegments &&
+               (localVertex == 0 || localVertex == 1));
     if (global::IOpolicy().stlFilesHaveLowerBound()) {
         double bound = global::IOpolicy().getLowerBoundForStlFiles();
-        Array<T,3> const& vertex (
-                vertices()[ edges()[ 3*iTriangle + ((localVertex == 0) ? 2 : localVertex-1) ].pv ] );
+        Array<T,2> const& vertex (
+                vertices()[ edges()[ 3*iSegment + ((localVertex == 0) ? 2 : localVertex-1) ].pv ] );
         return !(vertex[0]<bound && vertex[1]<bound && vertex[2]<bound);
     }
     else {
@@ -139,32 +139,32 @@ bool TriangularSurfaceMesh<T>::isValidVertex (
 }
 
 template<typename T>
-inline Array<T,3> const& TriangularSurfaceMesh<T>::getVertex (
+inline Array<T,2> const& SegmentPolygonMesh2D<T>::getVertex (
         plint iVertex) const
 {
     PLB_ASSERT(iVertex >= 0 && iVertex < numVertices);
-    Array<T,3> const& vertex(vertices()[iVertex]);
+    Array<T,2> const& vertex(vertices()[iVertex]);
     assertVertex(vertex);
     return vertex;
 }
 
 template<typename T>
-inline Array<T,3>& TriangularSurfaceMesh<T>::getVertex (
+inline Array<T,2>& SegmentPolygonMesh2D<T>::getVertex (
         plint iVertex)
 {
     PLB_ASSERT(iVertex >= 0 && iVertex < numVertices);
-    Array<T,3>& vertex(vertices()[iVertex]);
+    Array<T,2>& vertex(vertices()[iVertex]);
     assertVertex(vertex);
     return vertex;
 }
 
 template<typename T>
-inline bool TriangularSurfaceMesh<T>::isValidVertex (
+inline bool SegmentPolygonMesh2D<T>::isValidVertex (
         plint iVertex) const
 {
     PLB_ASSERT(iVertex >= 0 && iVertex < numVertices);
     if (global::IOpolicy().stlFilesHaveLowerBound()) {
-        Array<T,3> const& vertex(vertices()[iVertex]);
+        Array<T,2> const& vertex(vertices()[iVertex]);
         double bound = global::IOpolicy().getLowerBoundForStlFiles();
         return !(vertex[0]<bound && vertex[1]<bound && vertex[2]<bound);
     }
@@ -174,27 +174,24 @@ inline bool TriangularSurfaceMesh<T>::isValidVertex (
 }
 
 template<typename T>
-void TriangularSurfaceMesh<T>::computeBoundingBox (
-        Array<T,2>& xRange, Array<T,2>& yRange, Array<T,2>& zRange ) const
+void SegmentPolygonMesh2D<T>::computeBoundingBox (
+        Array<T,2>& xRange, Array<T,2>& yRange ) const
 {
     T minVal = std::numeric_limits<T>::min();
     T maxVal = std::numeric_limits<T>::max();
     xRange = Array<T,2>(maxVal, minVal);
     yRange = Array<T,2>(maxVal, minVal);
-    zRange = Array<T,2>(maxVal, minVal);
     for (plint iVertex=0; iVertex<getNumVertices(); ++iVertex) {
-        Array<T,3> const& vertex = getVertex(iVertex);
+        Array<T,2> const& vertex = getVertex(iVertex);
         xRange[0] = std::min(xRange[0], vertex[0]);
         xRange[1] = std::max(xRange[1], vertex[0]);
         yRange[0] = std::min(yRange[0], vertex[1]);
         yRange[1] = std::max(yRange[1], vertex[1]);
-        zRange[0] = std::min(zRange[0], vertex[2]);
-        zRange[1] = std::max(zRange[1], vertex[2]);
     }
 }
 
 template<typename T>
-void TriangularSurfaceMesh<T>::translate(Array<T,3> const& vector)
+void SegmentPolygonMesh2D<T>::translate(Array<T,2> const& vector)
 {
     if (util::fpequal(norm(vector), T(), eps0))
         return;
@@ -204,7 +201,7 @@ void TriangularSurfaceMesh<T>::translate(Array<T,3> const& vector)
 }
 
 template<typename T>
-void TriangularSurfaceMesh<T>::scale(T alpha)
+void SegmentPolygonMesh2D<T>::scale(T alpha)
 {
 
     PLB_ASSERT(! util::fpequal(alpha, T(), eps0));
@@ -216,7 +213,7 @@ void TriangularSurfaceMesh<T>::scale(T alpha)
 }
 
 template<typename T>
-void TriangularSurfaceMesh<T>::rotate(T phi, T theta, T psi)
+void SegmentPolygonMesh2D<T>::rotate(T phi, T theta, T psi)
 {
     static const T pi = acos(-1.0);
 
@@ -275,7 +272,7 @@ void TriangularSurfaceMesh<T>::rotate(T phi, T theta, T psi)
     }
 
     for (plint iVertex = 0; iVertex < numVertices; iVertex++) {
-        Array<T,3> x = getVertex(iVertex);
+        Array<T,2> x = getVertex(iVertex);
         for (int i = 0; i < 3; i++) {
             getVertex(iVertex)[i] = (T) 0.0;
             for (int j = 0; j < 3; j++) {
@@ -286,7 +283,7 @@ void TriangularSurfaceMesh<T>::rotate(T phi, T theta, T psi)
 }
 
 template<typename T>
-void TriangularSurfaceMesh<T>::smooth(plint maxiter, T relax, bool isMeasureWeighted)
+void SegmentPolygonMesh2D<T>::smooth(plint maxiter, T relax, bool isMeasureWeighted)
 {
     PLB_ASSERT(maxiter >= 0);
     PLB_ASSERT((relax > (T) 0.0 || fabs(relax) <= eps0) &&
@@ -295,37 +292,37 @@ void TriangularSurfaceMesh<T>::smooth(plint maxiter, T relax, bool isMeasureWeig
     if (maxiter <= 0)
         return;
 
-    std::vector<Array<T,3> > *bp0;
+    std::vector<Array<T,2> > *bp0;
     bp0 = vertexList;
 
-    std::vector<Array<T,3> > buf;
+    std::vector<Array<T,2> > buf;
     buf.resize(numVertices);
 
-    std::vector<Array<T,3> > *bp1;
+    std::vector<Array<T,2> > *bp1;
     bp1 = &buf;
 
     if (isMeasureWeighted) {
         for (plint iter = 0; iter < maxiter; iter++) {
             for (plint iVertex = 0; iVertex < numVertices; iVertex++) {
-                Array<T,3> iVertexPos = (*bp0)[iVertex];
+                Array<T,2> iVertexPos = (*bp0)[iVertex];
                 std::vector<plint> neighborVertexIds = getNeighborVertexIds(iVertex);
 
                 if (isInteriorVertex(iVertex)) {
                     pluint sizeIds = neighborVertexIds.size();
                     T area = (T) 0.0;
-                    Array<T,3> tmp((T) 0.0, (T) 0.0, (T) 0.0);
+                    Array<T,2> tmp((T) 0.0, (T) 0.0, (T) 0.0);
                     for (pluint i = 0; i < sizeIds; i++) {
                         plint jVertex = neighborVertexIds[i];
                         plint kVertex = (i + 1 < sizeIds) ? neighborVertexIds[i + 1] : neighborVertexIds[0];
 
-                        Array<T,3> jVertexPos = (*bp0)[jVertex];
-                        Array<T,3> kVertexPos = (*bp0)[kVertex];
+                        Array<T,2> jVertexPos = (*bp0)[jVertex];
+                        Array<T,2> kVertexPos = (*bp0)[kVertex];
 
-                        Array<T,3> middleVertexPos = (iVertexPos + jVertexPos + kVertexPos) / (T) 3.0;
+                        Array<T,2> middleVertexPos = (iVertexPos + jVertexPos + kVertexPos) / (T) 3.0;
 
-                        Array<T,3> eij = jVertexPos - iVertexPos;
-                        Array<T,3> eik = kVertexPos - iVertexPos;
-                        Array<T,3> n;
+                        Array<T,2> eij = jVertexPos - iVertexPos;
+                        Array<T,2> eik = kVertexPos - iVertexPos;
+                        Array<T,2> n;
                         crossProduct(eij, eik, n);
                         T locArea = (T) 0.5 * norm(n);
 
@@ -354,11 +351,11 @@ void TriangularSurfaceMesh<T>::smooth(plint maxiter, T relax, bool isMeasureWeig
 
                     PLB_ASSERT(counter == 2); // Problem with the boundary of the surface mesh.
 
-                    Array<T,3> jVertexPos = (*bp0)[jVertex];
-                    Array<T,3> kVertexPos = (*bp0)[kVertex];
+                    Array<T,2> jVertexPos = (*bp0)[jVertex];
+                    Array<T,2> kVertexPos = (*bp0)[kVertex];
 
-                    Array<T,3> middleVertexPos0 = (iVertexPos + jVertexPos) / (T) 2.0;
-                    Array<T,3> middleVertexPos1 = (iVertexPos + kVertexPos) / (T) 2.0;
+                    Array<T,2> middleVertexPos0 = (iVertexPos + jVertexPos) / (T) 2.0;
+                    Array<T,2> middleVertexPos1 = (iVertexPos + kVertexPos) / (T) 2.0;
 
                     T length0 = norm(jVertexPos - iVertexPos);
                     T length1 = norm(kVertexPos - iVertexPos);
@@ -368,7 +365,7 @@ void TriangularSurfaceMesh<T>::smooth(plint maxiter, T relax, bool isMeasureWeig
                 }
             }
             // Swap buffers.
-            std::vector<Array<T,3> > *tmp = bp0;
+            std::vector<Array<T,2> > *tmp = bp0;
             bp0 = bp1;
             bp1 = tmp;
         }
@@ -379,7 +376,7 @@ void TriangularSurfaceMesh<T>::smooth(plint maxiter, T relax, bool isMeasureWeig
 
                 if (isInteriorVertex(iVertex)) {
                     pluint sizeIds = neighborVertexIds.size();
-                    Array<T,3> tmp((T) 0.0, (T) 0.0, (T) 0.0);
+                    Array<T,2> tmp((T) 0.0, (T) 0.0, (T) 0.0);
                     for (pluint i = 0; i < sizeIds; i++) {
                         tmp += (*bp0)[neighborVertexIds[i]];
                     }
@@ -410,7 +407,7 @@ void TriangularSurfaceMesh<T>::smooth(plint maxiter, T relax, bool isMeasureWeig
                 }
             }
             // Swap buffers.
-            std::vector<Array<T,3> > *tmp = bp0;
+            std::vector<Array<T,2> > *tmp = bp0;
             bp0 = bp1;
             bp1 = tmp;
         }
@@ -423,14 +420,14 @@ void TriangularSurfaceMesh<T>::smooth(plint maxiter, T relax, bool isMeasureWeig
 }
 
 template<typename T>
-inline plint TriangularSurfaceMesh<T>::getVertexId(plint iTriangle, plint localVertex) const {
-    PLB_ASSERT(iTriangle >= 0 && iTriangle < numTriangles &&
-               (localVertex == 0 || localVertex == 1 || localVertex == 2));
-    return edges() [ 3*iTriangle + ((localVertex == 0) ? 2 : localVertex-1) ].pv;
+inline plint SegmentPolygonMesh2D<T>::getVertexId(plint iSegment, plint localVertex) const {
+    PLB_ASSERT(iSegment >= 0 && iSegment < numSegments &&
+               (localVertex == 0 || localVertex == 1));
+    return edges() [ 3*iSegment + ((localVertex == 0) ? 2 : localVertex-1) ].pv;
 }
 
 template<typename T>
-std::vector<plint> TriangularSurfaceMesh<T>::getNeighborVertexIds(
+std::vector<plint> SegmentPolygonMesh2D<T>::getNeighborVertexIds(
     plint iVertex) const
 {
     PLB_ASSERT(iVertex >= 0 && iVertex < numVertices);
@@ -463,17 +460,17 @@ std::vector<plint> TriangularSurfaceMesh<T>::getNeighborVertexIds(
 }
 
 template<typename T>
-std::vector<plint> TriangularSurfaceMesh<T>::getNeighborVertexIds(
+std::vector<plint> SegmentPolygonMesh2D<T>::getNeighborVertexIds(
     plint iVertex, plint jVertex) const
 {
     std::vector<plint> neighborVertexIds;
-    std::vector<plint> adjacentTriangleIds = getAdjacentTriangleIds(iVertex, jVertex);
-    std::vector<plint>::iterator tit = adjacentTriangleIds.begin();
-    for (; tit != adjacentTriangleIds.end(); ++tit) {
-        plint iTriangle = *tit;
-        plint id0 = getVertexId(iTriangle, 0);
-        plint id1 = getVertexId(iTriangle, 1);
-        plint id2 = getVertexId(iTriangle, 2);
+    std::vector<plint> adjacentSegmentIds = getAdjacentSegmentIds(iVertex, jVertex);
+    std::vector<plint>::iterator tit = adjacentSegmentIds.begin();
+    for (; tit != adjacentSegmentIds.end(); ++tit) {
+        plint iSegment = *tit;
+        plint id0 = getVertexId(iSegment, 0);
+        plint id1 = getVertexId(iSegment, 1);
+        plint id2 = getVertexId(iSegment, 2);
         plint kVertex =  (iVertex != id0 && jVertex != id0) ? id0 :
                         ((iVertex != id1 && jVertex != id1) ? id1 : id2);
         neighborVertexIds.push_back(kVertex);
@@ -486,50 +483,50 @@ std::vector<plint> TriangularSurfaceMesh<T>::getNeighborVertexIds(
 }
 
 template<typename T>
-std::vector<plint> TriangularSurfaceMesh<T>::getNeighborTriangleIds(
+std::vector<plint> SegmentPolygonMesh2D<T>::getNeighborSegmentIds(
     plint iVertex ) const
 {
     PLB_ASSERT(iVertex >= 0 && iVertex < numVertices);
 
-    std::vector<plint> neighborTriangleIds;
+    std::vector<plint> neighborSegmentIds;
 
     plint ee = emanatingEdges()[iVertex];
-    neighborTriangleIds.push_back(ee/3);
+    neighborSegmentIds.push_back(ee/3);
 
     plint e = prev(ee);
     if ((e = edges()[e].ne) < 0)
         e = ee;
 
     while (e != ee) {
-        neighborTriangleIds.push_back(e/3);
+        neighborSegmentIds.push_back(e/3);
 
         e = prev(e);
         if ((e = edges()[e].ne) < 0)
             e = ee;
     }
 
-    PLB_ASSERT(neighborTriangleIds.size() != 0); // Problem with the topology of the surface mesh.
+    PLB_ASSERT(neighborSegmentIds.size() != 0); // Problem with the topology of the surface mesh.
 
-    return neighborTriangleIds;
+    return neighborSegmentIds;
 }
 
 template<typename T>
-std::vector<plint> TriangularSurfaceMesh<T>::getAdjacentTriangleIds(
-    plint iTriangle) const
+std::vector<plint> SegmentPolygonMesh2D<T>::getAdjacentSegmentIds(
+    plint iSegment) const
 {
-    PLB_ASSERT(iTriangle >= 0 && iTriangle < numTriangles);
+    PLB_ASSERT(iSegment >= 0 && iSegment < numSegments);
 
-    std::vector<plint> adjacentTriangleIds;
+    std::vector<plint> adjacentSegmentIds;
     for (int localEdge = 0; localEdge < 3; localEdge++) {
-        plint e = edges()[3*iTriangle + localEdge].ne;
+        plint e = edges()[3*iSegment + localEdge].ne;
         if (e >= 0)
-            adjacentTriangleIds.push_back(e/3);
+            adjacentSegmentIds.push_back(e/3);
     }
-    return adjacentTriangleIds;
+    return adjacentSegmentIds;
 }
 
 template<typename T>
-std::vector<plint> TriangularSurfaceMesh<T>::getAdjacentTriangleIds(
+std::vector<plint> SegmentPolygonMesh2D<T>::getAdjacentSegmentIds(
     plint iVertex, plint jVertex) const
 {
     PLB_ASSERT(iVertex >= 0 && iVertex < numVertices &&
@@ -543,38 +540,38 @@ std::vector<plint> TriangularSurfaceMesh<T>::getAdjacentTriangleIds(
     PLB_ASSERT(vit != neighborVertexIds.end()); // Vertices do not belong to the same edge.
 #endif // PLB_DEBUG
 
-    std::vector<plint> adjacentTriangleIds;
-    std::vector<plint> neighborTriangleIds = getNeighborTriangleIds(iVertex);
-    std::vector<plint>::iterator tit = neighborTriangleIds.begin();
-    for (; tit != neighborTriangleIds.end(); ++tit) {
-        plint iTriangle = *tit;
-        plint id0 = getVertexId(iTriangle, 0);
-        plint id1 = getVertexId(iTriangle, 1);
-        plint id2 = getVertexId(iTriangle, 2);
+    std::vector<plint> adjacentSegmentIds;
+    std::vector<plint> neighborSegmentIds = getNeighborSegmentIds(iVertex);
+    std::vector<plint>::iterator tit = neighborSegmentIds.begin();
+    for (; tit != neighborSegmentIds.end(); ++tit) {
+        plint iSegment = *tit;
+        plint id0 = getVertexId(iSegment, 0);
+        plint id1 = getVertexId(iSegment, 1);
+        plint id2 = getVertexId(iSegment, 2);
         if ((iVertex == id0 || iVertex == id1 || iVertex == id2) &&
             (jVertex == id0 || jVertex == id1 || jVertex == id2))
-            adjacentTriangleIds.push_back(iTriangle);
+            adjacentSegmentIds.push_back(iSegment);
     }
 
-    PLB_ASSERT(adjacentTriangleIds.size() == 1 || adjacentTriangleIds.size() == 2); // Problem with the topology of the surface mesh.
+    PLB_ASSERT(adjacentSegmentIds.size() == 1 || adjacentSegmentIds.size() == 2); // Problem with the topology of the surface mesh.
 
-    return adjacentTriangleIds;
+    return adjacentSegmentIds;
 }
 
 template<typename T>
-Array<T,3> TriangularSurfaceMesh<T>::computeTriangleNormal(
-    plint iTriangle, bool isAreaWeighted) const
+Array<T,2> SegmentPolygonMesh2D<T>::computeSegmentNormal(
+    plint iSegment, bool isAreaWeighted) const
 {
-    PLB_ASSERT(iTriangle >= 0 && iTriangle < numTriangles);
+    PLB_ASSERT(iSegment >= 0 && iSegment < numSegments);
 
-    Array<T,3> v0 = getVertex(iTriangle, 0);
-    Array<T,3> v1 = getVertex(iTriangle, 1);
-    Array<T,3> v2 = getVertex(iTriangle, 2);
+    Array<T,2> v0 = getVertex(iSegment, 0);
+    Array<T,2> v1 = getVertex(iSegment, 1);
+    Array<T,2> v2 = getVertex(iSegment, 2);
 
-    Array<T,3> e01 = v1 - v0;
-    Array<T,3> e02 = v2 - v0;
+    Array<T,2> e01 = v1 - v0;
+    Array<T,2> e02 = v2 - v0;
 
-    Array<T,3> n;
+    Array<T,2> n;
     crossProduct(e01, e02, n);
     if (!isAreaWeighted)
         n /= norm(n);
@@ -583,7 +580,7 @@ Array<T,3> TriangularSurfaceMesh<T>::computeTriangleNormal(
 }
 
 template<typename T>
-Array<T,3> TriangularSurfaceMesh<T>::computeTriangleNormal(
+Array<T,2> SegmentPolygonMesh2D<T>::computeSegmentNormal(
     plint iVertex, plint jVertex, plint kVertex, bool isAreaWeighted) const
 {
     PLB_ASSERT(iVertex >= 0 && iVertex < numVertices &&
@@ -626,14 +623,14 @@ Array<T,3> TriangularSurfaceMesh<T>::computeTriangleNormal(
         PLB_ASSERT(false); // Vertices do not belong to the same triangle.
     }
 
-    Array<T,3> v0 = getVertex(id0);
-    Array<T,3> v1 = getVertex(id1);
-    Array<T,3> v2 = getVertex(id2);
+    Array<T,2> v0 = getVertex(id0);
+    Array<T,2> v1 = getVertex(id1);
+    Array<T,2> v2 = getVertex(id2);
 
-    Array<T,3> e01 = v1 - v0;
-    Array<T,3> e02 = v2 - v0;
+    Array<T,2> e01 = v1 - v0;
+    Array<T,2> e02 = v2 - v0;
 
-    Array<T,3> n;
+    Array<T,2> n;
     crossProduct(e01, e02, n);
     if (!isAreaWeighted)
         n /= norm(n);
@@ -642,63 +639,63 @@ Array<T,3> TriangularSurfaceMesh<T>::computeTriangleNormal(
 }
 
 template<typename T>
-Array<T,3> TriangularSurfaceMesh<T>::computeEdgeNormal(
+Array<T,2> SegmentPolygonMesh2D<T>::computeEdgeNormal(
     plint iVertex, plint jVertex, bool isAreaWeighted) const
 {
-    Array<T,3> n;
-    std::vector<plint> adjacentTriangleIds = getAdjacentTriangleIds(iVertex, jVertex);
-    std::vector<plint>::iterator tit = adjacentTriangleIds.begin();
-    for (n.resetToZero(); tit != adjacentTriangleIds.end(); ++tit)
-        n += computeTriangleNormal(*tit, isAreaWeighted);
+    Array<T,2> n;
+    std::vector<plint> adjacentSegmentIds = getAdjacentSegmentIds(iVertex, jVertex);
+    std::vector<plint>::iterator tit = adjacentSegmentIds.begin();
+    for (n.resetToZero(); tit != adjacentSegmentIds.end(); ++tit)
+        n += computeSegmentNormal(*tit, isAreaWeighted);
 
     n /= norm(n);
     return n;
 }
 
 template<typename T>
-Array<T,3> TriangularSurfaceMesh<T>::computeVertexNormal(
+Array<T,2> SegmentPolygonMesh2D<T>::computeVertexNormal(
     plint iVertex, bool isAreaWeighted) const
 {
-    std::vector<plint> neighborTriangleIds = getNeighborTriangleIds(iVertex);
-    Array<T,3> n;
-    std::vector<plint>::iterator it = neighborTriangleIds.begin();
-    for (n.resetToZero(); it != neighborTriangleIds.end(); ++it)
-        n += computeTriangleNormal(*it, isAreaWeighted);
+    std::vector<plint> neighborSegmentIds = getNeighborSegmentIds(iVertex);
+    Array<T,2> n;
+    std::vector<plint>::iterator it = neighborSegmentIds.begin();
+    for (n.resetToZero(); it != neighborSegmentIds.end(); ++it)
+        n += computeSegmentNormal(*it, isAreaWeighted);
 
     n /= norm(n);
     return n;
 }
 
 template<typename T>
-Array<T,3> TriangularSurfaceMesh<T>::computeContinuousNormal(
-    Array<T,3> const& p, plint iTriangle, bool isAreaWeighted) const
+Array<T,2> SegmentPolygonMesh2D<T>::computeContinuousNormal(
+    Array<T,2> const& p, plint iSegment, bool isAreaWeighted) const
 {
-    plint id0 = getVertexId(iTriangle, 0);
-    plint id1 = getVertexId(iTriangle, 1);
-    plint id2 = getVertexId(iTriangle, 2);
+    plint id0 = getVertexId(iSegment, 0);
+    plint id1 = getVertexId(iSegment, 1);
+    plint id2 = getVertexId(iSegment, 2);
 
-    Array<T,3> v0 = getVertex(id0);
-    Array<T,3> v1 = getVertex(id1);
-    Array<T,3> v2 = getVertex(id2);
+    Array<T,2> v0 = getVertex(id0);
+    Array<T,2> v1 = getVertex(id1);
+    Array<T,2> v2 = getVertex(id2);
 
-    Array<T,3> ep0 = v0 - p;
-    Array<T,3> ep1 = v1 - p;
-    Array<T,3> ep2 = v2 - p;
+    Array<T,2> ep0 = v0 - p;
+    Array<T,2> ep1 = v1 - p;
+    Array<T,2> ep2 = v2 - p;
 
-    Array<T,3> n;
+    Array<T,2> n;
     crossProduct(ep1, ep2, n);
     T area0 = (T) 0.5 * norm(n);
     crossProduct(ep2, ep0, n);
     T area1 = (T) 0.5 * norm(n);
 
-    T area = computeTriangleArea(iTriangle);
+    T area = computeSegmentArea(iSegment);
 
     T u = area0 / area;
     T v = area1 / area;
 
-    Array<T,3> n0 = computeVertexNormal(id0, isAreaWeighted);
-    Array<T,3> n1 = computeVertexNormal(id1, isAreaWeighted);
-    Array<T,3> n2 = computeVertexNormal(id2, isAreaWeighted);
+    Array<T,2> n0 = computeVertexNormal(id0, isAreaWeighted);
+    Array<T,2> n1 = computeVertexNormal(id1, isAreaWeighted);
+    Array<T,2> n2 = computeVertexNormal(id2, isAreaWeighted);
 
     n = u * n0 + v * n1 + ((T)1. - u - v) * n2;
     n /= norm(n);
@@ -706,22 +703,22 @@ Array<T,3> TriangularSurfaceMesh<T>::computeContinuousNormal(
 }
 
 template<typename T>
-T TriangularSurfaceMesh<T>::computeTriangleArea(plint iTriangle) const
+T SegmentPolygonMesh2D<T>::computeSegmentArea(plint iSegment) const
 {
-    Array<T,3> v0 = getVertex(iTriangle, 0);
-    Array<T,3> v1 = getVertex(iTriangle, 1);
-    Array<T,3> v2 = getVertex(iTriangle, 2);
+    Array<T,2> v0 = getVertex(iSegment, 0);
+    Array<T,2> v1 = getVertex(iSegment, 1);
+    Array<T,2> v2 = getVertex(iSegment, 2);
 
-    Array<T,3> e01 = v1 - v0;
-    Array<T,3> e02 = v2 - v0;
+    Array<T,2> e01 = v1 - v0;
+    Array<T,2> e02 = v2 - v0;
 
-    Array<T,3> n;
+    Array<T,2> n;
     crossProduct(e01, e02, n);
     return (T) 0.5 * norm(n);
 }
 
 template<typename T>
-T TriangularSurfaceMesh<T>::computeTriangleArea(
+T SegmentPolygonMesh2D<T>::computeSegmentArea(
     plint iVertex, plint jVertex, plint kVertex) const
 {
     PLB_ASSERT(iVertex >= 0 && iVertex < numVertices &&
@@ -753,41 +750,41 @@ T TriangularSurfaceMesh<T>::computeTriangleArea(
     PLB_ASSERT(kVertex == prevVertex || kVertex == nextVertex); // Vertices do not belong to the same triangle.
 #endif // PLB_DEBUG
 
-    Array<T,3> v0 = getVertex(iVertex);
-    Array<T,3> v1 = getVertex(jVertex);
-    Array<T,3> v2 = getVertex(kVertex);
-
-    return plb::computeTriangleArea(v0,v1,v2);
+    Array<T,2> v0 = getVertex(iVertex);
+    Array<T,2> v1 = getVertex(jVertex);
+    Array<T,2> v2 = getVertex(kVertex);
+//TODO FIX ME
+//     return plb::computeSegmentArea(v0,v1,v2);
 }
 
 template<typename T>
-T TriangularSurfaceMesh<T>::computeEdgeArea(plint iVertex, plint jVertex) const
+T SegmentPolygonMesh2D<T>::computeEdgeArea(plint iVertex, plint jVertex) const
 {
     T area = T();
-    std::vector<plint> adjacentTriangleIds = getAdjacentTriangleIds(iVertex, jVertex);
-    std::vector<plint>::iterator tit = adjacentTriangleIds.begin();
-    for (; tit != adjacentTriangleIds.end(); ++tit)
-        area += computeTriangleArea(*tit);
+    std::vector<plint> adjacentSegmentIds = getAdjacentSegmentIds(iVertex, jVertex);
+    std::vector<plint>::iterator tit = adjacentSegmentIds.begin();
+    for (; tit != adjacentSegmentIds.end(); ++tit)
+        area += computeSegmentArea(*tit);
 
     return area/3.0;
 }
 
 template<typename T>
-T TriangularSurfaceMesh<T>::computeVertexArea(plint iVertex) const
+T SegmentPolygonMesh2D<T>::computeVertexArea(plint iVertex) const
 {
-    std::vector<plint> neighborTriangleIds = getNeighborTriangleIds(iVertex);
+    std::vector<plint> neighborSegmentIds = getNeighborSegmentIds(iVertex);
     T area = T();
-    std::vector<plint>::iterator it = neighborTriangleIds.begin();
-    for (; it != neighborTriangleIds.end(); ++it)
+    std::vector<plint>::iterator it = neighborSegmentIds.begin();
+    for (; it != neighborSegmentIds.end(); ++it)
     {
-        area += computeTriangleArea(*it);
+        area += computeSegmentArea(*it);
     }
 
     return area/3.0;
 }
 
 template<typename T>
-T TriangularSurfaceMesh<T>::computeEdgeLength(plint iVertex, plint jVertex) const
+T SegmentPolygonMesh2D<T>::computeEdgeLength(plint iVertex, plint jVertex) const
 {
 #ifdef PLB_DEBUG
     std::vector<plint> neighborVertexIds = getNeighborVertexIds(iVertex);
@@ -800,27 +797,27 @@ T TriangularSurfaceMesh<T>::computeEdgeLength(plint iVertex, plint jVertex) cons
 }
 
 template<typename T>
-T TriangularSurfaceMesh<T>::computeDihedralAngle(plint iVertex, plint jVertex) const
+T SegmentPolygonMesh2D<T>::computeDihedralAngle(plint iVertex, plint jVertex) const
 {
-    std::vector<plint> adjacentTriangleIds = getAdjacentTriangleIds(iVertex, jVertex);
-    if (adjacentTriangleIds.size() == 1)
+    std::vector<plint> adjacentSegmentIds = getAdjacentSegmentIds(iVertex, jVertex);
+    if (adjacentSegmentIds.size() == 1)
         return T();
 
-    return angleBetweenVectors(computeTriangleNormal(adjacentTriangleIds[0]),
-                               computeTriangleNormal(adjacentTriangleIds[1]));
+    return angleBetweenVectors(computeSegmentNormal(adjacentSegmentIds[0]),
+                               computeSegmentNormal(adjacentSegmentIds[1]));
 }
 
 template<typename T>
-T TriangularSurfaceMesh<T>::computeEdgeTileSpan(plint iVertex, plint jVertex) const
+T SegmentPolygonMesh2D<T>::computeEdgeTileSpan(plint iVertex, plint jVertex) const
 {
     std::vector<plint> neighborVertexIds = getNeighborVertexIds(iVertex, jVertex);
 
-    Array<T,3> v0 = getVertex(neighborVertexIds[0]);
-    Array<T,3> v1 = getVertex(iVertex);
-    Array<T,3> v2 = getVertex(jVertex);
+    Array<T,2> v0 = getVertex(neighborVertexIds[0]);
+    Array<T,2> v1 = getVertex(iVertex);
+    Array<T,2> v2 = getVertex(jVertex);
 
-    Array<T,3> v01 = v1 - v0;
-    Array<T,3> v21 = v1 - v2;
+    Array<T,2> v01 = v1 - v0;
+    Array<T,2> v21 = v1 - v2;
     T angle_012 = angleBetweenVectors(v21, v01);
 
     T span = fabs(sin(angle_012)) * norm(v01);
@@ -828,10 +825,10 @@ T TriangularSurfaceMesh<T>::computeEdgeTileSpan(plint iVertex, plint jVertex) co
     if (neighborVertexIds.size() == 1)
         return span/6.0;
 
-    Array<T,3> v3 = getVertex(neighborVertexIds[1]);
+    Array<T,2> v3 = getVertex(neighborVertexIds[1]);
 
-    Array<T,3> v32 = v2 - v3;
-    Array<T,3> v12 = -v21;
+    Array<T,2> v32 = v2 - v3;
+    Array<T,2> v12 = -v21;
     T angle_321 = angleBetweenVectors(v12, v32);
     
     span += fabs(sin(angle_321)) * norm(v32);
@@ -840,7 +837,7 @@ T TriangularSurfaceMesh<T>::computeEdgeTileSpan(plint iVertex, plint jVertex) co
 }
 
 template<typename T>
-void TriangularSurfaceMesh<T>::writeAsciiSTL(std::string fname) const
+void SegmentPolygonMesh2D<T>::writeAsciiSTL(std::string fname) const
 {
     // Output only from one MPI process.
     if (!global::mpi().isMainProcessor()) {
@@ -865,9 +862,9 @@ void TriangularSurfaceMesh<T>::writeAsciiSTL(std::string fname) const
     }
 
     fprintf(fp, "solid surface\n");
-    for (plint i = 0; i < numTriangles; i++) {
-        Array<T,3> n = computeTriangleNormal(i);
-        Array<T,3> v;
+    for (plint i = 0; i < numSegments; i++) {
+        Array<T,2> n = computeSegmentNormal(i);
+        Array<T,2> v;
         fprintf(fp, fmt1, n[0], n[1], n[2]);
         fprintf(fp, "    outer loop\n");
         v = getVertex(i, 0);
@@ -885,7 +882,7 @@ void TriangularSurfaceMesh<T>::writeAsciiSTL(std::string fname) const
 }
 
 template<typename T>
-void TriangularSurfaceMesh<T>::writeBinarySTL(std::string fname) const
+void SegmentPolygonMesh2D<T>::writeBinarySTL(std::string fname) const
 {
     // Output only from one MPI process.
     if (!global::mpi().isMainProcessor()) {
@@ -894,7 +891,7 @@ void TriangularSurfaceMesh<T>::writeBinarySTL(std::string fname) const
     FILE *fp = fopen(fname.c_str(), "wb");
     PLB_ASSERT(fp != NULL);
 
-    unsigned int nt = (unsigned int) numTriangles;
+    unsigned int nt = (unsigned int) numSegments;
     unsigned short abc = 0;
     char buf[80];
 
@@ -903,9 +900,9 @@ void TriangularSurfaceMesh<T>::writeBinarySTL(std::string fname) const
 
     fwrite(buf, sizeof(char), 80, fp);
     fwrite(&nt, sizeof(unsigned int), 1, fp);
-    for (plint i = 0; i < numTriangles; i++) {
-        Array<T,3> vertex;
-        Array<T,3> normal = computeTriangleNormal(i);
+    for (plint i = 0; i < numSegments; i++) {
+        Array<T,2> vertex;
+        Array<T,2> normal = computeSegmentNormal(i);
         float n[3];
         n[0] = normal[0];
         n[1] = normal[1];
@@ -934,7 +931,7 @@ void TriangularSurfaceMesh<T>::writeBinarySTL(std::string fname) const
 }
 
 template<typename T>
-inline bool TriangularSurfaceMesh<T>::isBoundaryVertex(plint iVertex) const
+inline bool SegmentPolygonMesh2D<T>::isBoundaryVertex(plint iVertex) const
 {
     PLB_ASSERT(iVertex >= 0 && iVertex < numVertices);
     if ( edges()[ emanatingEdges()[iVertex] ].ne < 0)
@@ -943,7 +940,7 @@ inline bool TriangularSurfaceMesh<T>::isBoundaryVertex(plint iVertex) const
 }
 
 template<typename T>
-inline bool TriangularSurfaceMesh<T>::isInteriorVertex(plint iVertex) const
+inline bool SegmentPolygonMesh2D<T>::isInteriorVertex(plint iVertex) const
 {
     PLB_ASSERT(iVertex >= 0 && iVertex < numVertices);
     if ( edges()[ emanatingEdges()[iVertex] ].ne >= 0)
@@ -952,52 +949,52 @@ inline bool TriangularSurfaceMesh<T>::isInteriorVertex(plint iVertex) const
 }
 
 template<typename T>
-inline bool TriangularSurfaceMesh<T>::isBoundaryEdge(plint iVertex, plint jVertex) const
+inline bool SegmentPolygonMesh2D<T>::isBoundaryEdge(plint iVertex, plint jVertex) const
 {
-    if (getAdjacentTriangleIds(iVertex, jVertex).size() == 2)
+    if (getAdjacentSegmentIds(iVertex, jVertex).size() == 2)
         return false;
 
     return true;
 }
 
 template<typename T>
-inline bool TriangularSurfaceMesh<T>::isInteriorEdge(plint iVertex, plint jVertex) const
+inline bool SegmentPolygonMesh2D<T>::isInteriorEdge(plint iVertex, plint jVertex) const
 {
     return !isBoundaryEdge(iVertex, jVertex);
 }
 
 template<typename T>
-int TriangularSurfaceMesh<T>::pointOnTriangle (
-    Array<T,3> const& point1, Array<T,3> const& point2, int flag,
-    plint iTriangle, Array<T,3>& intersection, Array<T,3>& normal,
+int SegmentPolygonMesh2D<T>::pointOnSegment (
+    Array<T,2> const& point1, Array<T,2> const& point2, int flag,
+    plint iSegment, Array<T,2>& intersection, Array<T,2>& normal,
     T& distance) const
 {
-    if(!((flag == 0 || flag == 1 || flag == 2) &&iTriangle >= 0 && iTriangle < numTriangles)) {
-        pcout << "iTriangle=" << iTriangle << std::endl;
-        pcout << "numTriangles=" << numTriangles << std::endl;
+    if(!((flag == 0 || flag == 1 || flag == 2) &&iSegment >= 0 && iSegment < numSegments)) {
+        pcout << "iSegment=" << iSegment << std::endl;
+        pcout << "numSegments=" << numSegments << std::endl;
         pcout << "flag=" << flag << std::endl;
     }
     PLB_ASSERT((flag == 0 || flag == 1 || flag == 2) &&
-                iTriangle >= 0 && iTriangle < numTriangles);
+                iSegment >= 0 && iSegment < numSegments);
 
-    Array<T,3> v0 = getVertex(iTriangle, 0); // Triangle vertex coordinates
-    Array<T,3> v1 = getVertex(iTriangle, 1);
-    Array<T,3> v2 = getVertex(iTriangle, 2);
+    Array<T,2> v0 = getVertex(iSegment, 0); // Segment vertex coordinates
+    Array<T,2> v1 = getVertex(iSegment, 1);
+    Array<T,2> v2 = getVertex(iSegment, 2);
 
-    Array<T,3> e0 = v1 - v0;  // Triangle edge vectors starting at v0
-    Array<T,3> e1 = v2 - v0;
+    Array<T,2> e0 = v1 - v0;  // Segment edge vectors starting at v0
+    Array<T,2> e1 = v2 - v0;
 
-    crossProduct(e0, e1, normal); // Triangle unit normal
+    crossProduct(e0, e1, normal); // Segment unit normal
     normal /= norm(normal);
 
-    Array<T,3> direction = point2 - point1;
+    Array<T,2> direction = point2 - point1;
 
     T num = dot(v0, normal) - dot(point1, normal);
     T denom = dot(direction, normal);
 
     T t = num / denom;
 
-    // The function pointOnTriangle is essentially to verify crossings
+    // The function pointOnSegment is essentially to verify crossings
     //   through the surface from inside to outside or vice versa. When
     //   one of the end-points of a segment is right on top of the surface
     //   this creates an awkward ambiguity. To remove this ambiguity, the
@@ -1093,31 +1090,31 @@ int TriangularSurfaceMesh<T>::pointOnTriangle (
     }
 
     if (is_in_edge != -1) { // The point belongs to an edge
-        plint iVertex = getVertexId(iTriangle, is_in_edge);
-        plint jVertex = (is_in_edge == 2) ? getVertexId(iTriangle, 0) :
-                                            getVertexId(iTriangle, is_in_edge+1);
+        plint iVertex = getVertexId(iSegment, is_in_edge);
+        plint jVertex = (is_in_edge == 2) ? getVertexId(iSegment, 0) :
+                                            getVertexId(iSegment, is_in_edge+1);
 
         normal = computeEdgeNormal(iVertex, jVertex);
     } else if (is_vertex != -1) { // The point is a vertex
-        normal = computeVertexNormal(getVertexId(iTriangle, is_vertex));
+        normal = computeVertexNormal(getVertexId(iSegment, is_vertex));
     }
 
     return 1;
 }
 
 template<typename T>
-bool TriangularSurfaceMesh<T>::segmentIntersectsTriangle (
-    Array<T,3> const& point1, Array<T,3> const& point2, plint iTriangle ) const
+bool SegmentPolygonMesh2D<T>::segmentIntersectsSegment (
+    Array<T,2> const& point1, Array<T,2> const& point2, plint iSegment ) const
 {
-    PLB_ASSERT(iTriangle >= 0 && iTriangle < numTriangles);
+    PLB_ASSERT(iSegment >= 0 && iSegment < numSegments);
 
-    T v0[3], v1[3], v2[3]; // Triangle vertex coordinates
+    T v0[3], v1[3], v2[3]; // Segment vertex coordinates
 
-    Array<T,3> tv0 = getVertex(iTriangle, 0); tv0.to_cArray(v0);
-    Array<T,3> tv1 = getVertex(iTriangle, 1); tv1.to_cArray(v1);
-    Array<T,3> tv2 = getVertex(iTriangle, 2); tv2.to_cArray(v2);
+    Array<T,2> tv0 = getVertex(iSegment, 0); tv0.to_cArray(v0);
+    Array<T,2> tv1 = getVertex(iSegment, 1); tv1.to_cArray(v1);
+    Array<T,2> tv2 = getVertex(iSegment, 2); tv2.to_cArray(v2);
 
-    T e0[3], e1[3]; // Triangle edge vectors starting at v0
+    T e0[3], e1[3]; // Segment edge vectors starting at v0
 
     e0[0] = v1[0] - v0[0];
     e0[1] = v1[1] - v0[1];
@@ -1127,7 +1124,7 @@ bool TriangularSurfaceMesh<T>::segmentIntersectsTriangle (
     e1[1] = v2[1] - v0[1];
     e1[2] = v2[2] - v0[2];
 
-    T normal[3]; // Triangle normal
+    T normal[3]; // Segment normal
 
     normal[0] = e0[1]*e1[2] - e0[2]*e1[1];
     normal[1] = e0[2]*e1[0] - e0[0]*e1[2];
@@ -1152,7 +1149,7 @@ bool TriangularSurfaceMesh<T>::segmentIntersectsTriangle (
 
     T t = num / denom;
 
-    // The function segmentIntersectsTriangle is essentially to verify crossings
+    // The function segmentIntersectsSegment is essentially to verify crossings
     //   through the surface from inside to outside or vice versa. When
     //   one of the end-points of a segment is right on top of the surface
     //   this creates an awkward ambiguity. To remove this ambiguity, the
@@ -1219,22 +1216,22 @@ bool TriangularSurfaceMesh<T>::segmentIntersectsTriangle (
 }
 
 template<typename T>
-void TriangularSurfaceMesh<T>::distanceToEdgeLine (
-        Array<T,3> const& point, plint iTriangle, plint whichEdge,
+void SegmentPolygonMesh2D<T>::distanceToEdgeLine (
+        Array<T,2> const& point, plint iSegment, plint whichEdge,
         T& distance, bool& intersectionIsInside ) const
 {
-    PLB_ASSERT(iTriangle >= 0 && iTriangle < numTriangles &&
+    PLB_ASSERT(iSegment >= 0 && iSegment < numSegments &&
                (whichEdge == 0 || whichEdge == 1 || whichEdge == 2));
 
-    plint iVertex1 = edges()[3*iTriangle+((whichEdge==0) ? 2:whichEdge-1)].pv;
-    plint iVertex2 = edges()[3*iTriangle+whichEdge].pv;
-    Array<T,3> vertex1 = getVertex(iVertex1);
-    Array<T,3> vertex2 = getVertex(iVertex2);
-    Array<T,3> pv = point-vertex1;
-    Array<T,3> e = vertex2-vertex1;
+    plint iVertex1 = edges()[3*iSegment+((whichEdge==0) ? 2:whichEdge-1)].pv;
+    plint iVertex2 = edges()[3*iSegment+whichEdge].pv;
+    Array<T,2> vertex1 = getVertex(iVertex1);
+    Array<T,2> vertex2 = getVertex(iVertex2);
+    Array<T,2> pv = point-vertex1;
+    Array<T,2> e = vertex2-vertex1;
 
     T u = dot(pv,e) / dot(e,e);
-    Array<T,3> x = vertex1+u*e;
+    Array<T,2> x = vertex1+u*e;
     distance = norm(point-x);
 
     int ueq0 = util::fpequal_abs(u, (T) 0.0, eps1);
@@ -1243,15 +1240,15 @@ void TriangularSurfaceMesh<T>::distanceToEdgeLine (
 }
 
 template<typename T>
-void TriangularSurfaceMesh<T>::distanceToTrianglePlane (
-        Array<T,3> const& point, plint iTriangle,
+void SegmentPolygonMesh2D<T>::distanceToSegmentPlane (
+        Array<T,2> const& point, plint iSegment,
         T& distance, bool& intersectionIsInside, bool& pointIsBehind ) const
 {
-    Array<T,3> normal = computeTriangleNormal(iTriangle);
-    Array<T,3> intersection;
+    Array<T,2> normal = computeSegmentNormal(iSegment);
+    Array<T,2> intersection;
     int flag = 2; // Line.
     intersectionIsInside =
-        pointOnTriangle( point, point+normal, flag, iTriangle,
+        pointOnSegment( point, point+normal, flag, iSegment,
                          intersection, normal, distance ) == 1;
     T projection = dot(normal, point-intersection);
 
@@ -1260,13 +1257,13 @@ void TriangularSurfaceMesh<T>::distanceToTrianglePlane (
 }
 
 template<typename T>
-void TriangularSurfaceMesh<T>::distanceToTriangle (
-        Array<T,3> const& point, plint iTriangle,
+void SegmentPolygonMesh2D<T>::distanceToSegment (
+        Array<T,2> const& point, plint iSegment,
         T& distance, bool& pointIsBehind ) const
 {
     bool intersectionIsInside;
     // First possibility: The projection of the point is inside the triangle.
-    distanceToTrianglePlane( point, iTriangle, distance,
+    distanceToSegmentPlane( point, iSegment, distance,
                              intersectionIsInside, pointIsBehind );
     if (intersectionIsInside) {
         return;
@@ -1275,7 +1272,7 @@ void TriangularSurfaceMesh<T>::distanceToTriangle (
     bool intersectsWithEdge = false;
     for (plint iEdge=0; iEdge<=2; ++iEdge) {
         T newDistance;
-        distanceToEdgeLine(point, iTriangle, iEdge, newDistance, intersectionIsInside);
+        distanceToEdgeLine(point, iSegment, iEdge, newDistance, intersectionIsInside);
         if (iEdge==0 || newDistance<distance) {
             distance = newDistance;
             // The edge-line to which the point is closest should be selected if
@@ -1289,15 +1286,15 @@ void TriangularSurfaceMesh<T>::distanceToTriangle (
         return;
     }
     // Default: Compute the closest distance to one of the vertices.
-    T d0Sqr = normSqr(point-getVertex(iTriangle, 0));
-    T d1Sqr = normSqr(point-getVertex(iTriangle, 1));
-    T d2Sqr = normSqr(point-getVertex(iTriangle, 2));
+    T d0Sqr = normSqr(point-getVertex(iSegment, 0));
+    T d1Sqr = normSqr(point-getVertex(iSegment, 1));
+    T d2Sqr = normSqr(point-getVertex(iSegment, 2));
     T minDistSqr = std::min(d0Sqr, std::min(d1Sqr,d2Sqr));
     distance = sqrt(minDistSqr);
 }
 
 template<typename T>
-void TriangularSurfaceMesh<T>::reverseOrientation()
+void SegmentPolygonMesh2D<T>::reverseOrientation()
 {
     // Rearrange the emanating edge list.
     for (plint iVertex = 0; iVertex < numVertices; iVertex++)
@@ -1323,7 +1320,7 @@ void TriangularSurfaceMesh<T>::reverseOrientation()
 
     // Rearrange the neighboring edge list.
     std::vector<Edge> tmp = edges();
-    for (plint iEdge = 0; iEdge < 3*numTriangles; iEdge++)
+    for (plint iEdge = 0; iEdge < 3*numSegments; iEdge++)
         if (edges()[iEdge].ne < 0) {
             tmp[changeEdgeId(iEdge)].ne = -1;
         }
@@ -1334,21 +1331,21 @@ void TriangularSurfaceMesh<T>::reverseOrientation()
     edges().swap(tmp);
 
     // Rearrange the pointing vertex list.
-    for (plint iTriangle = 0; iTriangle < numTriangles; iTriangle++) {
-        plint id0 = getVertexId(iTriangle, 0);
-        plint id1 = getVertexId(iTriangle, 1);
-        plint id2 = getVertexId(iTriangle, 2);
+    for (plint iSegment = 0; iSegment < numSegments; iSegment++) {
+        plint id0 = getVertexId(iSegment, 0);
+        plint id1 = getVertexId(iSegment, 1);
+        plint id2 = getVertexId(iSegment, 2);
 
-        edges()[3*iTriangle].pv     = id2;
-        edges()[3*iTriangle + 1].pv = id1;
-        edges()[3*iTriangle + 2].pv = id0;
+        edges()[3*iSegment].pv     = id2;
+        edges()[3*iSegment + 1].pv = id1;
+        edges()[3*iSegment + 2].pv = id0;
     }
 }
 
 template<typename T>
-std::vector<Lid> TriangularSurfaceMesh<T>::closeHoles() {
+std::vector<Lid2D> SegmentPolygonMesh2D<T>::closeHoles() {
     std::vector<std::vector<plint> > holes = detectHoles();
-    std::vector<Lid> lids(holes.size());
+    std::vector<Lid2D> lids(holes.size());
     for (pluint iHole=0; iHole<holes.size(); ++iHole) {
         lids[iHole] = closeHole(holes[iHole]);
     }
@@ -1356,16 +1353,16 @@ std::vector<Lid> TriangularSurfaceMesh<T>::closeHoles() {
 }
 
 template<typename T>
-void TriangularSurfaceMesh<T>::avoidIntegerPositions() {
+void SegmentPolygonMesh2D<T>::avoidIntegerPositions() {
     for (plint iVertex=0; iVertex<getNumVertices(); ++iVertex) {
         avoidIntegerPosition(iVertex);
     }
 }
 
 template<typename T>
-void TriangularSurfaceMesh<T>::avoidIntegerPosition(plint iVertex) {
-    Array<T,3>& vertex = getVertex(iVertex);
-    Array<T,3> normal = computeVertexNormal(iVertex);
+void SegmentPolygonMesh2D<T>::avoidIntegerPosition(plint iVertex) {
+    Array<T,2>& vertex = getVertex(iVertex);
+    Array<T,2> normal = computeVertexNormal(iVertex);
     if ( vertex[0]-(plint)vertex[0] < 1.e-12 ||
          vertex[1]-(plint)vertex[1] < 1.e-12 ||
          vertex[2]-(plint)vertex[2] < 1.e-12 )
@@ -1375,39 +1372,39 @@ void TriangularSurfaceMesh<T>::avoidIntegerPosition(plint iVertex) {
 }
 
 template<typename T>
-void TriangularSurfaceMesh<T>::inflate(T amount) {
+void SegmentPolygonMesh2D<T>::inflate(T amount) {
     for (plint iVertex=0; iVertex<getNumVertices(); ++iVertex) {
-        Array<T,3>& vertex = getVertex(iVertex);
-        Array<T,3> normal = computeVertexNormal(iVertex);
+        Array<T,2>& vertex = getVertex(iVertex);
+        Array<T,2> normal = computeVertexNormal(iVertex);
         vertex += amount * normal;
     }
 }
 
 template<typename T>
-inline plint TriangularSurfaceMesh<T>::prev(plint iEdge) const
+inline plint SegmentPolygonMesh2D<T>::prev(plint iEdge) const
 {
-    PLB_ASSERT(iEdge >= 0 && iEdge < 3*numTriangles);
+    PLB_ASSERT(iEdge >= 0 && iEdge < 3*numSegments);
     return (iEdge%3 == 0) ? iEdge+2 : iEdge-1;
 }
 
 template<typename T>
-inline plint TriangularSurfaceMesh<T>::next(plint iEdge) const
+inline plint SegmentPolygonMesh2D<T>::next(plint iEdge) const
 {
-    PLB_ASSERT(iEdge >= 0 && iEdge < 3*numTriangles);
+    PLB_ASSERT(iEdge >= 0 && iEdge < 3*numSegments);
     return (iEdge%3 == 2) ? iEdge-2 : iEdge+1;
 }
 
 template<typename T>
-inline plint TriangularSurfaceMesh<T>::changeEdgeId(plint iEdge) const
+inline plint SegmentPolygonMesh2D<T>::changeEdgeId(plint iEdge) const
 {
-    plint iTriangle = iEdge/3;
+    plint iSegment = iEdge/3;
     plint mod = iEdge%3;
-    return (mod == 0) ? 3*iTriangle+2 : ((mod == 1) ? iEdge : 3*iTriangle);
+    return (mod == 0) ? 3*iSegment+2 : ((mod == 1) ? iEdge : 3*iSegment);
 }
 
 template<typename T>
 std::vector<std::vector<plint> >
-    TriangularSurfaceMesh<T>::detectHoles()
+    SegmentPolygonMesh2D<T>::detectHoles()
 {
     std::vector<std::vector<plint> > holes;
     std::vector<bool> check(getNumVertices());
@@ -1422,7 +1419,7 @@ std::vector<std::vector<plint> >
             check[iVertex] = true;
             std::vector<plint> newHole;
             newHole.push_back(iVertex);
-            Edge nextEdge = edges()[emanatingEdges()[iVertex]];
+            Edge2D nextEdge = edges()[emanatingEdges()[iVertex]];
             // Loop around the hole, until we're back to the first vertex.
             while (nextEdge.pv != iVertex) {
                 plint nextVertex = nextEdge.pv;
@@ -1437,12 +1434,12 @@ std::vector<std::vector<plint> >
 }
 
 template<typename T>
-Lid TriangularSurfaceMesh<T>::closeHole(std::vector<plint> const& hole)
+Lid2D SegmentPolygonMesh2D<T>::closeHole(std::vector<plint> const& hole)
 {
     plint numHoleVertices = (plint) hole.size();
 
     // 1. Create a new vertex, corresponding to the barycenter.
-    Array<T,3> baryCenter; baryCenter.resetToZero();
+    Array<T,2> baryCenter; baryCenter.resetToZero();
     for (plint iHole=0; iHole<numHoleVertices; ++iHole) {
         plint iVertex = hole[iHole];
         baryCenter += getVertex(iVertex);
@@ -1456,12 +1453,12 @@ Lid TriangularSurfaceMesh<T>::closeHole(std::vector<plint> const& hole)
     plint edgeIndex = edges().size()-1;
     plint firstAddedEdge = edgeIndex+1;
     // There is exactly one new triangle for each vertex along the hole.
-    for (plint iTriangle=0; iTriangle<numHoleVertices; ++iTriangle) {
-        plint iVertex = hole[iTriangle];
-        plint nextVertex = hole[iTriangle==numHoleVertices-1 ? 0 : iTriangle+1];
+    for (plint iSegment=0; iSegment<numHoleVertices; ++iSegment) {
+        plint iVertex = hole[iSegment];
+        plint nextVertex = hole[iSegment==numHoleVertices-1 ? 0 : iSegment+1];
 
         // a) Add the new edge which is horizontal to the hole boundary.
-        Edge counterEdge; ++edgeIndex;
+        Edge2D counterEdge; ++edgeIndex;
         counterEdge.pv = iVertex;
         counterEdge.ne = emanatingEdges()[iVertex];
         edges().push_back(counterEdge);
@@ -1469,9 +1466,9 @@ Lid TriangularSurfaceMesh<T>::closeHole(std::vector<plint> const& hole)
         edges()[counterEdge.ne].ne = edgeIndex; 
 
         // b) Add the edge that goes from a boundary vertex to the barycenter.
-        Edge firstEdge; ++edgeIndex;
+        Edge2D firstEdge; ++edgeIndex;
         firstEdge.pv = iCenter;
-        if (iTriangle>0) {
+        if (iSegment>0) {
             firstEdge.ne = edgeIndex-2;
             // Convert this former boundary edge to a bulk edge.
             edges()[firstEdge.ne].ne = edgeIndex;
@@ -1479,16 +1476,16 @@ Lid TriangularSurfaceMesh<T>::closeHole(std::vector<plint> const& hole)
         edges().push_back(firstEdge);
 
         // c) Add the edge that goes from the barycenter to a boundary vertex.
-        Edge secondEdge; ++edgeIndex;
+        Edge2D secondEdge; ++edgeIndex;
         secondEdge.pv = nextVertex;
-        if (iTriangle==numHoleVertices-1) {
+        if (iSegment==numHoleVertices-1) {
             secondEdge.ne = firstAddedEdge+1;
             // Convert this former boundary edge to a bulk edge.
             edges()[secondEdge.ne].ne = edgeIndex;
         }
         edges().push_back(secondEdge);
 
-        ++numTriangles; // Don't forget to update this class variable.
+        ++numSegments; // Don't forget to update this class variable.
     }
     // For the newly created barycenter, define the emanating edge to
     //   be the one corresponding to the first added triangle.
@@ -1498,9 +1495,9 @@ Lid TriangularSurfaceMesh<T>::closeHole(std::vector<plint> const& hole)
     avoidIntegerPosition(iCenter);
 
     // 4. Keep track of the newly created triangles with help of a "Lid" structure.
-    Lid lid;
-    lid.firstTriangle = firstAddedEdge/3;
-    lid.numTriangles = numHoleVertices;
+    Lid2D lid;
+    lid.firstSegment = firstAddedEdge/3;
+    lid.numSegments = numHoleVertices;
     lid.boundaryVertices = hole;
     lid.centerVertex = iCenter;
     return lid;
@@ -1509,28 +1506,26 @@ Lid TriangularSurfaceMesh<T>::closeHole(std::vector<plint> const& hole)
 
 template<typename T>
 void toLatticeUnits (
-        TriangularSurfaceMesh<T>& mesh,
+        SegmentPolygonMesh2D<T>& mesh,
         plint resolution, plint referenceDirection,
-        Array<T,3>& location, T& dx)
+        Array<T,2>& location, T& dx)
 {
     PLB_ASSERT(referenceDirection>=0 && referenceDirection <=2);
-    Array<T,2> xRange, yRange, zRange;
-    mesh.computeBoundingBox(xRange, yRange, zRange);
+    Array<T,2> xRange, yRange;
+    mesh.computeBoundingBox(xRange, yRange);
     T deltaX = T();
     switch (referenceDirection) {
         case 0: deltaX = xRange[1] - xRange[0];
                 break;
         case 1: deltaX = yRange[1] - yRange[0];
                 break;
-        case 2: deltaX = zRange[1] - zRange[0];
-                break;
     }
     
     T scalingFactor = (T)(resolution)/deltaX;
 
     // Transform mesh into the frame of coordinate of the multiScalarField.
-    location = Array<T,3>(xRange[0],yRange[0],zRange[0]);
-    mesh.translate(Array<T,3>(-location));
+    location = Array<T,2>(xRange[0],yRange[0]);
+    mesh.translate(Array<T,2>(-location));
     mesh.scale(scalingFactor);
     dx = 1./scalingFactor;
 }
@@ -1539,10 +1534,10 @@ void toLatticeUnits (
 /* ******* Lid operations ************************************************** */
 
 template<typename T>
-Array<T,3> computeBaryCenter (
-        TriangularSurfaceMesh<T> const& mesh, Lid const& lid )
+Array<T,2> computeBaryCenter (
+        SegmentPolygonMesh2D<T> const& mesh, Lid const& lid )
 {
-    Array<T,3> baryCenter; baryCenter.resetToZero();
+    Array<T,2> baryCenter; baryCenter.resetToZero();
     for ( plint iBoundary=0;
           iBoundary<(plint)lid.boundaryVertices.size(); ++iBoundary)
     {
@@ -1554,11 +1549,11 @@ Array<T,3> computeBaryCenter (
 }
 
 template<typename T>
-Array<T,3> computeGeometricCenter (
-        TriangularSurfaceMesh<T> const& mesh, Lid const& lid )
+Array<T,2> computeGeometricCenter (
+        SegmentPolygonMesh2D<T> const& mesh, Lid const& lid )
 {
-    typedef typename TriangularSurfaceMesh<T>::Edge Edge;
-    Array<T,3> center; center.resetToZero();
+    typedef typename SegmentPolygonMesh2D<T>::Edge Edge;
+    Array<T,2> center; center.resetToZero();
     T circumference = T();
     for ( plint iBoundary=0;
           iBoundary<(plint)lid.boundaryVertices.size(); ++iBoundary)
@@ -1566,8 +1561,8 @@ Array<T,3> computeGeometricCenter (
         plint iVertex = lid.boundaryVertices[iBoundary];
         Edge edge = mesh.edges()[mesh.emanatingEdges()[iVertex]];
         plint iNextVertex = edge.pv;
-        Array<T,3> v1 = mesh.getVertex(iVertex);
-        Array<T,3> v2 = mesh.getVertex(iNextVertex);
+        Array<T,2> v1 = mesh.getVertex(iVertex);
+        Array<T,2> v2 = mesh.getVertex(iNextVertex);
         T l = norm(v2-v1);
         center += (v1+v2)*l;
         circumference += l;
@@ -1578,10 +1573,10 @@ Array<T,3> computeGeometricCenter (
 
 template<typename T>
 T computeGeometricRadius (
-        TriangularSurfaceMesh<T> const& mesh, Lid const& lid )
+        SegmentPolygonMesh2D<T> const& mesh, Lid const& lid )
 {
-    typedef typename TriangularSurfaceMesh<T>::Edge Edge;
-    Array<T,3> center= computeGeometricCenter(mesh, lid);
+    typedef typename SegmentPolygonMesh2D<T>::Edge Edge;
+    Array<T,2> center= computeGeometricCenter(mesh, lid);
     T radius = T();
     T circumference = T();
     for ( plint iBoundary=0;
@@ -1590,8 +1585,8 @@ T computeGeometricRadius (
         plint iVertex = lid.boundaryVertices[iBoundary];
         Edge edge = mesh.edges()[mesh.emanatingEdges()[iVertex]];
         plint iNextVertex = edge.pv;
-        Array<T,3> v1 = mesh.getVertex(iVertex);
-        Array<T,3> v2 = mesh.getVertex(iNextVertex);
+        Array<T,2> v1 = mesh.getVertex(iVertex);
+        Array<T,2> v2 = mesh.getVertex(iNextVertex);
         T l = norm(v2-v1);
         radius += norm(v1-center)*l;
         circumference += l;
@@ -1602,7 +1597,7 @@ T computeGeometricRadius (
 
 template<typename T>
 void computeBoundingBox (
-        TriangularSurfaceMesh<T> const& mesh, Lid const& lid,
+        SegmentPolygonMesh2D<T> const& mesh, Lid const& lid,
         Array<T,2>& xLim, Array<T,2>& yLim, Array<T,2>& zLim )
 {
     xLim[0] = yLim[0] = zLim[0] = std::numeric_limits<T>::max();
@@ -1611,7 +1606,7 @@ void computeBoundingBox (
           iBoundary<(plint)lid.boundaryVertices.size(); ++iBoundary )
     {
         plint iVertex = lid.boundaryVertices[iBoundary];
-        Array<T,3> const& vertex = mesh.getVertex(iVertex);
+        Array<T,2> const& vertex = mesh.getVertex(iVertex);
         xLim[0] = std::min(xLim[0], vertex[0]);
         xLim[1] = std::max(xLim[1], vertex[0]);
         yLim[0] = std::min(yLim[0], vertex[1]);
@@ -1623,7 +1618,7 @@ void computeBoundingBox (
 
 template<typename T>
 T computeInnerRadius (
-        TriangularSurfaceMesh<T> const& mesh, Lid const& lid )
+        SegmentPolygonMesh2D<T> const& mesh, Lid const& lid )
 {
     if (lid.boundaryVertices.empty()) {
         return T();
@@ -1644,7 +1639,7 @@ T computeInnerRadius (
 
 template<typename T>
 T computeOuterRadius (
-        TriangularSurfaceMesh<T> const& mesh, Lid const& lid )
+        SegmentPolygonMesh2D<T> const& mesh, Lid const& lid )
 {
     if (lid.boundaryVertices.empty()) {
         return T();
@@ -1665,7 +1660,7 @@ T computeOuterRadius (
 
 template<typename T>
 T computeArea (
-        TriangularSurfaceMesh<T> const& mesh, Lid const& lid )
+        SegmentPolygonMesh2D<T> const& mesh, Lid const& lid )
 {
     T area = T();
     plint numVertices = (plint)lid.boundaryVertices.size();
@@ -1674,14 +1669,14 @@ T computeArea (
     {
         plint vertex1 = lid.boundaryVertices[iBoundary];
         plint vertex2 = lid.boundaryVertices[(iBoundary+1)%numVertices];
-        area += mesh.computeTriangleArea(centerVertex, vertex1, vertex2);
+        area += mesh.computeSegmentArea(centerVertex, vertex1, vertex2);
     }
     return area;
 }
 
 template<typename T>
-Array<T,3> computeNormal (
-        TriangularSurfaceMesh<T> const& mesh, Lid const& lid )
+Array<T,2> computeNormal (
+        SegmentPolygonMesh2D<T> const& mesh, Lid const& lid )
 {
     return mesh.computeVertexNormal(lid.centerVertex);
 }
@@ -1689,30 +1684,30 @@ Array<T,3> computeNormal (
 
 template<typename T>
 void reCenter (
-        TriangularSurfaceMesh<T>& mesh, Lid const& lid )
+        SegmentPolygonMesh2D<T>& mesh, Lid const& lid )
 {
-    Array<T,3> newCenter = computeBaryCenter(mesh,lid);
+    Array<T,2> newCenter = computeBaryCenter(mesh,lid);
     mesh.replaceVertex(lid.centerVertex, newCenter);
 }
 
 
 template<typename T>
-void TriangularSurfaceMesh<T>::writeHTML(std::string fname)
+void SegmentPolygonMesh2D<T>::writeHTML(std::string fname)
 {
-    writeHTML(fname, "Palabos html output", T(), Array<T,3>(0.,0.,0.));
+    writeHTML(fname, "Palabos html output", T(), Array<T,2>(0.,0.,0.));
 }
 
 template<typename T>
-void TriangularSurfaceMesh<T>::writeHTML (
-        std::string fname, std::string title, T phys_dx, Array<T,3> phys_location)
+void SegmentPolygonMesh2D<T>::writeHTML (
+        std::string fname, std::string title, T phys_dx, Array<T,2> phys_location)
 {
     if (!global::mpi().isMainProcessor()) {
         return;
     }
-    std::vector<Array<T,3> > posVect(getNumVertices());
+    std::vector<Array<T,2> > posVect(getNumVertices());
     T maxLimit = std::numeric_limits<T>::max();
     T minLimit = std::numeric_limits<T>::min();
-    Array<T,3> minPos(maxLimit,maxLimit,maxLimit), maxPos(minLimit,minLimit,minLimit);
+    Array<T,2> minPos(maxLimit,maxLimit,maxLimit), maxPos(minLimit,minLimit,minLimit);
     for (plint i=0; i<getNumVertices(); ++i) {
         posVect[i] = (*vertexList)[i];
         if (posVect[i][0]<minPos[0]) minPos[0] = posVect[i][0];
@@ -1728,7 +1723,7 @@ void TriangularSurfaceMesh<T>::writeHTML (
     T diffz = maxPos[2]-minPos[2];
     T diff = std::max(diffx,std::max(diffy,diffz));
     T dx_nonDim = 2./diff;
-    Array<T,3> offset_nonDim (
+    Array<T,2> offset_nonDim (
                  -(1.0+minPos[0]/diff),
                  -(1.0+minPos[1]/diff),
                  -(1.0+minPos[2]/diff) );
@@ -1737,7 +1732,7 @@ void TriangularSurfaceMesh<T>::writeHTML (
         posVect[i] += offset_nonDim;
     }
     T dx_ndToPhys = phys_dx/dx_nonDim;
-    Array<T,3> location_ndToPhys = phys_location-dx_ndToPhys*offset_nonDim;
+    Array<T,2> location_ndToPhys = phys_location-dx_ndToPhys*offset_nonDim;
     
     std::ofstream ofile(fname.c_str());
     ofile << std::fixed << std::setprecision(5);
@@ -1762,10 +1757,10 @@ void TriangularSurfaceMesh<T>::writeHTML (
     ofile << "            <shape>\n";
     ofile << "            <indexedtriangleset index=\"";
 
-    for (plint iTriangle=0; iTriangle<getNumTriangles(); ++iTriangle) {
-        plint i0 = getVertexId(iTriangle, 0);
-        plint i1 = getVertexId(iTriangle, 1);
-        plint i2 = getVertexId(iTriangle, 2);
+    for (plint iSegment=0; iSegment<getNumSegments(); ++iSegment) {
+        plint i0 = getVertexId(iSegment, 0);
+        plint i1 = getVertexId(iSegment, 1);
+        plint i2 = getVertexId(iSegment, 2);
         ofile << i0 << " " << i1 << " " << i2 << " ";
     }
     ofile << "\" solid=\"false\">\n";
@@ -1781,7 +1776,7 @@ void TriangularSurfaceMesh<T>::writeHTML (
     ofile << "\"> </coordinate>\n";
     ofile << "            <normal vector=\"";
     for (plint iVertex=0; iVertex<getNumVertices(); ++iVertex) {
-        Array<T,3> normal = computeVertexNormal(iVertex);
+        Array<T,2> normal = computeVertexNormal(iVertex);
         ofile << normal[0] << " "
               << normal[1] << " "
               << normal[2];

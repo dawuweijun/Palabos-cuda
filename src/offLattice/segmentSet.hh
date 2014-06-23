@@ -27,7 +27,7 @@
 #ifndef SEGMENT_SET_HH
 #define SEGMENT_SET_HH
 
-#include "offLattice/SegmentSet.h"
+#include "offLattice/segmentSet.h"
 #include "core/util.h"
 #include <algorithm>
 #include <limits>
@@ -37,20 +37,20 @@
 namespace plb {
 
 template<typename T>
-TriangleSet<T>::TriangleSet(Precision precision_)
+SegmentSet<T>::SegmentSet(Precision precision_)
     : minEdgeLength(std::numeric_limits<T>::max()),
       maxEdgeLength(std::numeric_limits<T>::min())
 {
     PLB_ASSERT(precision_ == FLT || precision_ == DBL || precision_ == LDBL);
     precision = precision_;
 
-    boundingCuboid.lowerLeftCorner  = Array<T,3>((T) 0.0, (T) 0.0, (T) 0.0);
-    boundingCuboid.upperRightCorner = Array<T,3>((T) 0.0, (T) 0.0, (T) 0.0);
+    boundingCuboid.lowerLeftCorner  = Array<T,2>((T) 0.0, (T) 0.0, (T) 0.0);
+    boundingCuboid.upperRightCorner = Array<T,2>((T) 0.0, (T) 0.0, (T) 0.0);
 }
 
 template<typename T>
-TriangleSet<T>::TriangleSet(std::vector<Triangle> const& triangles_, Precision precision_)
-    : triangles(triangles_),
+SegmentSet<T>::SegmentSet(std::vector<Segment> const& segments_, Precision precision_)
+    : segments(segments_),
       minEdgeLength(std::numeric_limits<T>::max()),
       maxEdgeLength(std::numeric_limits<T>::min())
 {
@@ -62,7 +62,7 @@ TriangleSet<T>::TriangleSet(std::vector<Triangle> const& triangles_, Precision p
 }
 
 template<typename T>
-TriangleSet<T>::TriangleSet(std::string fname, Precision precision_, SurfaceGeometryFileFormat fformat)
+SegmentSet<T>::SegmentSet(std::string fname, Precision precision_, SurfaceGeometryFileFormat fformat)
     : minEdgeLength(std::numeric_limits<T>::max()),
       maxEdgeLength(std::numeric_limits<T>::min())
 {
@@ -84,21 +84,21 @@ TriangleSet<T>::TriangleSet(std::string fname, Precision precision_, SurfaceGeom
 }
 
 template<typename T>
-std::vector<typename TriangleSet<T>::Triangle> const&
-    TriangleSet<T>::getTriangles() const
+std::vector<typename SegmentSet<T>::Segment> const&
+    SegmentSet<T>::getSegments() const
 {
-    return triangles;
+    return segments;
 }
 
 template<typename T>
-void TriangleSet<T>::setPrecision(Precision precision_)
+void SegmentSet<T>::setPrecision(Precision precision_)
 {
     PLB_ASSERT(precision_ == FLT || precision_ == DBL || precision_ == LDBL);
     precision = precision_;
 }
 
 template<typename T>
-void TriangleSet<T>::readSTL(std::string fname)
+void SegmentSet<T>::readSTL(std::string fname)
 {
     char buf[256];
     FILE *fp = fopen(fname.c_str(), "r");
@@ -119,7 +119,7 @@ void TriangleSet<T>::readSTL(std::string fname)
 }
 
 template<typename T>
-void TriangleSet<T>::readAsciiSTL(FILE* fp) {
+void SegmentSet<T>::readAsciiSTL(FILE* fp) {
     char buf[256];
     char *cp, *sp;
 
@@ -152,7 +152,7 @@ void TriangleSet<T>::readAsciiSTL(FILE* fp) {
                 failed = true;
             }
             cp += 12;
-            Array<T,3> n;
+            Array<T,2> n;
             if (sscanf(cp, fmt, &n[0], &n[1], &n[2]) != 3) {
                 failed = true;
             }
@@ -162,7 +162,7 @@ void TriangleSet<T>::readAsciiSTL(FILE* fp) {
                 failed = true;
             }
 
-            Triangle triangle;
+            Segment segment;
             T nextMin, nextMax;
             for (int i = 0; i < 3; i++) {
                 if ( fgets(buf, 256, fp) == NULL ||
@@ -171,13 +171,13 @@ void TriangleSet<T>::readAsciiSTL(FILE* fp) {
                     failed = true;
                 }
                 cp += 6;
-                triangle[i][0] = T();
-                triangle[i][1] = T();
-                triangle[i][2] = T();
+                segment[i][0] = T();
+                segment[i][1] = T();
+                segment[i][2] = T();
                 if (sscanf( cp, fmt,
-                            &triangle[i][0],
-                            &triangle[i][1],
-                            &triangle[i][2] ) != 3)
+                            &segment[i][0],
+                            &segment[i][1],
+                            &segment[i][2] ) != 3)
                 {
                     failed = true;
                 }
@@ -191,10 +191,10 @@ void TriangleSet<T>::readAsciiSTL(FILE* fp) {
                 failed = true;
             }
 
-            if (checkNoAbort(triangle, n)) {
-                triangles.push_back(triangle);
+            if (checkNoAbort(segment, n)) {
+                segments.push_back(segment);
 
-                computeMinMaxEdge(triangles.size()-1, nextMin, nextMax);
+                computeMinMaxEdge(segments.size()-1, nextMin, nextMax);
                 minEdgeLength = std::min(minEdgeLength, nextMin);
                 maxEdgeLength = std::max(maxEdgeLength, nextMax);
             }
@@ -215,7 +215,7 @@ void TriangleSet<T>::readAsciiSTL(FILE* fp) {
 }
 
 template<typename T>
-void TriangleSet<T>::readBinarySTL(FILE* fp)
+void SegmentSet<T>::readBinarySTL(FILE* fp)
 {
     char buf[256];
     unsigned int nt;
@@ -232,32 +232,32 @@ void TriangleSet<T>::readBinarySTL(FILE* fp)
             if (fread(array, sizeof(float), 3, fp) != 3) {
                 failed = true;
             }
-            Array<T,3> n;
+            Array<T,2> n;
             n[0] = array[0];
             n[1] = array[1];
             n[2] = array[2];
 
-            Triangle triangle;
+            Segment segment;
             for (int i = 0; i < 3 && !failed; i++) {
                 if (fread(array, sizeof(float), 3, fp) != 3) {
                     failed = true;
                 }
-                triangle[i][0] = T();
-                triangle[i][1] = T();
-                triangle[i][2] = T();
-                triangle[i][0] = array[0];
-                triangle[i][1] = array[1];
-                triangle[i][2] = array[2];
+                segment[i][0] = T();
+                segment[i][1] = T();
+                segment[i][2] = T();
+                segment[i][0] = array[0];
+                segment[i][1] = array[1];
+                segment[i][2] = array[2];
             }
 
             if (fread(&abc, sizeof(unsigned short), 1, fp) != 1) {
                 failed = true;
             }
 
-            if (checkNoAbort(triangle, n)) {
-                triangles.push_back(triangle);
+            if (checkNoAbort(segment, n)) {
+                segments.push_back(segment);
 
-                computeMinMaxEdge(triangles.size()-1, nextMin, nextMax);
+                computeMinMaxEdge(segments.size()-1, nextMin, nextMax);
                 minEdgeLength = std::min(minEdgeLength, nextMin);
                 maxEdgeLength = std::max(maxEdgeLength, nextMax);
             }
@@ -270,95 +270,95 @@ void TriangleSet<T>::readBinarySTL(FILE* fp)
     PLB_ASSERT(!failed); // The input file is badly structured.
 }
 
-/// Make some optional checks and fix triangle orientation.
+/// Make some optional checks and fix segment orientation.
 template<typename T>
-void TriangleSet<T>::check(Triangle& triangle, Array<T,3> const& n)
+void SegmentSet<T>::check(Segment& segment, Array<T,2> const& n)
 {
     T eps = getEpsilon<T>(precision);
 
-    Array<T,3> v01 = triangle[1] - triangle[0];
-    Array<T,3> v02 = triangle[2] - triangle[0];
-    Array<T,3> v12 = triangle[2] - triangle[1];
+    Array<T,2> v01 = segment[1] - segment[0];
+    Array<T,2> v02 = segment[2] - segment[0];
+    Array<T,2> v12 = segment[2] - segment[1];
 
-    T norm01 = sqrt(VectorTemplateImpl<T,3>::normSqr(v01));
-    T norm02 = sqrt(VectorTemplateImpl<T,3>::normSqr(v02));
-    T norm12 = sqrt(VectorTemplateImpl<T,3>::normSqr(v12));
+    T norm01 = sqrt(VectorTemplateImpl<T,2>::normSqr(v01));
+    T norm02 = sqrt(VectorTemplateImpl<T,2>::normSqr(v02));
+    T norm12 = sqrt(VectorTemplateImpl<T,2>::normSqr(v12));
 
     if (util::fpequal(norm01, (T) 0.0, eps) || util::fpequal(norm02, (T) 0.0, eps) ||
         util::fpequal(norm12, (T) 0.0, eps))
     {
-        PLB_ASSERT(false); // One of the triangles is degenerate.
+        PLB_ASSERT(false); // One of the segments is degenerate.
     }
 
-    Array<T,3> cn;
+    Array<T,2> cn;
     crossProduct(v01, v02, cn);
 
-    T norm_cn = sqrt(VectorTemplateImpl<T,3>::normSqr(cn));
+    T norm_cn = sqrt(VectorTemplateImpl<T,2>::normSqr(cn));
 
     if (util::fpequal(norm_cn, (T) 0.0, eps))
     {
-        PLB_ASSERT(false); // One of the triangles has zero area.
+        PLB_ASSERT(false); // One of the segments has zero area.
     }
 
-    T dot = VectorTemplateImpl<T,3>::scalarProduct(cn,n);
+    T dot = VectorTemplateImpl<T,2>::scalarProduct(cn,n);
 
     if (dot < (T) 0.0) {
-        std::swap(triangle[1],triangle[2]);
+        std::swap(segment[1],segment[2]);
     }
 }
 
-/// Make some optional checks and fix triangle orientation.
+/// Make some optional checks and fix segment orientation.
 template<typename T>
-bool TriangleSet<T>::checkNoAbort(Triangle& triangle, Array<T,3> const& n)
+bool SegmentSet<T>::checkNoAbort(Segment& segment, Array<T,2> const& n)
 {
     T eps = getEpsilon<T>(precision);
 
-    Array<T,3> v01 = triangle[1] - triangle[0];
-    Array<T,3> v02 = triangle[2] - triangle[0];
-    Array<T,3> v12 = triangle[2] - triangle[1];
+    Array<T,2> v01 = segment[1] - segment[0];
+    Array<T,2> v02 = segment[2] - segment[0];
+    Array<T,2> v12 = segment[2] - segment[1];
 
-    T norm01 = sqrt(VectorTemplateImpl<T,3>::normSqr(v01));
-    T norm02 = sqrt(VectorTemplateImpl<T,3>::normSqr(v02));
-    T norm12 = sqrt(VectorTemplateImpl<T,3>::normSqr(v12));
+    T norm01 = sqrt(VectorTemplateImpl<T,2>::normSqr(v01));
+    T norm02 = sqrt(VectorTemplateImpl<T,2>::normSqr(v02));
+    T norm12 = sqrt(VectorTemplateImpl<T,2>::normSqr(v12));
 
     if (util::fpequal(norm01, (T) 0.0, eps) || util::fpequal(norm02, (T) 0.0, eps) ||
         util::fpequal(norm12, (T) 0.0, eps))
     {
-        return false; // One of the triangles is degenerate.
+        return false; // One of the segments is degenerate.
     }
 
-    Array<T,3> cn;
+    Array<T,2> cn;
     crossProduct(v01, v02, cn);
 
-    T norm_cn = sqrt(VectorTemplateImpl<T,3>::normSqr(cn));
+    T norm_cn = sqrt(VectorTemplateImpl<T,2>::normSqr(cn));
 
     if (util::fpequal(norm_cn, (T) 0.0, eps))
     {
-        return false; // One of the triangles has zero area.
+        return false; // One of the segments has zero area.
     }
 
-    T dot = VectorTemplateImpl<T,3>::scalarProduct(cn,n);
+    T dot = VectorTemplateImpl<T,2>::scalarProduct(cn,n);
 
     if (dot < (T) 0.0) {
-        std::swap(triangle[1],triangle[2]);
+        std::swap(segment[1],segment[2]);
     }
     return true;
 }
 
 template<typename T>
-void TriangleSet<T>::translate(Array<T,3> const& vector)
+void SegmentSet<T>::translate(Array<T,2> const& vector)
 {
     T eps = std::numeric_limits<T>::epsilon();
-    if (util::fpequal((T) sqrt(VectorTemplateImpl<T,3>::normSqr(vector)), (T) 0.0, eps))
+    if (util::fpequal((T) sqrt(VectorTemplateImpl<T,2>::normSqr(vector)), (T) 0.0, eps))
         return;
 
-    plint size = triangles.size();
+    plint size = segments.size();
     if (size == 0)
         return;
 
     for (plint i = 0; i < size; i++) {
         for (int j = 0; j < 3; j++) {
-            triangles[i][j] += vector;
+            segments[i][j] += vector;
         }
     }
 
@@ -367,19 +367,19 @@ void TriangleSet<T>::translate(Array<T,3> const& vector)
 }
 
 template<typename T>
-void TriangleSet<T>::scale(T alpha)
+void SegmentSet<T>::scale(T alpha)
 {
     T eps = std::numeric_limits<T>::epsilon();
     if (util::fpequal(alpha, (T) 1.0, eps))
         return;
 
-    plint size = triangles.size();
+    plint size = segments.size();
     if (size == 0)
         return;
 
     for (plint i = 0; i < size; i++) {
         for (int j = 0; j < 3; j++) {
-            triangles[i][j] *= alpha;
+            segments[i][j] *= alpha;
         }
     }
     minEdgeLength *= alpha;
@@ -390,13 +390,13 @@ void TriangleSet<T>::scale(T alpha)
 }
 
 template<typename T>
-void TriangleSet<T>::rotateAtOrigin(Array<T,3> const& normedAxis, T theta) {
-    plint size = (plint)triangles.size();
-    for (plint iTriangle = 0; iTriangle < size; iTriangle++) {
+void SegmentSet<T>::rotateAtOrigin(Array<T,2> const& normedAxis, T theta) {
+    plint size = (plint)segments.size();
+    for (plint iSegment = 0; iSegment < size; iSegment++) {
         for (int iVertex = 0; iVertex < 3; iVertex++) {
-            triangles[iTriangle][iVertex] =
+            segments[iSegment][iVertex] =
                 plb::rotateAtOrigin (
-                    triangles[iTriangle][iVertex], normedAxis, theta );
+                    segments[iSegment][iVertex], normedAxis, theta );
         }
     }
 
@@ -404,7 +404,7 @@ void TriangleSet<T>::rotateAtOrigin(Array<T,3> const& normedAxis, T theta) {
 }
 
 template<typename T>
-void TriangleSet<T>::rotate(T phi, T theta, T psi)
+void SegmentSet<T>::rotate(T phi, T theta, T psi)
 {   
     T eps = std::numeric_limits<T>::epsilon();
     T pi = acos(-1.0);
@@ -412,7 +412,7 @@ void TriangleSet<T>::rotate(T phi, T theta, T psi)
     PLB_ASSERT((theta > (T) 0.0 || util::fpequal(theta, (T) 0.0, eps)) &&
                (theta < pi  || util::fpequal(theta, pi, eps)));
 
-    plint size = triangles.size();
+    plint size = segments.size();
     if (size == 0)
         return;
 
@@ -467,13 +467,13 @@ void TriangleSet<T>::rotate(T phi, T theta, T psi)
         }
     }
 
-    for (plint iTriangle = 0; iTriangle < size; iTriangle++) {
+    for (plint iSegment = 0; iSegment < size; iSegment++) {
         for (int iVertex = 0; iVertex < 3; iVertex++) {
-            Array<T,3> x = triangles[iTriangle][iVertex];
+            Array<T,2> x = segments[iSegment][iVertex];
             for (int i = 0; i < 3; i++) {
-                triangles[iTriangle][iVertex][i] = (T) 0.0;
+                segments[iSegment][iVertex][i] = (T) 0.0;
                 for (int j = 0; j < 3; j++) {
-                    triangles[iTriangle][iVertex][i] += a[i][j]*x[j];
+                    segments[iSegment][iVertex][i] += a[i][j]*x[j];
                 }
             }
         }
@@ -483,16 +483,16 @@ void TriangleSet<T>::rotate(T phi, T theta, T psi)
 }
 
 template<typename T>
-void TriangleSet<T>::merge(std::vector<TriangleSet<T>*> meshes)
+void SegmentSet<T>::merge(std::vector<SegmentSet<T>*> meshes)
 {
     PLB_ASSERT(meshes.size() != 0);
 
-    triangles.assign(meshes[0]->getTriangles().begin(), meshes[0]->getTriangles().end());
+    segments.assign(meshes[0]->getSegments().begin(), meshes[0]->getSegments().end());
     minEdgeLength = meshes[0]->getMinEdgeLength();
     maxEdgeLength = meshes[0]->getMaxEdgeLength();
     boundingCuboid = meshes[0]->getBoundingCuboid();
     for (pluint i = 1; i < meshes.size(); i++) {
-        triangles.insert(triangles.end(), meshes[i]->getTriangles().begin(), meshes[i]->getTriangles().end());
+        segments.insert(segments.end(), meshes[i]->getSegments().begin(), meshes[i]->getSegments().end());
         minEdgeLength = std::min(minEdgeLength, meshes[i]->getMinEdgeLength());
         maxEdgeLength = std::max(maxEdgeLength, meshes[i]->getMaxEdgeLength());
 
@@ -507,14 +507,14 @@ void TriangleSet<T>::merge(std::vector<TriangleSet<T>*> meshes)
 }
 
 template<typename T>
-void TriangleSet<T>::append(TriangleSet<T> const& mesh)
+void SegmentSet<T>::append(SegmentSet<T> const& mesh)
 {
-    triangles.insert(triangles.end(), mesh.getTriangles().begin(), mesh.getTriangles().end());
+    segments.insert(segments.end(), mesh.getSegments().begin(), mesh.getSegments().end());
     minEdgeLength = std::min(minEdgeLength, mesh.getMinEdgeLength());
     maxEdgeLength = std::max(maxEdgeLength, mesh.getMaxEdgeLength());
 
-    Cuboid<T> bcuboid = mesh.getBoundingCuboid();
-    for (plint j = 0; j < 3; j++) {
+    Cuboid2D<T> bcuboid = mesh.getBoundingCuboid();
+    for (plint j = 0; j < 2; j++) {
         boundingCuboid.lowerLeftCorner[j]  = std::min(boundingCuboid.lowerLeftCorner[j],
                                                       bcuboid.lowerLeftCorner[j]);
         boundingCuboid.upperRightCorner[j] = std::max(boundingCuboid.upperRightCorner[j],
@@ -523,79 +523,79 @@ void TriangleSet<T>::append(TriangleSet<T> const& mesh)
 }
 
 template<typename T>
-void TriangleSet<T>::refine()
+void SegmentSet<T>::refine()
 {
-    std::vector<Triangle> newTriangles;
+    std::vector<Segment> newSegments;
 
-    for (pluint i = 0; i < triangles.size(); ++i) {
-        Triangle const& triangle = triangles[i];
+    for (pluint i = 0; i < segments.size(); ++i) {
+        Segment const& segment = segments[i];
 
-        Array<T,3> v00 = triangle[0];
-        Array<T,3> v11 = triangle[1];
-        Array<T,3> v22 = triangle[2];
+        Array<T,2> v00 = segment[0];
+        Array<T,2> v11 = segment[1];
+        Array<T,2> v22 = segment[2];
 
-        Array<T,3> v01 = 0.5 * (v00 + v11);
-        Array<T,3> v12 = 0.5 * (v11 + v22);
-        Array<T,3> v20 = 0.5 * (v22 + v00);
+        Array<T,2> v01 = 0.5 * (v00 + v11);
+        Array<T,2> v12 = 0.5 * (v11 + v22);
+        Array<T,2> v20 = 0.5 * (v22 + v00);
 
-        Triangle newTriangle;
+        Segment newSegment;
 
-        newTriangle[0] = v01;
-        newTriangle[1] = v12;
-        newTriangle[2] = v20;
-        newTriangles.push_back(newTriangle);
+        newSegment[0] = v01;
+        newSegment[1] = v12;
+        newSegment[2] = v20;
+        newSegments.push_back(newSegment);
 
-        newTriangle[0] = v00;
-        newTriangle[1] = v01;
-        newTriangle[2] = v20;
-        newTriangles.push_back(newTriangle);
+        newSegment[0] = v00;
+        newSegment[1] = v01;
+        newSegment[2] = v20;
+        newSegments.push_back(newSegment);
 
-        newTriangle[0] = v01;
-        newTriangle[1] = v11;
-        newTriangle[2] = v12;
-        newTriangles.push_back(newTriangle);
+        newSegment[0] = v01;
+        newSegment[1] = v11;
+        newSegment[2] = v12;
+        newSegments.push_back(newSegment);
 
-        newTriangle[0] = v20;
-        newTriangle[1] = v12;
-        newTriangle[2] = v22;
-        newTriangles.push_back(newTriangle);
+        newSegment[0] = v20;
+        newSegment[1] = v12;
+        newSegment[2] = v22;
+        newSegments.push_back(newSegment);
     }
 
-    triangles.clear();
-    triangles = newTriangles;
+    segments.clear();
+    segments = newSegments;
 
     computeMinMaxEdges();
     computeBoundingCuboid();
 }
 
 template<typename T>
-void TriangleSet<T>::reverseOrientation()
+void SegmentSet<T>::reverseOrientation()
 {
-    plint size = triangles.size();
+    plint size = segments.size();
     for (plint i = 0; i < size; i++) 
-        std::swap(triangles[i][1],triangles[i][2]);
+        std::swap(segments[i][1],segments[i][2]);
 }
 
 template<typename T>
-void TriangleSet<T>::writeAsciiSTL(std::string fname) const
+void SegmentSet<T>::writeAsciiSTL(std::string fname) const
 {
     if (global::mpi().isMainProcessor()) {
         FILE *fp = fopen(fname.c_str(), "w");
         PLB_ASSERT(fp != NULL);
 
-        plint size = triangles.size();
+        plint size = segments.size();
         fprintf(fp, "solid plb\n");
         for (plint i = 0; i < size; i++) {
-            Array<T,3> v0 = triangles[i][0];
-            Array<T,3> v1 = triangles[i][1];
-            Array<T,3> v2 = triangles[i][2];
+            Array<T,2> v0 = segments[i][0];
+            Array<T,2> v1 = segments[i][1];
+            Array<T,2> v2 = segments[i][2];
 
-            Array<T,3> e01 = v1 - v0;
-            Array<T,3> e02 = v2 - v0;
+            Array<T,2> e01 = v1 - v0;
+            Array<T,2> e02 = v2 - v0;
 
-            Array<T,3> n;
+            Array<T,2> n;
             crossProduct(e01, e02, n);
-            n /= sqrt(VectorTemplateImpl<T,3>::normSqr(n));
+            n /= sqrt(VectorTemplateImpl<T,2>::normSqr(n));
             fprintf(fp, "  facet normal % e % e % e\n", (double) n[0], (double) n[1], (double) n[2]);
             fprintf(fp, "    outer loop\n");
             fprintf(fp, "      vertex % e % e % e\n", (double) v0[0], (double) v0[1], (double) v0[2]);
@@ -610,13 +610,13 @@ void TriangleSet<T>::writeAsciiSTL(std::string fname) const
 }
 
 template<typename T>
-void TriangleSet<T>::writeBinarySTL(std::string fname) const
+void SegmentSet<T>::writeBinarySTL(std::string fname) const
 {
     if (global::mpi().isMainProcessor()) {
         FILE *fp = fopen(fname.c_str(), "wb");
         PLB_ASSERT(fp != NULL);
 
-        unsigned int nt = triangles.size();
+        unsigned int nt = segments.size();
         unsigned short abc = 0;
         char buf[80];
 
@@ -626,16 +626,16 @@ void TriangleSet<T>::writeBinarySTL(std::string fname) const
         fwrite(buf, sizeof(char), 80, fp);
         fwrite(&nt, sizeof(unsigned int), 1, fp);
         for (unsigned int i = 0; i < nt; i++) {
-            Array<T,3> v0 = triangles[i][0];
-            Array<T,3> v1 = triangles[i][1];
-            Array<T,3> v2 = triangles[i][2];
+            Array<T,2> v0 = segments[i][0];
+            Array<T,2> v1 = segments[i][1];
+            Array<T,2> v2 = segments[i][2];
 
-            Array<T,3> e01 = v1 - v0;
-            Array<T,3> e02 = v2 - v0;
+            Array<T,2> e01 = v1 - v0;
+            Array<T,2> e02 = v2 - v0;
 
-            Array<T,3> nrml;
+            Array<T,2> nrml;
             crossProduct(e01, e02, nrml);
-            nrml /= sqrt(VectorTemplateImpl<T,3>::normSqr(nrml));
+            nrml /= sqrt(VectorTemplateImpl<T,2>::normSqr(nrml));
 
             float n[3];
             n[0] = nrml[0];
@@ -663,23 +663,23 @@ void TriangleSet<T>::writeBinarySTL(std::string fname) const
 }
 
 template<typename T>
-int TriangleSet<T>::cutTriangleWithPlane(Plane<T> const& plane, Triangle const& triangle,
-        TriangleSet<T>& newTriangleSet) const
+int SegmentSet<T>::cutSegmentWithLine(Line<T> const& line, Segment const& segment,
+        SegmentSet<T>& newSegmentSet) const
 {
     T epsilon = getEpsilon<T>(precision);
 
     int vertexTags[3];
 
-    // Tag the triangle vertices.
+    // Tag the segment vertices.
     for (int iVertex = 0; iVertex < 3; iVertex++) {
-        Array<T,3> tmp = triangle[iVertex] - plane.point;
+        Array<T,2> tmp = segment[iVertex] - line.point;
         T norm_tmp = norm(tmp);
         if (norm_tmp > epsilon) {
             tmp /= norm_tmp;
         } else {
             tmp[0] = tmp[1] = tmp[2] = (T) 0.0;
         }
-        T dotp = dot(tmp, plane.normal);
+        T dotp = dot(tmp, line.normal);
         if (fabs(dotp) <= epsilon) {
             vertexTags[iVertex] = 0;
         } else if (dotp > (T) 0.0 && fabs(dotp) > epsilon) {
@@ -691,96 +691,96 @@ int TriangleSet<T>::cutTriangleWithPlane(Plane<T> const& plane, Triangle const& 
         }
     }
 
-    // All three vertices belong to one side of the cut plane.
+    // All three vertices belong to one side of the cut line.
     if (vertexTags[0] == 1 && vertexTags[1] == 1 && vertexTags[2] == 1) {
-        newTriangleSet.triangles.push_back(triangle);
+        newSegmentSet.segments.push_back(segment);
         return 1;
     } else if (vertexTags[0] == -1 && vertexTags[1] == -1 && vertexTags[2] == -1) {
         return 0;
     }
 
-    // One vertex belongs to one side of the cut plane and the other two vertices
+    // One vertex belongs to one side of the cut line and the other two vertices
     //   belong to the other side.
     for (int i = 0; i < 3; i++) {
         int j = (i + 1) != 3 ? (i + 1) : 0;
         int k = (j + 1) != 3 ? (j + 1) : 0;
 
         if (vertexTags[i] == 1 && vertexTags[j] == -1 && vertexTags[k] == -1) {
-            Array<T,3> intersection_ij((T) 0.0, (T) 0.0, (T) 0.0), intersection_ik((T) 0.0, (T) 0.0, (T) 0.0);
+            Array<T,2> intersection_ij((T) 0.0, (T) 0.0, (T) 0.0), intersection_ik((T) 0.0, (T) 0.0, (T) 0.0);
             int rv = 0;
-            rv = lineIntersectionWithPlane<T>(plane, triangle[i], triangle[j], precision, intersection_ij);
+            rv = lineIntersectionWithLine<T>(line, segment[i], segment[j], precision, intersection_ij);
             if (rv != 1) {
                 return -1;
             }
-            rv = lineIntersectionWithPlane<T>(plane, triangle[i], triangle[k], precision, intersection_ik);
+            rv = lineIntersectionWithLine<T>(line, segment[i], segment[k], precision, intersection_ik);
             if (rv != 1) {
                 return -1;
             }
-            Triangle newTriangle(triangle[i], intersection_ij, intersection_ik);
-            newTriangleSet.triangles.push_back(newTriangle);
+            Segment newSegment(segment[i], intersection_ij, intersection_ik);
+            newSegmentSet.segments.push_back(newSegment);
             return 1;
         } else if (vertexTags[i] == -1 && vertexTags[j] == 1 && vertexTags[k] == 1) {
-            Array<T,3> intersection_ij((T) 0.0, (T) 0.0, (T) 0.0), intersection_ik((T) 0.0, (T) 0.0, (T) 0.0);
+            Array<T,2> intersection_ij((T) 0.0, (T) 0.0, (T) 0.0), intersection_ik((T) 0.0, (T) 0.0, (T) 0.0);
             int rv = 0;
-            rv = lineIntersectionWithPlane<T>(plane, triangle[i], triangle[j], precision, intersection_ij);
+            rv = lineIntersectionWithLine<T>(line, segment[i], segment[j], precision, intersection_ij);
             if (rv != 1) {
                 return -1;
             }
-            rv = lineIntersectionWithPlane<T>(plane, triangle[i], triangle[k], precision, intersection_ik);
+            rv = lineIntersectionWithLine<T>(line, segment[i], segment[k], precision, intersection_ik);
             if (rv != 1) {
                 return -1;
             }
-            Triangle newTriangle_0(triangle[k], intersection_ij, triangle[j]);
-            Triangle newTriangle_1(triangle[k], intersection_ik, intersection_ij);
-            newTriangleSet.triangles.push_back(newTriangle_0);
-            newTriangleSet.triangles.push_back(newTriangle_1);
+            Segment newSegment_0(segment[k], intersection_ij, segment[j]);
+            Segment newSegment_1(segment[k], intersection_ik, intersection_ij);
+            newSegmentSet.segments.push_back(newSegment_0);
+            newSegmentSet.segments.push_back(newSegment_1);
             return 1;
         }
     }
 
-    // Only one vertex belongs to the cut plane.
+    // Only one vertex belongs to the cut line.
     for (int i = 0; i < 3; i++) {
         int j = (i + 1) != 3 ? (i + 1) : 0;
         int k = (j + 1) != 3 ? (j + 1) : 0;
 
         if (vertexTags[i] == 0) {
             if (vertexTags[j] == 1 && vertexTags[k] == 1) {
-                newTriangleSet.triangles.push_back(triangle);
+                newSegmentSet.segments.push_back(segment);
                 return 1;
             } else if (vertexTags[j] == -1 && vertexTags[k] == -1) {
                 return 0;
             } else if (vertexTags[j] == 1 && vertexTags[k] == -1) {
-                Array<T,3> intersection((T) 0.0, (T) 0.0, (T) 0.0);
+                Array<T,2> intersection((T) 0.0, (T) 0.0, (T) 0.0);
                 int rv = 0;
-                rv = lineIntersectionWithPlane<T>(plane, triangle[j], triangle[k], precision, intersection);
+                rv = lineIntersectionWithLine<T>(line, segment[j], segment[k], precision, intersection);
                 if (rv != 1) {
                     return -1;
                 }
-                Triangle newTriangle(triangle[i], triangle[j], intersection);
-                newTriangleSet.triangles.push_back(newTriangle);
+                Segment newSegment(segment[i], segment[j], intersection);
+                newSegmentSet.segments.push_back(newSegment);
                 return 1;
             } else if (vertexTags[j] == -1 && vertexTags[k] == 1) {
-                Array<T,3> intersection((T) 0.0, (T) 0.0, (T) 0.0);
+                Array<T,2> intersection((T) 0.0, (T) 0.0, (T) 0.0);
                 int rv = 0;
-                rv = lineIntersectionWithPlane<T>(plane, triangle[j], triangle[k], precision, intersection);
+                rv = lineIntersectionWithLine<T>(line, segment[j], segment[k], precision, intersection);
                 if (rv != 1) {
                     return -1;
                 }
-                Triangle newTriangle(triangle[i], intersection, triangle[k]);
-                newTriangleSet.triangles.push_back(newTriangle);
+                Segment newSegment(segment[i], intersection, segment[k]);
+                newSegmentSet.segments.push_back(newSegment);
                 return 1;
             }
         }
     }
 
-    // Only two of the three vertices belong to the cut plane.
+    // Only two of the three vertices belong to the cut line.
     for (int i = 0; i < 3; i++) {
         int j = (i + 1) != 3 ? (i + 1) : 0;
         int k = (j + 1) != 3 ? (j + 1) : 0;
 
         if (vertexTags[i] == 0 && vertexTags[j] == 0) {
             if (vertexTags[k] == 1) {
-                newTriangleSet.triangles.push_back(triangle);
+                newSegmentSet.segments.push_back(segment);
                 return 1;
             } else if (vertexTags[k] == -1) {
                 return 0;
@@ -788,9 +788,9 @@ int TriangleSet<T>::cutTriangleWithPlane(Plane<T> const& plane, Triangle const& 
         }
     }
 
-    // All 3 vertices belong to the cut plane.
+    // All 3 vertices belong to the cut line.
     if (vertexTags[0] == 0 && vertexTags[1] == 0 && vertexTags[2] == 0) {
-        newTriangleSet.triangles.push_back(triangle);
+        newSegmentSet.segments.push_back(segment);
         return 1;
     }
 
@@ -798,32 +798,32 @@ int TriangleSet<T>::cutTriangleWithPlane(Plane<T> const& plane, Triangle const& 
 }
 
 template<typename T>
-int TriangleSet<T>::cutWithPlane(Plane<T> const& plane, TriangleSet<T>& newTriangleSet) const
+int SegmentSet<T>::cutWithLine(Line<T> const& line, SegmentSet<T>& newSegmentSet) const
 {
     T epsilon = getEpsilon<T>(precision);
 
-    T norm_normal = norm(plane.normal);
-    PLB_ASSERT(norm_normal > epsilon); // The cut plane normal vector cannot have zero magnitude.
-    Plane<T> newPlane;
-    newPlane.point = plane.point;
-    newPlane.normal = plane.normal / norm_normal;
+    T norm_normal = norm(line.normal);
+    PLB_ASSERT(norm_normal > epsilon); // The cut line normal vector cannot have zero magnitude.
+    Line<T> newLine;
+    newLine.point = line.point;
+    newLine.normal = line.normal / norm_normal;
 
-    newTriangleSet.triangles.resize(0);
+    newSegmentSet.segments.resize(0);
 
-    newTriangleSet.precision = precision;
+    newSegmentSet.precision = precision;
 
-    for (pluint iTriangle = 0; iTriangle < triangles.size(); iTriangle++) {
-        if (cutTriangleWithPlane(newPlane, triangles[iTriangle], newTriangleSet) == -1) {
+    for (pluint iSegment = 0; iSegment < segments.size(); iSegment++) {
+        if (cutSegmentWithLine(newLine, segments[iSegment], newSegmentSet) == -1) {
             return -1;
         }
     }
 
-    if (newTriangleSet.triangles.size() != 0) {
-        newTriangleSet.computeMinMaxEdges();
-        newTriangleSet.computeBoundingCuboid();
+    if (newSegmentSet.segments.size() != 0) {
+        newSegmentSet.computeMinMaxEdges();
+        newSegmentSet.computeBoundingCuboid();
     }
 
-    if (newTriangleSet.triangles.size() == 0 || newTriangleSet.triangles.size() == triangles.size()) {
+    if (newSegmentSet.segments.size() == 0 || newSegmentSet.segments.size() == segments.size()) {
         return 0;
     }
 
@@ -831,39 +831,39 @@ int TriangleSet<T>::cutWithPlane(Plane<T> const& plane, TriangleSet<T>& newTrian
 }
 
 template<typename T>
-int TriangleSet<T>::cutWithPlane (
-        Plane<T> const& plane, Cuboid<T> const& cuboid, TriangleSet<T>& newTriangleSet ) const
+int SegmentSet<T>::cutWithLine (
+        Line<T> const& line, Cuboid2D<T> const& cuboid, SegmentSet<T>& newSegmentSet ) const
 {
     T epsilon = getEpsilon<T>(precision);
 
-    T norm_normal = norm(plane.normal);
-    PLB_ASSERT(norm_normal > epsilon); // The cut plane normal vector cannot have zero magnitude.
-    Plane<T> newPlane;
-    newPlane.point = plane.point;
-    newPlane.normal = plane.normal / norm_normal;
+    T norm_normal = norm(line.normal);
+    PLB_ASSERT(norm_normal > epsilon); // The cut line normal vector cannot have zero magnitude.
+    Line<T> newLine;
+    newLine.point = line.point;
+    newLine.normal = line.normal / norm_normal;
 
     T norm_diagonal = norm(cuboid.upperRightCorner - cuboid.lowerLeftCorner);
     PLB_ASSERT(norm_diagonal > epsilon); // The diagonal of the cuboid cannot have zero length.
 
-    newTriangleSet.triangles.resize(0);
+    newSegmentSet.segments.resize(0);
 
-    newTriangleSet.precision = precision;
+    newSegmentSet.precision = precision;
 
-    for (pluint iTriangle = 0; iTriangle < triangles.size(); iTriangle++) {
-        Triangle const& triangle = triangles[iTriangle];
+    for (pluint iSegment = 0; iSegment < segments.size(); iSegment++) {
+        Segment const& segment = segments[iSegment];
 
-        Array<T,3> vertices[3];
-        vertices[0] = triangle[0];
-        vertices[1] = triangle[1];
-        vertices[2] = triangle[2];
+        Array<T,2> vertices[3];
+        vertices[0] = segment[0];
+        vertices[1] = segment[1];
+        vertices[2] = segment[2];
 
-        // Check if the triangle is fully contained in the cuboid.
+        // Check if the segment is fully contained in the cuboid.
         int isNotFullyContained = 0;
         for (int iVertex = 0; iVertex < 3; iVertex++) {
-            Array<T,3> diff_l;
+            Array<T,2> diff_l;
             diff_l = vertices[iVertex] - cuboid.lowerLeftCorner;
 
-            Array<T,3> diff_u;
+            Array<T,2> diff_u;
             diff_u = vertices[iVertex] - cuboid.upperRightCorner;
 
             if ((diff_l[0] < (T) 0.0 && fabs(diff_l[0]) > epsilon) ||
@@ -878,20 +878,20 @@ int TriangleSet<T>::cutWithPlane (
         }
 
         if (isNotFullyContained) {
-            newTriangleSet.triangles.push_back(triangle);
+            newSegmentSet.segments.push_back(segment);
             continue;
         }
 
-        if (cutTriangleWithPlane(newPlane, triangle, newTriangleSet) == -1)
+        if (cutSegmentWithLine(newLine, segment, newSegmentSet) == -1)
             return -1;
     }
 
-    if (newTriangleSet.triangles.size() != 0) {
-        newTriangleSet.computeMinMaxEdges();
-        newTriangleSet.computeBoundingCuboid();
+    if (newSegmentSet.segments.size() != 0) {
+        newSegmentSet.computeMinMaxEdges();
+        newSegmentSet.computeBoundingCuboid();
     }
 
-    if (newTriangleSet.triangles.size() == 0 || newTriangleSet.triangles.size() == triangles.size()) {
+    if (newSegmentSet.segments.size() == 0 || newSegmentSet.segments.size() == segments.size()) {
         return 0;
     }
 
@@ -899,9 +899,9 @@ int TriangleSet<T>::cutWithPlane (
 }
 
 template<typename T>
-void TriangleSet<T>::computeMinMaxEdges() {
+void SegmentSet<T>::computeMinMaxEdges() {
     T nextMin, nextMax;
-    for (pluint i=0; i<triangles.size(); ++i) {
+    for (pluint i=0; i<segments.size(); ++i) {
         computeMinMaxEdge(i, nextMin, nextMax);
         minEdgeLength = std::min(minEdgeLength, nextMin);
         maxEdgeLength = std::max(maxEdgeLength, nextMax);
@@ -909,36 +909,34 @@ void TriangleSet<T>::computeMinMaxEdges() {
 }
 
 template<typename T>
-void TriangleSet<T>::computeMinMaxEdge(pluint iTriangle, T& minEdge, T& maxEdge) const {
-    PLB_ASSERT( iTriangle<triangles.size() );
-    Triangle const& triangle = triangles[iTriangle];
-    T edge1 = norm(triangle[1]-triangle[0]);
-    T edge2 = norm(triangle[2]-triangle[1]);
-    T edge3 = norm(triangle[0]-triangle[2]);
+void SegmentSet<T>::computeMinMaxEdge(pluint iSegment, T& minEdge, T& maxEdge) const {
+    PLB_ASSERT( iSegment<segments.size() );
+    Segment const& segment = segments[iSegment];
+    T edge1 = norm(segment[1]-segment[0]);
+    T edge2 = norm(segment[2]-segment[1]);
+    T edge3 = norm(segment[0]-segment[2]);
     minEdge = std::min(edge1, std::min(edge2, edge3));
     maxEdge = std::max(edge1, std::max(edge2, edge3));
 }
 
 template<typename T>
-void TriangleSet<T>::computeBoundingCuboid() {
-    T xMin, yMin, zMin;
-    T xMax, yMax, zMax;
+void SegmentSet<T>::computeBoundingCuboid() {
+    T xMin, yMin;
+    T xMax, yMax;
 
-    xMin = yMin = zMin =  std::numeric_limits<T>::max();
-    xMax = yMax = zMax = -std::numeric_limits<T>::max();
-    for (pluint i=0; i<triangles.size(); ++i) {
-        Triangle const& triangle = triangles[i];
+    xMin = yMin  =  std::numeric_limits<T>::max();
+    xMax = yMax  = -std::numeric_limits<T>::max();
+    for (pluint i=0; i<segments.size(); ++i) {
+        Segment const& segment = segments[i];
 
-        xMin = std::min(xMin, std::min(triangle[0][0], std::min(triangle[1][0], triangle[2][0])));
-        yMin = std::min(yMin, std::min(triangle[0][1], std::min(triangle[1][1], triangle[2][1])));
-        zMin = std::min(zMin, std::min(triangle[0][2], std::min(triangle[1][2], triangle[2][2])));
+        xMin = std::min(xMin, std::min(segment[0][0], segment[1][0]));
+        yMin = std::min(yMin, std::min(segment[0][1], segment[1][1]));
 
-        xMax = std::max(xMax, std::max(triangle[0][0], std::max(triangle[1][0], triangle[2][0])));
-        yMax = std::max(yMax, std::max(triangle[0][1], std::max(triangle[1][1], triangle[2][1])));
-        zMax = std::max(zMax, std::max(triangle[0][2], std::max(triangle[1][2], triangle[2][2])));
+        xMax = std::max(xMax, std::max(segment[0][0], segment[1][0]));
+        yMax = std::max(yMax, std::max(segment[0][1], segment[1][1]));
     }
-    boundingCuboid.lowerLeftCorner  = Array<T,3>(xMin, yMin, zMin);
-    boundingCuboid.upperRightCorner = Array<T,3>(xMax, yMax, zMax);
+    boundingCuboid.lowerLeftCorner  = Array<T,2>(xMin, yMin);
+    boundingCuboid.upperRightCorner = Array<T,2>(xMax, yMax);
 }
 
 } // namespace plb

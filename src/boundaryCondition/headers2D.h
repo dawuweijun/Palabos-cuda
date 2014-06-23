@@ -41,6 +41,7 @@
 #include "boundaryCondition/neumannCondition2D.h"
 #include "boundaryCondition/bounceBackModels.h"
 #include "boundaryCondition/bounceBackModels2D.h"
+#include "boundaryCondition/spongeZones2D.h"
 
 #ifndef PLB_BGP
 #include "boundaryCondition/generalizedBoundaryDynamics.h"

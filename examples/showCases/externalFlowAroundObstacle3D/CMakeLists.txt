@@ -1,0 +1,2 @@
+add_executable(externalFlowAroundObstacle3D externalFlowAroundObstacle.cpp)
+target_link_libraries(externalFlowAroundObstacle3D Palabos)

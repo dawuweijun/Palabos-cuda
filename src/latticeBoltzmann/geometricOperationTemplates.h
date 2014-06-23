@@ -473,6 +473,22 @@ Array<T,3> crossProduct(Array<T,3> const& u1, Array<T,3> const& u2)
     return result;
 }
 
+template <typename T>
+void crossProduct(Array<T,2> const& u1, Array<T,2> const& u2, Array<T,2>& result)
+{
+    result[0] = -u1[1]*u2[0];
+    result[1] = u1[0]*u2[1];
+}
+
+template <typename T>
+Array<T,2> crossProduct(Array<T,2> const& u1, Array<T,2> const& u2)
+{
+    Array<T,2> result;
+    crossProduct(u1, u2, result);
+
+    return result;
+}
+
 /// Scalar product between two vectors.
 template<typename T, pluint n>
 T dot(Array<T,n> const& v1, Array<T,n> const& v2) {
