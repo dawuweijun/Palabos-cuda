@@ -41,8 +41,8 @@ namespace plb {
 
 template<typename T, template<typename U> class Descriptor>
 ViscositySpongeZone2D<T,Descriptor>::ViscositySpongeZone2D(plint nx_, plint ny_, T bulkOmega_,
-        Array<plint,6> const& numSpongeCells_, Array<T,6> const& translationParameters_,
-        Array<T,6> const& scaleParameters_)
+        Array<plint,4> const& numSpongeCells_, Array<T,4> const& translationParameters_,
+        Array<T,4> const& scaleParameters_)
         : nx(ny_),
           ny(ny_),
           bulkOmega(bulkOmega_),
@@ -51,14 +51,14 @@ ViscositySpongeZone2D<T,Descriptor>::ViscositySpongeZone2D(plint nx_, plint ny_,
           scaleParameters(scaleParameters_),
           useTanhSpongeFunction(true)
 {
-    for (int i = 0; i < 6; i++) {
+    for (int i = 0; i < 4; i++) {
         PLB_ASSERT(translationParameters[i] > (T) 0 && translationParameters[i] < (T) 1);
     }
 }
 
 template<typename T, template<typename U> class Descriptor>
 ViscositySpongeZone2D<T,Descriptor>::ViscositySpongeZone2D(plint nx_, plint ny_, T bulkOmega_,
-        Array<plint,6> const& numSpongeCells_)
+        Array<plint,4> const& numSpongeCells_)
         : nx(nx_),
           ny(ny_),
           bulkOmega(bulkOmega_),
@@ -79,24 +79,21 @@ void ViscositySpongeZone2D<T,Descriptor>::processGenericBlocks(Box2D domain, std
 
     T alpha = targetOmega / bulkOmega;
 
-    plint spongePositions[6]; // Sponge positions.
+    plint spongePositions[4]; // Sponge positions.
     spongePositions[0] =          numSpongeCells[0];
     spongePositions[1] = nx - 1 - numSpongeCells[1];
     spongePositions[2] =          numSpongeCells[2];
     spongePositions[3] = ny - 1 - numSpongeCells[3];
-    spongePositions[4] =          numSpongeCells[4];
 
     if (useTanhSpongeFunction) {
-        plint spongeCenters[6]; // Sponge centers.
+        plint spongeCenters[4]; // Sponge centers.
         spongeCenters[0] = util::roundToInt(((T) 1             - translationParameters[0]) * numSpongeCells[0]);
         spongeCenters[1] = util::roundToInt(spongePositions[1] + translationParameters[1]  * numSpongeCells[1]);
         spongeCenters[2] = util::roundToInt(((T) 1             - translationParameters[2]) * numSpongeCells[2]);
         spongeCenters[3] = util::roundToInt(spongePositions[3] + translationParameters[3]  * numSpongeCells[3]);
-        spongeCenters[4] = util::roundToInt(((T) 1             - translationParameters[4]) * numSpongeCells[4]);
-        spongeCenters[5] = util::roundToInt(spongePositions[5] + translationParameters[5]  * numSpongeCells[5]);
 
-        T sigma[6]; // Sponge parameters.
-        for (int i = 0; i < 6; i++) {
+        T sigma[4]; // Sponge parameters.
+        for (int i = 0; i < 4; i++) {
             sigma[i] = scaleParameters[i] * numSpongeCells[i];
         }
 
@@ -173,8 +170,8 @@ void ViscositySpongeZone2D<T,Descriptor>::processGenericBlocks(Box2D domain, std
 
 template<typename T, template<typename U> class Descriptor>
 SmagorinskySpongeZone2D<T,Descriptor>::SmagorinskySpongeZone2D(plint nx_, plint ny_, T bulkCSmago_, T targetCSmago_,
-        Array<plint,6> const& numSpongeCells_, Array<T,6> const& translationParameters_,
-        Array<T,6> const& scaleParameters_)
+        Array<plint,4> const& numSpongeCells_, Array<T,4> const& translationParameters_,
+        Array<T,4> const& scaleParameters_)
         : nx(nx_),
           ny(ny_),
           bulkCSmago(bulkCSmago_),
@@ -184,14 +181,14 @@ SmagorinskySpongeZone2D<T,Descriptor>::SmagorinskySpongeZone2D(plint nx_, plint 
           scaleParameters(scaleParameters_),
           useTanhSpongeFunction(true)
 {
-    for (int i = 0; i < 6; i++) {
+    for (int i = 0; i < 4; i++) {
         PLB_ASSERT(translationParameters[i] > (T) 0 && translationParameters[i] < (T) 1);
     }
 }
 
 template<typename T, template<typename U> class Descriptor>
 SmagorinskySpongeZone2D<T,Descriptor>::SmagorinskySpongeZone2D(plint nx_, plint ny_, T bulkCSmago_, T targetCSmago_,
-        Array<plint,6> const& numSpongeCells_)
+        Array<plint,4> const& numSpongeCells_)
         : nx(nx_),
           ny(ny_),
           bulkCSmago(bulkCSmago_),
@@ -199,7 +196,7 @@ SmagorinskySpongeZone2D<T,Descriptor>::SmagorinskySpongeZone2D(plint nx_, plint 
           numSpongeCells(numSpongeCells_),
           useTanhSpongeFunction(false)
 {
-    for (int i = 0; i < 6; i++) {
+    for (int i = 0; i < 4; i++) {
         numSpongeCells[i] = numSpongeCells_[i];
     }
 }
@@ -223,16 +220,14 @@ void SmagorinskySpongeZone2D<T,Descriptor>::processGenericBlocks(Box2D domain, s
     spongePositions[3] = ny - 1 - numSpongeCells[3];
 
     if (useTanhSpongeFunction) {
-        plint spongeCenters[6]; // Sponge centers.
+        plint spongeCenters[4]; // Sponge centers.
         spongeCenters[0] = util::roundToInt(((T) 1             - translationParameters[0]) * numSpongeCells[0]);
         spongeCenters[1] = util::roundToInt(spongePositions[1] + translationParameters[1]  * numSpongeCells[1]);
         spongeCenters[2] = util::roundToInt(((T) 1             - translationParameters[2]) * numSpongeCells[2]);
         spongeCenters[3] = util::roundToInt(spongePositions[3] + translationParameters[3]  * numSpongeCells[3]);
-        spongeCenters[4] = util::roundToInt(((T) 1             - translationParameters[4]) * numSpongeCells[4]);
-        spongeCenters[5] = util::roundToInt(spongePositions[5] + translationParameters[5]  * numSpongeCells[5]);
 
-        T sigma[6]; // Sponge parameters.
-        for (int i = 0; i < 6; i++) {
+        T sigma[4]; // Sponge parameters.
+        for (int i = 0; i < 4; i++) {
             sigma[i] = scaleParameters[i] * numSpongeCells[i];
         }
 

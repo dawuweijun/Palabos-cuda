@@ -49,12 +49,12 @@ public:
     //   Nice value for the translation parameters is 0.5.
     //   Nice value for the scale parameters is 0.12.
     ViscositySpongeZone2D(plint nx_, plint ny_, T bulkOmega_,
-            Array<plint,6> const& numSpongeCells_, Array<T,6> const& translationParameters_,
-            Array<T,6> const& scaleParameters_);
+            Array<plint,4> const& numSpongeCells_, Array<T,4> const& translationParameters_,
+            Array<T,4> const& scaleParameters_);
 
     // Constructor for the cos sponge function.
     ViscositySpongeZone2D(plint nx_, plint ny_, T bulkOmega_,
-                        Array<plint,6> const& numSpongeCells_);
+                        Array<plint,4> const& numSpongeCells_);
 
     virtual void processGenericBlocks(Box2D domain, std::vector<AtomicBlock2D*> blocks);
 
@@ -70,9 +70,9 @@ public:
 private:
     plint nx, ny;                  // Lattice dimensions.
     T bulkOmega;                       // Value of the relaxation parameter outside of the sponge zone.
-    Array<plint,6> numSpongeCells;     // Width of the sponge zones.
-    Array<T,6> translationParameters;  // Translation parameters of the tanh sponge functions.
-    Array<T,6> scaleParameters;        // Scaling parameters of the tanh sponge functions.
+    Array<plint,4> numSpongeCells;     // Width of the sponge zones.
+    Array<T,4> translationParameters;  // Translation parameters of the tanh sponge functions.
+    Array<T,4> scaleParameters;        // Scaling parameters of the tanh sponge functions.
     bool useTanhSpongeFunction;        // Use a tanh sponge function, or a cos sponge function.
 };
 
@@ -91,12 +91,12 @@ public:
     //   Nice value for the translation parameters is 0.5.
     //   Nice value for the scale parameters is 0.12.
     SmagorinskySpongeZone2D(plint nx_, plint ny_, T bulkCSmago_, T targetCSmago_,
-            Array<plint,6> const& numSpongeCells_, Array<T,6> const& translationParameters_,
-            Array<T,6> const& scaleParameters_);
+            Array<plint,4> const& numSpongeCells_, Array<T,4> const& translationParameters_,
+            Array<T,4> const& scaleParameters_);
 
     // Constructor for the cos sponge function.
     SmagorinskySpongeZone2D(plint nx_, plint ny_, T bulkCSmago_, T targetCSmago_,
-            Array<plint,6> const& numSpongeCells_);
+            Array<plint,4> const& numSpongeCells_);
 
     virtual void processGenericBlocks(Box2D domain, std::vector<AtomicBlock2D*> blocks);
 
@@ -112,9 +112,9 @@ public:
 private:
     plint nx, ny;                  // Lattice dimensions.
     T bulkCSmago, targetCSmago;        // Varying parameter: bulk and target values.
-    Array<plint,6> numSpongeCells;     // Width of the sponge zones.
-    Array<T,6> translationParameters;  // Translation parameters of the tanh sponge functions.
-    Array<T,6> scaleParameters;        // Scaling parameters of the tanh sponge functions.
+    Array<plint,4> numSpongeCells;     // Width of the sponge zones.
+    Array<T,4> translationParameters;  // Translation parameters of the tanh sponge functions.
+    Array<T,4> scaleParameters;        // Scaling parameters of the tanh sponge functions.
     bool useTanhSpongeFunction;        // Use a tanh sponge function, or a cos sponge function.
 };
 

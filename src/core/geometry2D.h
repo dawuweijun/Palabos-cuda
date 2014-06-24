@@ -350,12 +350,12 @@ inline void adjustEqualSize(Box2D& fromDomain, Box2D& toDomain)
 
 /// Definition of a 2D unbounded line.
 template<typename T>
-struct Line {
-    Line(Array<T,2> point_, Array<T,2> normal_)
+struct Line2D {
+    Line2D(Array<T,2> point_, Array<T,2> normal_)
         : point(point_),
           normal(normal_)
     { }
-    Line() {
+    Line2D() {
         point.resetToZero();
         normal.resetToZero();
     }
@@ -386,7 +386,7 @@ struct Cuboid2D {
 ///   it, and 0 otherwise.
 template<typename T>
 inline int lineIntersectionWithLine (
-        Line<T> const& line, Array<T,2> const& point1,
+        Line2D<T> const& line, Array<T,2> const& point1,
         Array<T,2> const& point2, Precision precision, Array<T,2>& intersection )
 {
     T epsilon = getEpsilon<T>(precision);

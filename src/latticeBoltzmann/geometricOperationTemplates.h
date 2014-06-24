@@ -594,7 +594,22 @@ Array<T,3> rotateAtOrigin(Array<T,3> const& p, Array<T,3> const& normedAxis, T t
 
     return q2;
 }
+
+template<typename T>
+Array<T,2> rotateAtOrigin2D(Array<T,2> const& p, T theta) {
+
+    Array<T,2> q1;
+    // Perform desired rotation.
+    T ct = cos(theta);
+    T st = sin(theta);
+    
+    q1[0]=ct*p[0]-st*p[1];
+    q1[0]=ct*p[0]+st*p[1];
+    
+    return q1;
+}
   
 }  // namespace plb
 
 #endif
+

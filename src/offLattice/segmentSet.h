@@ -48,11 +48,11 @@ public:
     Precision getPrecision() const { return precision; }
     void setPrecision(Precision precision_);
 
-    /// Translate the triangle set surface mesh.
+    /// Translate the Segment set polygon mesh.
     void translate(Array<T,2> const& vector);
-    /// Scale the triangle set surface mesh.
+    /// Scale the segment set polygon mesh.
     void scale(T alpha);
-    /// Rotate the triangle set surface mesh.
+    /// Rotate the segment set polygon mesh.
     ///   The arguments of this function are the Euler angles in radians.
     ///   The so-called "x-convention" is used, in which the rotation is
     ///   given by the three angles (phi, theta, psi), where:
@@ -60,31 +60,30 @@ public:
     ///   2.] The second rotation is by an angle theta in [0, pi] about
     ///       the new x-axis,
     ///   3.] The third rotation is by an angle psi about the new z-axis.
-    void rotate(T phi, T theta, T psi);
-    void rotateAtOrigin(Array<T,2> const& normedAxis, T theta);
-
-    /// Erase the current triangle set surface mesh, and merge into it the new meshes.
+    void rotate(T theta);
+    
+    /// Erase the current segment set surface mesh, and merge into it the new meshes.
     ///   This function currently does not check for duplicate
     ///   segments in the new meshes, and does not handle
     ///   cases when the resulting merged surface mesh is
     ///   non-manifold. It is in the user's jurisdiction to
     ///   make sure that the resulting mesh is well defined.
-    ///   Practically, this can be achieved if the new triangle set
+    ///   Practically, this can be achieved if the new segment set
     ///   meshes given as arguments are mutually disjoint.
     void merge(std::vector<SegmentSet<T>*> meshes);
 
-    /// Append to the current triangle mesh, the mesh that is passed as an argument.
+    /// Append to the current segment mesh, the mesh that is passed as an argument.
     ///   This function currently does not check for duplicate
     ///   segments in the two meshes, and does not handle
     ///   cases when the resulting merged surface mesh is
     ///   non-manifold. It is in the user's jurisdiction to
     ///   make sure that the resulting mesh is well defined.
-    ///   Practically, this can be achieved if the two triangle set
+    ///   Practically, this can be achieved if the two segment set
     ///   meshes are mutually disjoint.
     void append(SegmentSet<T> const& mesh);
 
-    /// Refine the current triangle set surface mesh by splitting each
-    ///   original triangle into four smaller segments constructed by
+    /// Refine the current segment set surface mesh by splitting each
+    ///   original segment into four smaller segments constructed by
     ///   joining the middle points of the original edges. The old mesh
     ///   is deleted.
     void refine();
@@ -97,35 +96,35 @@ public:
     /// Export the mesh as an binary STL file.
     void writeBinarySTL(std::string fname) const;
 
-    /// Cut the current triangle set mesh by a plane "plane" which is
+    /// Cut the current segment set mesh by a plane "plane" which is
     ///   defined by a point and a normal. This cutting operation will
-    ///   produce a new triangle set "newSegmentSet" which is
+    ///   produce a new segment set "newSegmentSet" which is
     ///   the one that belongs to the half-space that the normal of the
     ///   cutting plane points outside of. The function returns 1 if
     ///   the cut was successful, 0 if there was no intersection between
-    ///   the original triangle set and the plane provided, and -1 if an
+    ///   the original segment set and the plane provided, and -1 if an
     ///   error occured.
-    int cutWithLine(Line<T> const& plane, SegmentSet<T>& newSegmentSet) const;
+    int cutWithLine(Line2D<T> const& plane, SegmentSet<T>& newSegmentSet) const;
 
-    /// Cut the current triangle set mesh by a plane "plane" which is
+    /// Cut the current segment set mesh by a plane "plane" which is
     ///   defined by a point and a normal and a cuboid "cuboid" which is
     ///   defined by a lower left corner and a right upper corner. This
     ///   cutting operation will cut off all segments, or parts of segments
     ///   that are fully contained in the cuboid and are positioned in
     ///   the half-space that the normal of the cutting plane points into.
     ///   Caution is needed, because this function does not use the cuboid
-    ///   to cut, but only to select parts of the original triangle set,
+    ///   to cut, but only to select parts of the original segment set,
     ///   to be then cut by the plane. Obviously, at least a part of the
     ///   cutting plane must be contained in the cuboid, for the cutting
     ///   to make any sense. If not used wisely, this function can lead to
     ///   broken STL files. The function returns 1 if the cut was successful,
-    ///   0 if there was no intersection between the original triangle set
+    ///   0 if there was no intersection between the original segment set
     ///   the plane and the cuboid provided, and -1 if an error occured.
-    int cutWithLine(Line<T> const& plane, Cuboid2D<T> const& cuboid,
+    int cutWithLine(Line2D<T> const& plane, Cuboid2D<T> const& cuboid,
             SegmentSet<T>& newSegmentSet) const;
 
-    T getMinEdgeLength() const { return minEdgeLength; }
-    T getMaxEdgeLength() const { return maxEdgeLength; }
+    T getMinEdgeLength() const { return minSegLength; }
+    T getMaxEdgeLength() const { return maxSegLength; }
 
     Cuboid2D<T> getBoundingCuboid() const { return boundingCuboid; }
 
@@ -133,26 +132,26 @@ private:
     void readSTL(std::string fname);
     void readAsciiSTL(FILE* fp);
     void readBinarySTL(FILE* fp);
-    void check(Segment& triangle, Array<T,2> const& n);
-    bool checkNoAbort(Segment& triangle, Array<T,2> const& n);
-    void computeMinMaxEdge(pluint iSegment, T& minEdge, T& maxEdge) const;
-    void computeMinMaxEdges();
+    void check(Segment& segment, Array<T,2> const& n);
+    bool checkNoAbort(Segment& segment, Array<T,2> const& n);
+    void computeSegmentLength(pluint iSegment, T& segLength) const;
+    void computeMinMaxSegments();
     void computeBoundingCuboid();
-    /// Cut the current triangle by a plane "plane" which is
+    /// Cut the current segment by a plane "plane" which is
     ///   defined by a point and a normal. This cutting operation will
-    ///   add or not one or more segments to the triangle set "newSegmentSet".
+    ///   add or not one or more segments to the segment set "newSegmentSet".
     ///   The segments added belong to the half-space that the normal of
     ///   the plane given points outside of. The function returns 1 if the
     ///   cut was successful, 0 if there was no intersection between the
-    ///   original triangle set and the plane and -1 if an error occured.
-    int cutSegmentWithLine(Line<T> const& plane, Segment const& triangle,
+    ///   original segment set and the plane and -1 if an error occured.
+    int cutSegmentWithLine(Line2D<T> const& plane, Segment const& segment,
             SegmentSet<T>& newSegmentSet) const;
 
 private:
     std::vector<Segment> segments;
-    T minEdgeLength, maxEdgeLength;
+    T minSegLength, maxSegLength;
     Cuboid2D<T> boundingCuboid;
-    /// Enumeration constant that sets the precision for triangle set checks.
+    /// Enumeration constant that sets the precision for segment set checks.
     /// Single precision (float): FLT
     /// Double precision (double): DBL
     /// Extended precision (long double): LDBL
