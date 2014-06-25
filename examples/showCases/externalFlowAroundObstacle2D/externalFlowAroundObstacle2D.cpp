@@ -85,7 +85,7 @@ struct Param
     plint initialIter;                  // Number of initial iterations until the inlet velocity reaches its final value.
 
     Box2D inlet, outlet, lateral1;      // Outer domain boundaries in lattice units.
-    Box2D lateral2, lateral3, lateral4;
+    Box2D lateral2;
 
     std::string geometry_fname;
 
@@ -163,8 +163,6 @@ struct Param
         outlet   = Box2D(nx-1,   nx-1,   0,      ny-1);
         lateral1 = Box2D(1,      nx-2,   0,      0   );
         lateral2 = Box2D(1,      nx-2,   ny-1,   ny-1);
-        lateral3 = Box2D(1,      nx-2,   1,      ny-2);
-        lateral4 = Box2D(1,      nx-2,   1,      ny-2);
     }
 
     Box2D boundingBox() const
@@ -210,8 +208,6 @@ void outerDomainBoundaries(MultiBlockLattice2D<T,DESCRIPTOR> *lattice,
 
         bc->setVelocityConditionOnBlockBoundaries(*lattice, param.lateral1, boundary::freeslip);
         bc->setVelocityConditionOnBlockBoundaries(*lattice, param.lateral2, boundary::freeslip);
-        bc->setVelocityConditionOnBlockBoundaries(*lattice, param.lateral3, boundary::freeslip);
-        bc->setVelocityConditionOnBlockBoundaries(*lattice, param.lateral4, boundary::freeslip);
 
         // The VirtualOutlet2D is a sophisticated outflow boundary condition.
         Box2D globalDomain(lattice->getBoundingBox());
@@ -269,12 +265,10 @@ void writeVTK(OffLatticeBoundaryCondition2D<T,DESCRIPTOR,Velocity>& bc, plint iT
 // Write PPM images on slices.
 void writePPM(OffLatticeBoundaryCondition2D<T,DESCRIPTOR,Velocity>& bc, plint iT)
 {
-    Box2D xSlice(param.cxLB, param.cxLB, 0,          param.ny-1);
-    Box2D ySlice(0,          param.nx-1, param.cyLB, param.cyLB);
+    Box2D Slice(0,          param.nx-1, 0,          param.ny-1);
 
     ImageWriter<T> writer("leeloo");
-    writer.writeScaledPpm(createFileName("vnorm_xslice", iT, PADDING), *bc.computeVelocityNorm(xSlice));
-    writer.writeScaledPpm(createFileName("vnorm_yslice", iT, PADDING), *bc.computeVelocityNorm(ySlice));
+    writer.writeScaledPpm(createFileName("vnorm_xslice", iT, PADDING), *bc.computeVelocityNorm(Slice));
 }
 
 void runProgram()
@@ -426,7 +420,7 @@ void runProgram()
 
     if (param.numOutletSpongeCells > 0) {
         T bulkValue;
-        Array<plint,6> numSpongeCells;
+        Array<plint,4> numSpongeCells;
 
         if (param.outletSpongeZoneType == 0) {
             pcout << "Generating an outlet viscosity sponge zone." << std::endl;
@@ -448,8 +442,6 @@ void runProgram()
         numSpongeCells[1] = param.numOutletSpongeCells;
         numSpongeCells[2] = 0;
         numSpongeCells[3] = 0;
-        numSpongeCells[4] = 0;
-        numSpongeCells[5] = 0;
 
         std::vector<MultiBlock2D*> args;
         args.push_back(lattice);

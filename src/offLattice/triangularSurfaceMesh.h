@@ -377,9 +377,9 @@ public:
 };
 
 template<typename T>
-class LidLessThan {
+class LidLessThan3D {
 public:
-    LidLessThan(plint mainDirection_, TriangularSurfaceMesh<T> const& mesh_)
+    LidLessThan3D(plint mainDirection_, TriangularSurfaceMesh<T> const& mesh_)
         : mainDirection(mainDirection_),
           mesh(mesh_)
     { }

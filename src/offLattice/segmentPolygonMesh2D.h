@@ -413,7 +413,7 @@ T toLatticeUnits (
         SegmentPolygonMesh2D<T>& mesh,
         plint resolution, plint referenceDirection );
 template<typename T>
-void toLatticeUnits (
+void toLatticeUnits2D (
         SegmentPolygonMesh2D<T>& mesh,
         plint resolution, plint referenceDirection,
         Array<T,2>& location, T& dx);

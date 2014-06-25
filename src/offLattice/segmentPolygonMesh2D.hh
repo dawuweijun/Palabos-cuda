@@ -1505,7 +1505,7 @@ Lid2D SegmentPolygonMesh2D<T>::closeHole(std::vector<plint> const& hole)
 
 
 template<typename T>
-void toLatticeUnits (
+void toLatticeUnits2D (
         SegmentPolygonMesh2D<T>& mesh,
         plint resolution, plint referenceDirection,
         Array<T,2>& location, T& dx)
@@ -1534,7 +1534,7 @@ void toLatticeUnits (
 /* ******* Lid operations ************************************************** */
 
 template<typename T>
-Array<T,2> computeBaryCenter (
+Array<T,2> computeBaryCenter2D (
         SegmentPolygonMesh2D<T> const& mesh, Lid const& lid )
 {
     Array<T,2> baryCenter; baryCenter.resetToZero();
@@ -1549,7 +1549,7 @@ Array<T,2> computeBaryCenter (
 }
 
 template<typename T>
-Array<T,2> computeGeometricCenter (
+Array<T,2> computeGeometricCenter2D (
         SegmentPolygonMesh2D<T> const& mesh, Lid const& lid )
 {
     typedef typename SegmentPolygonMesh2D<T>::Edge Edge;
@@ -1572,11 +1572,11 @@ Array<T,2> computeGeometricCenter (
 }
 
 template<typename T>
-T computeGeometricRadius (
+T computeGeometricRadius2D (
         SegmentPolygonMesh2D<T> const& mesh, Lid const& lid )
 {
     typedef typename SegmentPolygonMesh2D<T>::Edge Edge;
-    Array<T,2> center= computeGeometricCenter(mesh, lid);
+    Array<T,2> center= computeGeometricCenter2D(mesh, lid);
     T radius = T();
     T circumference = T();
     for ( plint iBoundary=0;

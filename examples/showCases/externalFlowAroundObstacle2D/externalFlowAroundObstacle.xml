@@ -11,13 +11,13 @@
     <!-- The name of the STL file that contains the representation of the obstacle. -->
     <filename> obstacle.stl </filename>
     <!-- Position of the center of the obstacle in the simulation domain. -->
-    <center> <x> 0.45 </x> <y> 0.455 </y> <z> 0.455 </z> </center>
+    <center> <x> 0.45 </x> <y> 0.455 </y></center>
     <!-- If False, the surface of the obstacle is no-slip, otherwise it is free-slip. -->
     <freeSlipWall> False </freeSlipWall>
     <!-- If False the lateral boundaries are periodic, otherwise they are free-slip. -->
     <lateralFreeSlip> False </lateralFreeSlip>
     <!-- Size of the full simulation domain. -->
-    <domain> <x> 2.95 </x> <y> 0.9 </y> <z> 0.9 </z> </domain>
+    <domain> <x> 2.95 </x> <y> 0.9 </y></domain>
 </geometry>
 
 <numerics>

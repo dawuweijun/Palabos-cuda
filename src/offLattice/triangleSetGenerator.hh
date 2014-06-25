@@ -29,6 +29,7 @@
 
 #include "core/globalDefs.h"
 #include "offLattice/triangleSetGenerator.h"
+#include "offLattice/triangularSurfaceMesh.h"
 
 namespace plb {
 
@@ -508,7 +509,7 @@ TriangleSet<T> patchTubes(TriangleSet<T> const& geometryWithOpenings, plint sort
     TriangularSurfaceMesh<T>& mesh = defMesh->getMesh();
 
     std::vector<Lid> holes = mesh.closeHoles();
-    std::sort(holes.begin(), holes.end(), LidLessThan<T>(sortDirection, mesh));
+    std::sort(holes.begin(), holes.end(), LidLessThan3D<T>(sortDirection, mesh));
 
     PLB_ASSERT( holes.size() == patchLengths.size() );
     

@@ -294,7 +294,7 @@ void DEFscaledMesh2D<T>::initialize (
     if ( resolution_!=0 )
     {
         // Convert the mesh to lattice units.
-        toLatticeUnits<T> (
+        toLatticeUnits2D<T> (
             getMesh(), resolution_, referenceDirection_, physicalLocation, dx );
 
         Array<T,2> luOffset ( location.x,location.y );
@@ -666,7 +666,7 @@ SegmentBoundary2D<T>::getInletOutlet ( plint sortDirection ) const
 {
     PLB_PRECONDITION ( topology.top() ==1 );
     std::vector<Lid2D> lids_copy ( lids );
-    std::sort ( lids_copy.begin(), lids_copy.end(), LidLessThan<T> ( sortDirection, getMesh() ) );
+    std::sort ( lids_copy.begin(), lids_copy.end(), LidLessThan2D<T> ( sortDirection, getMesh() ) );
     return lids_copy;
 }
 
@@ -679,7 +679,7 @@ std::vector<plint> SegmentBoundary2D<T>::getInletOutletIds ( plint sortDirection
         segmentToOriginalLid[lids[iLid].firstSegment] = iLid;
     }
     std::vector<Lid2D> tmpLids ( lids );
-    std::sort ( tmpLids.begin(), tmpLids.end(), LidLessThan<T> ( sortDirection, getMesh() ) );
+    std::sort ( tmpLids.begin(), tmpLids.end(), LidLessThan2D<T> ( sortDirection, getMesh() ) );
     std::vector<plint> ids ( tmpLids.size() );
     for ( pluint iLid=0; iLid<tmpLids.size(); ++iLid )
     {
@@ -697,7 +697,7 @@ void SegmentBoundary2D<T>::getLidProperties (
     // Lid properties can only be computed in a closed mesh, by definition.
     PLB_PRECONDITION ( topology.top() ==1 );
     std::vector<Lid2D> tmpLids ( lids );
-    std::sort ( tmpLids.begin(), tmpLids.end(), LidLessThan<T> ( sortDirection, getMesh() ) );
+    std::sort ( tmpLids.begin(), tmpLids.end(), LidLessThan2D<T> ( sortDirection, getMesh() ) );
     normal.resize ( tmpLids.size() );
     center.resize ( tmpLids.size() );
     radius.resize ( tmpLids.size() );
