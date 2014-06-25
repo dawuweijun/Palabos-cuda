@@ -213,72 +213,20 @@ void SegmentPolygonMesh2D<T>::scale(T alpha)
 }
 
 template<typename T>
-void SegmentPolygonMesh2D<T>::rotate(T phi, T theta, T psi)
+void SegmentPolygonMesh2D<T>::rotate(T theta)
 {
-    static const T pi = acos(-1.0);
-
-    PLB_ASSERT((theta > T() || util::fpequal(theta, T(), eps0)) &&
-               (theta < pi  || util::fpequal(theta, pi, eps0)));
-
-    T a[3][3];
-    a[0][0] =  (T) 1.0;
-    a[0][1] =  (T) 0.0;
-    a[0][2] =  (T) 0.0;
-    a[1][0] =  (T) 0.0;
-    a[1][1] =  cos(theta);
-    a[1][2] = -sin(theta);
-    a[2][0] =  (T) 0.0;
-    a[2][1] =  sin(theta);
-    a[2][2] =  cos(theta);
-
-    T b[3][3];
-    b[0][0] =  cos(phi);
-    b[0][1] = -sin(phi);
-    b[0][2] =  (T) 0.0;
-    b[1][0] =  sin(phi);
-    b[1][1] =  cos(phi);
-    b[1][2] =  (T) 0.0;
-    b[2][0] =  (T) 0.0;
-    b[2][1] =  (T) 0.0;
-    b[2][2] =  (T) 1.0;
-
-    T c[3][3];
-    for (int i = 0; i < 3; i++) {
-        for (int j = 0; j < 3; j++) {
-            c[i][j] = (T) 0.0;
-            for (int k = 0; k < 3; k++) {
-                c[i][j] += a[i][k]*b[k][j];
-            }
-        }
-    }
-
-    b[0][0] =  cos(psi);
-    b[0][1] = -sin(psi);
-    b[0][2] =  (T) 0.0;
-    b[1][0] =  sin(psi);
-    b[1][1] =  cos(psi);
-    b[1][2] =  (T) 0.0;
-    b[2][0] =  (T) 0.0;
-    b[2][1] =  (T) 0.0;
-    b[2][2] =  (T) 1.0;
-
-    for (int i = 0; i < 3; i++) {
-        for (int j = 0; j < 3; j++) {
-            a[i][j] = (T) 0.0;
-            for (int k = 0; k < 3; k++) {
-                a[i][j] += b[i][k]*c[k][j];
-            }
-        }
-    }
+    T ct =cos(theta);
+    T st=cos(theta);
+    T a[2][2];
+    a[0][0] =  ct;
+    a[0][1] = -st;
+    a[1][0] =  st;
+    a[1][1] =  ct;
 
     for (plint iVertex = 0; iVertex < numVertices; iVertex++) {
-        Array<T,2> x = getVertex(iVertex);
-        for (int i = 0; i < 3; i++) {
-            getVertex(iVertex)[i] = (T) 0.0;
-            for (int j = 0; j < 3; j++) {
-                getVertex(iVertex)[i] += a[i][j]*x[j];
-            }
-        }
+      Array<T,2> x = getVertex(iVertex);
+      getVertex(iVertex)[0] = a[0][0]*x[0]+a[0][1]*x[1];
+      getVertex(iVertex)[1] = a[1][0]*x[0]+a[1][1]*x[1];
     }
 }
 

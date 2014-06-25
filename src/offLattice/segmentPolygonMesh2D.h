@@ -78,7 +78,7 @@ template<typename T>
 class SegmentPolygonMesh2D {
 public:
     /// Typedefs for backward compatibility.
-    typedef plb::Curve2D Lid2D;
+    typedef plb::Curve2D Curve2D;
     typedef plb::Edge2D Edge2D;
 public:
     /// The ownership over the parameters vertexList, emanatingEdgeList, and
@@ -141,7 +141,7 @@ public:
     ///   2.] The second rotation is by an angle theta in [0, pi] about
     ///       the new x-axis,
     ///   3.] The third rotation is by an angle psi about the new z-axis.
-    void rotate(T phi, T theta, T psi);
+    void rotate(T theta);
 
     /// Smooth the surface mesh.
     ///   The triangular surface mesh is smoothed by using a spatial
