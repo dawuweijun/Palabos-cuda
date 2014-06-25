@@ -30,6 +30,8 @@
 #include "core/globalDefs.h"
 #include "offLattice/segmentSetGenerator.h"
 #include "offLattice/segmentPolygonMesh2D.h"
+#include "offLattice/segmentBoundary2D.h"
+#include "offLattice/segmentPolygonMesh2D.h"
 
 namespace plb
 {
@@ -159,8 +161,8 @@ SegmentSet<T> patchTubes ( SegmentSet<T> const& geometryWithOpenings, plint sort
 
     std::vector<Segment> fullGeometry ( geometryWithOpenings.getSegments() );
 
-    DEFscaledMesh<T>* defMesh = new DEFscaledMesh<T> ( geometryWithOpenings );
-    TriangularSurfaceMesh<T>& mesh = defMesh->getMesh();
+    DEFscaledMesh2D<T>* defMesh = new DEFscaledMesh2D<T> ( geometryWithOpenings );
+    SegmentPolygonMesh2D<T>& mesh = defMesh->getMesh();
 
     std::vector<Lid> holes = mesh.closeHoles();
     std::sort ( holes.begin(), holes.end(), LidLessThan2D<T> ( sortDirection, mesh ) );

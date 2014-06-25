@@ -238,13 +238,13 @@ public: // Mesh usage interface.
     }
 public: // Mesh preparation interface.
     /// Get a list of all inlets and outlets (no specific sorting order).
-    std::vector<Lid2D> const& getInletOutlet() const;
+    std::vector<Curve2D> const& getInletOutlet() const;
     /// Get a list of all inlets and outlets, sorted along a given direction.
     /** This information can be used as a hint to select the boundary condition
      *    associated to each inlet/outlet. Access the variable lid.baryCenter 
      *    to know the location of a given inlet/outlet.
      **/
-    std::vector<Lid2D> getInletOutlet(plint sortDirection) const;
+    std::vector<Curve2D> getInletOutlet(plint sortDirection) const;
     template<typename DomainFunctional> plint tagDomain(DomainFunctional functional);
     template<typename DomainFunctional> plint tagDomain(DomainFunctional functional, Array<T,2> normal, T angleTolerance, plint previousTag=-1);
     std::vector<plint> getInletOutletIds(plint sortDirection) const;
@@ -276,7 +276,7 @@ private:
     ///   The tag is taken in increasing integer value according to a sorting
     ///   or the inlets/outlets along the given space direction.
     void tagInletOutlet (
-        std::vector<Lid2D> const& newLids );
+        std::vector<Curve2D> const& newLids );
     /// There may exist more than one set of vertices, for example in
     ///   case of a moving wall which has current vertex positions and
     ///   equilibrium vertex positions.
@@ -301,7 +301,7 @@ private:
     /// Vertex properties, indexed by the vertex type in vertexTagList.
     std::vector<VertexProperty2D<T>*> vertexProperties;
     /// Inlets and outlets, saved as a collection of segments.
-    std::vector<Lid2D> lids;
+    std::vector<Curve2D> lids;
     plint margin;
     Array<T,2> physicalLocation;
     T dx;

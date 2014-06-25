@@ -440,7 +440,7 @@ template<typename T>
 void SegmentBoundary2D<T>::closeHoles()
 {
     // Close the holes and assign inlets/outlets.
-    std::vector<Lid2D> newlids
+    std::vector<Curve2D> newlids
         = meshes[1].closeHoles();
 
     // Prepare the vector "segment type", which later on will inform on
@@ -653,7 +653,7 @@ void SegmentBoundary2D<T>::cloneVertexSet ( plint whichVertexSet )
 }
 
 template<typename T>
-std::vector<Lid2D> const&
+std::vector<Curve2D> const&
 SegmentBoundary2D<T>::getInletOutlet() const
 {
     PLB_PRECONDITION ( topology.top() ==1 );
@@ -661,11 +661,11 @@ SegmentBoundary2D<T>::getInletOutlet() const
 }
 
 template<typename T>
-std::vector<Lid2D>
+std::vector<Curve2D>
 SegmentBoundary2D<T>::getInletOutlet ( plint sortDirection ) const
 {
     PLB_PRECONDITION ( topology.top() ==1 );
-    std::vector<Lid2D> lids_copy ( lids );
+    std::vector<Curve2D> lids_copy ( lids );
     std::sort ( lids_copy.begin(), lids_copy.end(), LidLessThan2D<T> ( sortDirection, getMesh() ) );
     return lids_copy;
 }
@@ -678,7 +678,7 @@ std::vector<plint> SegmentBoundary2D<T>::getInletOutletIds ( plint sortDirection
     {
         segmentToOriginalLid[lids[iLid].firstSegment] = iLid;
     }
-    std::vector<Lid2D> tmpLids ( lids );
+    std::vector<Curve2D> tmpLids ( lids );
     std::sort ( tmpLids.begin(), tmpLids.end(), LidLessThan2D<T> ( sortDirection, getMesh() ) );
     std::vector<plint> ids ( tmpLids.size() );
     for ( pluint iLid=0; iLid<tmpLids.size(); ++iLid )
@@ -696,7 +696,7 @@ void SegmentBoundary2D<T>::getLidProperties (
 {
     // Lid properties can only be computed in a closed mesh, by definition.
     PLB_PRECONDITION ( topology.top() ==1 );
-    std::vector<Lid2D> tmpLids ( lids );
+    std::vector<Curve2D> tmpLids ( lids );
     std::sort ( tmpLids.begin(), tmpLids.end(), LidLessThan2D<T> ( sortDirection, getMesh() ) );
     normal.resize ( tmpLids.size() );
     center.resize ( tmpLids.size() );
@@ -704,7 +704,7 @@ void SegmentBoundary2D<T>::getLidProperties (
     for ( pluint iLid=0; iLid<tmpLids.size(); ++iLid )
     {
         normal[iLid] = computeNormal ( getMesh(), tmpLids[iLid] );
-        center[iLid] = computeBaryCenter ( getMesh(), tmpLids[iLid] );
+        center[iLid] = computeBaryCenter2D ( getMesh(), tmpLids[iLid] );
         radius[iLid] = ( T ) 0.5 * (
                            computeInnerRadius ( getMesh(), tmpLids[iLid] ) +
                            computeOuterRadius ( getMesh(), tmpLids[iLid] ) );
@@ -713,7 +713,7 @@ void SegmentBoundary2D<T>::getLidProperties (
 
 template<typename T>
 void SegmentBoundary2D<T>::tagInletOutlet (
-    std::vector<Lid2D> const& newLids )
+    std::vector<Curve2D> const& newLids )
 {
     // Inlet/Outlet can only be set for a closed mesh, by definition.
     PLB_PRECONDITION ( topology.top() ==1 );
@@ -826,7 +826,7 @@ void SegmentBoundary2D<T>::assignLidVertexProperty()
 {
     // Make sure we're working with the closed mesh.
     PLB_PRECONDITION ( topology.top() ==1 );
-    std::vector<Lid2D> const& lids = getInletOutlet();
+    std::vector<Curve2D> const& lids = getInletOutlet();
     if ( lids.empty() ) return;
 
     if ( vertexTagList.empty() )
@@ -1304,7 +1304,7 @@ void VoxelizedDomain2D<T>::reCreateSegmentHash (
     //   This is a necessary and sufficient information because
     //   all segments connected to the barycenters are non-parallel,
     //   and all non-parallel segments are connected to a barycenter.
-    std::vector<Lid2D> const& lids = boundary.getInletOutlet();
+    std::vector<Curve2D> const& lids = boundary.getInletOutlet();
     plint numLids = ( plint ) lids.size();
     std::vector<plint> lidBaryCenters ( numLids );
     for ( plint iLid=0; iLid<numLids; ++iLid )

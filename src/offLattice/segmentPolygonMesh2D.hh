@@ -1343,9 +1343,9 @@ void SegmentPolygonMesh2D<T>::reverseOrientation()
 }
 
 template<typename T>
-std::vector<Lid2D> SegmentPolygonMesh2D<T>::closeHoles() {
+std::vector<Curve2D> SegmentPolygonMesh2D<T>::closeHoles() {
     std::vector<std::vector<plint> > holes = detectHoles();
-    std::vector<Lid2D> lids(holes.size());
+    std::vector<Curve2D> lids(holes.size());
     for (pluint iHole=0; iHole<holes.size(); ++iHole) {
         lids[iHole] = closeHole(holes[iHole]);
     }
@@ -1434,7 +1434,7 @@ std::vector<std::vector<plint> >
 }
 
 template<typename T>
-Lid2D SegmentPolygonMesh2D<T>::closeHole(std::vector<plint> const& hole)
+Curve2D SegmentPolygonMesh2D<T>::closeHole(std::vector<plint> const& hole)
 {
     plint numHoleVertices = (plint) hole.size();
 
@@ -1495,7 +1495,7 @@ Lid2D SegmentPolygonMesh2D<T>::closeHole(std::vector<plint> const& hole)
     avoidIntegerPosition(iCenter);
 
     // 4. Keep track of the newly created triangles with help of a "Lid" structure.
-    Lid2D lid;
+    Curve2D lid;
     lid.firstSegment = firstAddedEdge/3;
     lid.numSegments = numHoleVertices;
     lid.boundaryVertices = hole;
@@ -1531,11 +1531,11 @@ void toLatticeUnits2D (
 }
 
 
-/* ******* Lid operations ************************************************** */
+/* ******* Curve2Doperations ************************************************** */
 
 template<typename T>
 Array<T,2> computeBaryCenter2D (
-        SegmentPolygonMesh2D<T> const& mesh, Lid const& lid )
+        SegmentPolygonMesh2D<T> const& mesh, Curve2D const& lid )
 {
     Array<T,2> baryCenter; baryCenter.resetToZero();
     for ( plint iBoundary=0;
@@ -1550,7 +1550,7 @@ Array<T,2> computeBaryCenter2D (
 
 template<typename T>
 Array<T,2> computeGeometricCenter2D (
-        SegmentPolygonMesh2D<T> const& mesh, Lid const& lid )
+        SegmentPolygonMesh2D<T> const& mesh, Curve2D const& lid )
 {
     typedef typename SegmentPolygonMesh2D<T>::Edge Edge;
     Array<T,2> center; center.resetToZero();
@@ -1573,7 +1573,7 @@ Array<T,2> computeGeometricCenter2D (
 
 template<typename T>
 T computeGeometricRadius2D (
-        SegmentPolygonMesh2D<T> const& mesh, Lid const& lid )
+        SegmentPolygonMesh2D<T> const& mesh, Curve2D const& lid )
 {
     typedef typename SegmentPolygonMesh2D<T>::Edge Edge;
     Array<T,2> center= computeGeometricCenter2D(mesh, lid);
@@ -1597,11 +1597,11 @@ T computeGeometricRadius2D (
 
 template<typename T>
 void computeBoundingBox (
-        SegmentPolygonMesh2D<T> const& mesh, Lid const& lid,
-        Array<T,2>& xLim, Array<T,2>& yLim, Array<T,2>& zLim )
+        SegmentPolygonMesh2D<T> const& mesh, Curve2D const& lid,
+        Array<T,2>& xLim, Array<T,2>& yLim )
 {
-    xLim[0] = yLim[0] = zLim[0] = std::numeric_limits<T>::max();
-    xLim[1] = yLim[1] = zLim[1] = std::numeric_limits<T>::min();
+    xLim[0] = yLim[0] = std::numeric_limits<T>::max();
+    xLim[1] = yLim[1] = std::numeric_limits<T>::min();
     for ( plint iBoundary=0;
           iBoundary<(plint)lid.boundaryVertices.size(); ++iBoundary )
     {
@@ -1611,14 +1611,12 @@ void computeBoundingBox (
         xLim[1] = std::max(xLim[1], vertex[0]);
         yLim[0] = std::min(yLim[0], vertex[1]);
         yLim[1] = std::max(yLim[1], vertex[1]);
-        zLim[0] = std::min(zLim[0], vertex[2]);
-        zLim[1] = std::max(zLim[1], vertex[2]);
     }
 }
 
 template<typename T>
 T computeInnerRadius (
-        SegmentPolygonMesh2D<T> const& mesh, Lid const& lid )
+        SegmentPolygonMesh2D<T> const& mesh, Curve2D const& lid )
 {
     if (lid.boundaryVertices.empty()) {
         return T();
@@ -1639,7 +1637,7 @@ T computeInnerRadius (
 
 template<typename T>
 T computeOuterRadius (
-        SegmentPolygonMesh2D<T> const& mesh, Lid const& lid )
+        SegmentPolygonMesh2D<T> const& mesh, Curve2D const& lid )
 {
     if (lid.boundaryVertices.empty()) {
         return T();
@@ -1657,10 +1655,10 @@ T computeOuterRadius (
         return innerRadius;
     }
 }
-
+/*
 template<typename T>
 T computeArea (
-        SegmentPolygonMesh2D<T> const& mesh, Lid const& lid )
+        SegmentPolygonMesh2D<T> const& mesh, Curve2D const& lid )
 {
     T area = T();
     plint numVertices = (plint)lid.boundaryVertices.size();
@@ -1673,10 +1671,10 @@ T computeArea (
     }
     return area;
 }
-
+*/
 template<typename T>
 Array<T,2> computeNormal (
-        SegmentPolygonMesh2D<T> const& mesh, Lid const& lid )
+        SegmentPolygonMesh2D<T> const& mesh, Curve2D const& lid )
 {
     return mesh.computeVertexNormal(lid.centerVertex);
 }
@@ -1684,7 +1682,7 @@ Array<T,2> computeNormal (
 
 template<typename T>
 void reCenter (
-        SegmentPolygonMesh2D<T>& mesh, Lid const& lid )
+        SegmentPolygonMesh2D<T>& mesh, Curve2D const& lid )
 {
     Array<T,2> newCenter = computeBaryCenter(mesh,lid);
     mesh.replaceVertex(lid.centerVertex, newCenter);
@@ -1694,7 +1692,7 @@ void reCenter (
 template<typename T>
 void SegmentPolygonMesh2D<T>::writeHTML(std::string fname)
 {
-    writeHTML(fname, "Palabos html output", T(), Array<T,2>(0.,0.,0.));
+    writeHTML(fname, "Palabos html output", T(), Array<T,2>(0.,0.));
 }
 
 template<typename T>
@@ -1712,21 +1710,17 @@ void SegmentPolygonMesh2D<T>::writeHTML (
         posVect[i] = (*vertexList)[i];
         if (posVect[i][0]<minPos[0]) minPos[0] = posVect[i][0];
         if (posVect[i][1]<minPos[1]) minPos[1] = posVect[i][1];
-        if (posVect[i][2]<minPos[2]) minPos[2] = posVect[i][2];
         if (posVect[i][0]>maxPos[0]) maxPos[0] = posVect[i][0];
         if (posVect[i][1]>maxPos[1]) maxPos[1] = posVect[i][1];
-        if (posVect[i][2]>maxPos[2]) maxPos[2] = posVect[i][2];
     }
 
     T diffx = maxPos[0]-minPos[0];
     T diffy = maxPos[1]-minPos[1];
-    T diffz = maxPos[2]-minPos[2];
-    T diff = std::max(diffx,std::max(diffy,diffz));
+    T diff = std::max(diffx,diffy);
     T dx_nonDim = 2./diff;
     Array<T,2> offset_nonDim (
                  -(1.0+minPos[0]/diff),
-                 -(1.0+minPos[1]/diff),
-                 -(1.0+minPos[2]/diff) );
+                 -(1.0+minPos[1]/diff) );
     for (plint i=0; i<getNumVertices(); ++i) {
         posVect[i] *= dx_nonDim;
         posVect[i] += offset_nonDim;
@@ -1748,8 +1742,7 @@ void SegmentPolygonMesh2D<T>::writeHTML (
     ofile << "            var scale = " << std::setprecision(5) << dx_ndToPhys << ";\n";
     ofile << "            var offset = new Array(" << std::setprecision(5)
           << location_ndToPhys[0] << ","
-          << location_ndToPhys[1] << ","
-          << location_ndToPhys[2] << ");\n";
+          << location_ndToPhys[1] << ");\n";
     ofile << "        </script>\n";
     ofile << "    </head>\n";
     ofile << "    <x3d style=\"width: 100%; height :100%\">\n";
@@ -1760,15 +1753,13 @@ void SegmentPolygonMesh2D<T>::writeHTML (
     for (plint iSegment=0; iSegment<getNumSegments(); ++iSegment) {
         plint i0 = getVertexId(iSegment, 0);
         plint i1 = getVertexId(iSegment, 1);
-        plint i2 = getVertexId(iSegment, 2);
-        ofile << i0 << " " << i1 << " " << i2 << " ";
+        ofile << i0 << " " << i1 << " ";
     }
     ofile << "\" solid=\"false\">\n";
     ofile << "            <coordinate point=\"";
     for (plint iVertex=0; iVertex<getNumVertices(); ++iVertex) {
         ofile << posVect[iVertex][0] << " "
-              << posVect[iVertex][1] << " "
-              << posVect[iVertex][2];
+              << posVect[iVertex][1];
         if (iVertex < getNumVertices()-1) {
             ofile << " ";
         }
@@ -1778,8 +1769,7 @@ void SegmentPolygonMesh2D<T>::writeHTML (
     for (plint iVertex=0; iVertex<getNumVertices(); ++iVertex) {
         Array<T,2> normal = computeVertexNormal(iVertex);
         ofile << normal[0] << " "
-              << normal[1] << " "
-              << normal[2];
+              << normal[1];
         if (iVertex < getNumVertices()-1) {
             ofile << " ";
         }
@@ -1787,7 +1777,7 @@ void SegmentPolygonMesh2D<T>::writeHTML (
     ofile << "\"> </normal>\n";
     ofile << "            </indexedtriangleset>\n";
     ofile << "            </shape>\n";
-    ofile << "            <viewpoint position=\'0.0 0.0 4.0\' orientation=\'0.0 0.0 0.0 0.0\'></viewpoint>\n";
+    ofile << "            <viewpoint position=\'0.0 0.0\' orientation=\'0.0 0.0 0.0 0.0\'></viewpoint>\n";
     ofile << "        </scene>\n";
     ofile << "    </x3d>\n";
     ofile << "</html>\n";

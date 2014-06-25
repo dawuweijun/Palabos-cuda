@@ -43,13 +43,13 @@ struct Edge2D {
 
 /// Refers to a lid, i.e. a collection of segments, constructed
 ///   by filling a hole in the mesh.
-struct Lid2D {
+struct Curve2D{
     // Comment: if the close-holes algorithm is to be made more
     //   general one day, you will need to (1) assign the proper
     //   value to numAddedVertices, and (2) replace centerVertex
     //   by something else and change all codes which access
     //   centerVertex.
-    Lid2D() : numAddedVertices(1) { }
+    Curve2D() : numAddedVertices(1) { }
     plint firstSegment;
     plint numSegments;
     std::vector<plint> boundaryVertices;
@@ -78,7 +78,7 @@ template<typename T>
 class SegmentPolygonMesh2D {
 public:
     /// Typedefs for backward compatibility.
-    typedef plb::Lid2D Lid2D;
+    typedef plb::Curve2D Lid2D;
     typedef plb::Edge2D Edge2D;
 public:
     /// The ownership over the parameters vertexList, emanatingEdgeList, and
@@ -307,9 +307,9 @@ public:
     /// Detect holes in the mesh and fill each of them by creating a lid,
     ///   i.e. a collection of segments created by adding a single new
     ///   vertex at the barycenter of the hole, and connecting it radially
-    ///   with each boundary vertex of the hole. Returns a Lid structure
+    ///   with each boundary vertex of the hole. Returns a Lid2Dstructure
     ///   for each created lid.
-    std::vector<Lid2D> closeHoles();
+    std::vector<Curve2D> closeHoles();
     /// Returns, for each detected hole, a list of vertices.
     std::vector<std::vector<plint> > detectHoles();
     void avoidIntegerPositions();
@@ -361,7 +361,7 @@ private:
     }
 private:
     /// Close a single hole by creating a lid.
-    Lid2D closeHole(std::vector<plint> const& hole);
+    Curve2D closeHole(std::vector<plint> const& hole);
 private:
     plint prev(plint iEdge) const;
     plint next(plint iEdge) const;
@@ -382,7 +382,7 @@ public:
         : mainDirection(mainDirection_),
           mesh(mesh_)
     { }
-    bool operator()(Lid const& lid1, Lid const& lid2) const
+    bool operator()(Curve2D const& lid1, Curve2D const& lid2) const
     {
         plint dim1 = mainDirection;
         plint dim2 = (dim1+1)%3;
@@ -419,36 +419,37 @@ void toLatticeUnits2D (
         Array<T,2>& location, T& dx);
 
 
-/* ******* Lid operations ************************************************** */
+/* ******* Lid2Doperations ************************************************** */
 
 template<typename T>
-Array<T,2> computeBaryCenter (
-        SegmentPolygonMesh2D<T> const& mesh, Lid const& lid );
+Array<T,2> computeBaryCenter2D (
+        SegmentPolygonMesh2D<T> const& mesh, Curve2D const& lid );
 
 template<typename T>
 void computeBoundingBox (
-        SegmentPolygonMesh2D<T> const& mesh, Lid const& lid,
-        Array<T,2>& xLim, Array<T,2>& yLim, Array<T,2>& zLim );
+        SegmentPolygonMesh2D<T> const& mesh, Curve2D const& lid,
+        Array<T,2>& xLim, Array<T,2>& yLim);
 
 template<typename T>
 T computeInnerRadius (
-        SegmentPolygonMesh2D<T> const& mesh, Lid const& lid );
+        SegmentPolygonMesh2D<T> const& mesh, Curve2D const& lid );
 
 template<typename T>
 T computeOuterRadius (
-        SegmentPolygonMesh2D<T> const& mesh, Lid const& lid );
-
+        SegmentPolygonMesh2D<T> const& mesh, Curve2D const& lid );
+//TODO in 2D condition, we should compute the length of the curve
+/*
 template<typename T>
 T computeArea (
-        SegmentPolygonMesh2D<T> const& mesh, Lid const& lid );
-
+        SegmentPolygonMesh2D<T> const& mesh, Curve2D const& lid );
+*/
 template<typename T>
 Array<T,2> computeNormal (
-        SegmentPolygonMesh2D<T> const& mesh, Lid const& lid );
+        SegmentPolygonMesh2D<T> const& mesh, Curve2D const& lid );
 
 template<typename T>
 void reCenter (
-        SegmentPolygonMesh2D<T>& mesh, Lid const& lid );
+        SegmentPolygonMesh2D<T>& mesh, Curve2D const& lid );
 
 } // namespace plb
 
