@@ -1,0 +1,4 @@
+version=3
+opts=uversionmangle=s/-(RC|Linux|Windows|OSX)/~$1/g \
+     http://paraview.org/files/v(?!3\.98)(\d+\.\d*[02468])/[pP]ara[vV]iew-(\d.*?)(?:-Source)?\.(?:tgz|tbz2|tar\.(?:gz|bz2|xz))
+# Bart Martens <bartm@debian.org>  Fri, 23 Nov 2012 08:09:56 +0000

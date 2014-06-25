@@ -1,0 +1,65 @@
+Source: libpalabos
+Section: science
+Priority: extra
+Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
+XSBC-Original-Maintainer: Debian Science Team <debian-science-maintainers@lists.alioth.debian.org>
+Uploaders: Huijie Zhang <prudhomm@debian.org>
+Build-Depends: debhelper (>= 9), cmake (>= 2.6.3),
+ libtinyxml2-dev,mpi-default-dev, mpi-default-bin,
+ libeigen3-dev
+Standards-Version: 3.9.4
+Homepage: http://www.palabos.org/
+Vcs-Git: git://git.debian.org/git/debian-science/packages/palabos.git
+Vcs-Browser: http://git.debian.org/?p=debian-science/packages/palabos.git
+
+Package: libpalabos
+Architecture: any
+Depends: imagemagick,${shlibs:Depends}, ${misc:Depends}
+Suggests: paraview
+Recommends: mpi-default-bin, palabos-dev, palabos-doc
+Description: Parallel Lattice Boltzmann Simulation. Runtime libraries files.
+ Palabos is a C++ solver with wide-spread use in the lattice Boltzmann
+ community. It covers a large range of applications and specializes on
+ multi-phase flow, flow through porous media, and complex flow with 
+ chemical reactions.
+ The lattice Boltzmann method(LBM) is considered to be a powerful, modern
+ alternative to classical CFD. It models a fluid through kinetic theory
+ (a statistical theory of molecular motion) and offers computational 
+ efficiency and high resolution for complex fluids like two-phase systems.
+ The lattice Boltzmann forum offers an exchange platform for the very
+ active lattice Boltzmann community. 
+ 
+Package: palabos-dev
+Architecture: any
+Section: libdevel
+Depends: libtinyxml2-dev,${shlibs:Depends}, ${misc:Depends}, libpalabos (= ${binary:Version}),
+  libeigen3-dev,mpi-default-dev
+Recommends: qt4-dev-tools (>= 4.3.3-2)
+Description: Parallel Lattice Boltzmann Simulation. Development header files
+ Palabos is a C++ solver with wide-spread use in the lattice Boltzmann
+ community. It covers a large range of applications and specializes on
+ multi-phase flow, flow through porous media, and complex flow with 
+ chemical reactions.
+ The lattice Boltzmann method(LBM) is considered to be a powerful, modern
+ alternative to classical CFD. It models a fluid through kinetic theory
+ (a statistical theory of molecular motion) and offers computational 
+ efficiency and high resolution for complex fluids like two-phase systems.
+ The lattice Boltzmann forum offers an exchange platform for the very
+ active lattice Boltzmann community.
+
+Package: palabos-doc
+Architecture: all
+Recommends: palabos
+Section: doc
+Depends: ${misc:Depends}
+Description: Parallel Lattice Boltzmann Simulation. Comprehensive documentation
+ Palabos is a C++ solver with wide-spread use in the lattice Boltzmann
+ community. It covers a large range of applications and specializes on
+ multi-phase flow, flow through porous media, and complex flow with 
+ chemical reactions.
+ The lattice Boltzmann method(LBM) is considered to be a powerful, modern
+ alternative to classical CFD. It models a fluid through kinetic theory
+ (a statistical theory of molecular motion) and offers computational 
+ efficiency and high resolution for complex fluids like two-phase systems.
+ The lattice Boltzmann forum offers an exchange platform for the very
+ active lattice Boltzmann community.

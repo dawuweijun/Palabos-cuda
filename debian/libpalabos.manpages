@@ -1,0 +1,2 @@
+debian/manuals/man_paraview/*.1
+debian/tmp/usr/share/man/man3/*

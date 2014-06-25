@@ -1,0 +1,70 @@
+Palabos (1.4.1)
+  * Improved sponge zone outflow models for exterior flow problems. STL handling utilities.
+  --Release data: May 16, 2013 	
+
+Palabos (1.4.0)
+
+  * New module for moving boundaries. Canonic example for exterior flow problems. Improved compatibility with MPICH.
+  --Release data: May 13, 2013 	
+
+
+Palabos (1.3.0)
+
+  * New comprehensive volume-of-fluid based multi-phase framework. Bubble pressure correction model for free-surface. Bug fix in MPI communication.
+  --Release data: February 2, 2013 	
+
+
+Palabos (1.2.0)
+
+  * Combined particle-particle and particle-fluid coupling. Free-surface with surface tension and contact angle. Coupling between several free-surface models to achieve multi-phase.
+  --Release data: September 9, 2012 	
+
+Palabos (1.1.0)
+
+  * Free-Surface Model. Marching-Cube post-processing.Off-Lattice boundaries for advection-diffusion. Java interface for Palabos.
+  --Release data: February 13, 2012 	
+
+Palabos (1.0.1)
+
+  * Compilation fix of the Python interface. Renewed Code::Blocks project.
+  --Release data: October 27, 2011 	
+
+Palabos (1.0.0)
+
+  * Completely overhauled with new physics and new models, announcement of FlowKit Ltd.
+  --Release data: October 17, 2011 	
+
+Palabos (0.7.3)
+
+  * Bug fixes in Palabos-Python binding and MRT implementation
+  --Release data: November 25, 2010 	
+
+Palabos (0.7.2)
+
+  * Compilation error in voxelizer and in tutorial 2.1 fixed.
+  --Release data: August 19, 2010 	
+
+Palabos (0.7.1)
+
+  * Bug fixes, especially in Python binding
+  --Release data: August 13, 2010 	
+
+Palabos (0.7.0)
+
+  * Python interface to Palabos - Grid refinement - New multi-phase model (He/Lee)
+  --Release data: July 4, 2010 	
+
+Palabos (0.6.2)
+
+  * Bug fix for linker errors with multiple-source-file end-user programs.
+  --Release data: February 12, 2010
+
+Palabos (0.6.1)
+
+  * Hybrid-type couplings, new body force terms, and XML user input added.
+  --Release data: January 5, 2010 
+
+Palabos (0.6.0)
+
+  * This is the first Palabos release, after branching off the OpenLB hierarchy.
+  --Release data: September 27, 2009
