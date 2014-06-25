@@ -29,7 +29,7 @@
 
 #include "core/globalDefs.h"
 #include "offLattice/segmentSet.h"
-
+#include <vector>
 namespace plb {
 
 /// Create and return a sphere as a set of segments. The center and radius of the sphere
@@ -37,32 +37,10 @@ namespace plb {
 ///   must be provided as well. This number is suggestive for the resolution. The
 ///   actual number of segments can be greater than the one provided.
 template<typename T>
-SegmentSet<T> constructSphere(Array<T,2> const& center, T radius, plint minNumOfSegments);
-
-/// Create and return a circular tapered cylinder. The axis of the cylinder is parallel
-///   to the x-axis. The center of the inlet disk must be given as argument, as well as
-///   the inlet and outer radii and the length of the object. ``nAxial'' is the
-///   number of points in the axial direction before triangulation, and ``nCirc''
-///   is the number of points in the circumferential direction before triangulation.
-///   The final number of points will be 2*nAxial-1 and 2*nCirc in the axial
-///   and circumferential directions, respectively.
-template<typename T>
-SegmentSet<T> constructCylinder(Array<T,2> const& inletCenter, T inletRadius, T outletRadius,
-                                 T length, plint nAxial, plint nCirc);
+SegmentSet<T> constructCircle(Array<T,2> const& center, T radius, plint minNumOfSegments);
 
 template<typename T>
-SegmentSet<T> constructCylinder( Array<T,2> const& inletCenter, T inletRadius, T outletRadius,
-                                  T length, plint nAxial, plint nCirc,
-                                  std::vector<Array<T,2> >& inletPoints );
-
-template<typename T>
-SegmentSet<T> constructCylinder( Array<T,2> const& inletCenter, Array<T,2> const& axis,
-                                  T inletRadius, T outletRadius,
-                                  T length, plint nAxial, plint nCirc,
-                                  std::vector<Array<T,2> >& inletPoints );
-
-template<typename T>
-SegmentSet<T> constructCuboid (
+SegmentSet<T> constructCuboid2D (
         Array<T,2> const& lowerCorner, Array<T,2> const& upperCorner,
         Array<plint,3> const& nSegments );
 
@@ -72,7 +50,7 @@ SegmentSet<T> patchTubes(SegmentSet<T> const& geometryWithOpenings, plint sortDi
 
 /// Create and return a rectangle. The rectangle is on the x-y plane, and its lower left
 ///   corner is at the origin of the axes. It's sides have length "lx" and "ly", while
-///   the number of points for the triangulation are "nx" and "ny" on the x and y axis,
+///   the number of points for the segment are "nx" and "ny" on the x and y axis,
 ///   respectively. This means that the total number of segments is 2*(nx-1)*(ny-1).
 template<typename T>
 SegmentSet<T> constructRectangle(T lx, T ly, plint nx, plint ny);

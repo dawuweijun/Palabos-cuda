@@ -5,7 +5,7 @@
  * 1010 Lausanne, Switzerland
  * E-mail contact: contact@flowkit.com
  *
- * The most recent release of Palabos can be downloaded at 
+ * The most recent release of Palabos can be downloaded at
  * <http://www.palabos.org/>
  *
  * The library Palabos is free software: you can redistribute it and/or
@@ -29,606 +29,269 @@
 
 #include "core/globalDefs.h"
 #include "offLattice/segmentSetGenerator.h"
+#include "offLattice/segmentPolygonMesh2D.h"
 
-namespace plb {
+namespace plb
+{
 
 template<typename T>
-SegmentSet<T> constructSphere(Array<T,2> const& center, T radius, plint minNumOfSegments)
+SegmentSet<T> constructCircle ( Array<T,2> const& center, T radius, plint minNumOfSegments )
 {
     std::vector<typename SegmentSet<T>::Segment> segments;
 #ifdef PLB_DEBUG
     static const T eps = std::numeric_limits<T>::epsilon();
 #endif
-    PLB_ASSERT(radius > (T) 0.0 && !util::fpequal(radius, (T) 0.0, eps) &&
-               minNumOfSegments >= 8);
+    PLB_ASSERT ( radius > ( T ) 0.0 && !util::fpequal ( radius, ( T ) 0.0, eps ) &&
+                 minNumOfSegments >= 3 );
 
     // Create a triangularized unit sphere
 
     // Initial 6 vertices
 
     Array<T,2> va;
-    va[0] = (T) 1.0;
-    va[1] = (T) 0.0;
-    va[2] = (T) 0.0;
+    va[0] = ( T ) 1.0;
+    va[1] = ( T ) 0.0;
 
     Array<T,2> vb;
-    vb[0] = (T) 0.0;
-    vb[1] = (T) 1.0;
-    vb[2] = (T) 0.0;
+    vb[0] = ( T ) 0.0;
+    vb[1] = ( T ) 1.0;
 
     Array<T,2> vc;
-    vc[0] = (T) (-1.0);
-    vc[1] = (T) 0.0;
-    vc[2] = (T) 0.0;
-
-    Array<T,2> vd;
-    vd[0] = (T) 0.0;
-    vd[1] = (T) (-1.0);
-    vd[2] = (T) 0.0;
-
-    Array<T,2> ve;
-    ve[0] = (T) 0.0;
-    ve[1] = (T) 0.0;
-    ve[2] = (T) 1.0;
-
-    Array<T,2> vf;
-    vf[0] = (T) 0.0;
-    vf[1] = (T) 0.0;
-    vf[2] = (T) (-1.0);
+    vc[0] = ( T ) ( -1.0 );
+    vc[1] = ( T ) 0.0;
 
     // Initial 8 segments
 
     typename SegmentSet<T>::Segment tmp;
 
-    tmp[0] = ve;
+    tmp[0] = vc;
     tmp[1] = va;
-    tmp[2] = vb;
-    segments.push_back(tmp);
+    segments.push_back ( tmp );
 
-    tmp[0] = ve;
+    tmp[0] = va;
     tmp[1] = vb;
-    tmp[2] = vc;
-    segments.push_back(tmp);
+    segments.push_back ( tmp );
 
-    tmp[0] = ve;
+    tmp[0] = vb;
     tmp[1] = vc;
-    tmp[2] = vd;
-    segments.push_back(tmp);
-
-    tmp[0] = ve;
-    tmp[1] = vd;
-    tmp[2] = va;
-    segments.push_back(tmp);
-
-    tmp[0] = vf;
-    tmp[1] = vb;
-    tmp[2] = va;
-    segments.push_back(tmp);
-
-    tmp[0] = vf;
-    tmp[1] = vc;
-    tmp[2] = vb;
-    segments.push_back(tmp);
-
-    tmp[0] = vf;
-    tmp[1] = vd;
-    tmp[2] = vc;
-    segments.push_back(tmp);
-
-    tmp[0] = vf;
-    tmp[1] = va;
-    tmp[2] = vd;
-    segments.push_back(tmp);
+    segments.push_back ( tmp );
 
     // Perform refinement iterations
 
     plint size;
-    while ((size = segments.size()) < minNumOfSegments) {
-        for (plint i = 0; i < size; i++) {
+    while ( ( size = segments.size() ) < minNumOfSegments )
+    {
+        for ( plint i = 0; i < size; i++ )
+        {
             va = segments[i][0];
             vb = segments[i][1];
-            vc = segments[i][2];
 
-            vd = (T) 0.5 * (va + vb);
-            ve = (T) 0.5 * (vb + vc);
-            vf = (T) 0.5 * (vc + va);
+            vc = ( T ) 0.5 * ( va + vb );
 
-            vd /= norm(vd);
-            ve /= norm(ve);
-            vf /= norm(vf);
+            vc /= norm ( vc );
 
-            segments[i][0] = vd;
-            segments[i][1] = ve;
-            segments[i][2] = vf;
+            segments[i][0] = va;
+            segments[i][1] = vc;
 
-            tmp[0] = va;
-            tmp[1] = vd;
-            tmp[2] = vf;
-            segments.push_back(tmp);
-
-            tmp[0] = vd;
+            tmp[0] = vc;
             tmp[1] = vb;
-            tmp[2] = ve;
-            segments.push_back(tmp);
 
-            tmp[0] = vf;
-            tmp[1] = ve;
-            tmp[2] = vc;
-            segments.push_back(tmp);
+            segments.push_back ( tmp );
         }
     }
 
     // Scale and translate the mesh
 
-    SegmentSet<T> segmentSet(segments);
+    SegmentSet<T> segmentSet ( segments );
 
-    segmentSet.scale(radius);
-    segmentSet.translate(center);
+    segmentSet.scale ( radius );
+    segmentSet.translate ( center );
 
     return segmentSet;
 }
 
 template<typename T>
-SegmentSet<T> constructCylinder( Array<T,2> const& inletCenter, T inletRadius, T outletRadius,
-                                  T length, plint nAxial, plint nCirc,
-                                  std::vector<Array<T,2> >& inletPoints )
-{
-    static const T eps = std::numeric_limits<T>::epsilon();
-    std::vector<typename SegmentSet<T>::Segment> segments;
-    PLB_ASSERT( inletRadius > (T) 0.0 && !util::fpequal( inletRadius, (T) 0.0, eps) &&
-               outletRadius > (T) 0.0 && !util::fpequal(outletRadius, (T) 0.0, eps) &&
-                     length > (T) 0.0 && !util::fpequal(      length, (T) 0.0, eps) &&
-               nAxial >= 2 && nCirc >= 2);
-
-    inletPoints.resize(0);
-    segments.resize(0);
-
-    // Construction of the cylindrical grid and triangulation
-
-    T pi = (T) acos((T) (-1.0));
-
-    T dtheta = (T) 2.0*pi / nCirc;
-    T dx = length / (nAxial-(T)1.0);
-    T dr = (outletRadius-inletRadius) / length * dx;
-
-    T x0 = inletCenter[0];
-    T y0 = inletCenter[1];
-    T z0 = inletCenter[2];
-
-    for (plint i = 0; i < nAxial-1; i++) {
-        T x = x0 + i*dx;
-        T r = (outletRadius-inletRadius) * (x-x0) / length + inletRadius;
-        for (plint j = 0; j < nCirc; j++) {
-            T theta = j * dtheta;
-
-            Array<Array<T,2>, 4> v;
-
-            v[0][0] = x;
-            v[0][1] = y0 + r * cos(theta);
-            v[0][2] = z0 + r * sin(theta);
-
-            v[1][0] = x;
-            v[1][1] = y0 + r * cos(theta + dtheta);
-            v[1][2] = z0 + r * sin(theta + dtheta);
-
-            v[2][0] = x + dx;
-            v[2][1] = y0 + (r + dr) * cos(theta + dtheta);
-            v[2][2] = z0 + (r + dr) * sin(theta + dtheta);
-
-            v[3][0] = x + dx;
-            v[3][1] = y0 + (r + dr) * cos(theta);
-            v[3][2] = z0 + (r + dr) * sin(theta);
-
-            Array<T,2> vc;
-
-            vc[0] = x + (T) 0.5 * dx;
-            vc[1] = y0 + (r + (T) 0.5 * dr) * cos(theta + (T) 0.5 * dtheta);
-            vc[2] = z0 + (r + (T) 0.5 * dr) * sin(theta + (T) 0.5 * dtheta);
-
-            Array<Array<T,2>, 4> vce;
-
-
-            vce[0][0] = x;
-            vce[0][1] = y0 + r * cos(theta + (T) 0.5 * dtheta);
-            vce[0][2] = z0 + r * sin(theta + (T) 0.5 * dtheta);
-
-            if (i==0) {
-                inletPoints.push_back(v[0]);
-                inletPoints.push_back(vce[0]);
-            }
-
-            vce[1][0] = x + (T) 0.5 * dx;
-            vce[1][1] = y0 + (r + (T) 0.5 * dr) * cos(theta + dtheta);
-            vce[1][2] = z0 + (r + (T) 0.5 * dr) * sin(theta + dtheta);
-
-            vce[2][0] = x + dx;
-            vce[2][1] = y0 + (r + dr) * cos(theta + (T) 0.5 * dtheta);
-            vce[2][2] = z0 + (r + dr) * sin(theta + (T) 0.5 * dtheta);
-
-            vce[3][0] = x + (T) 0.5 * dx;
-            vce[3][1] = y0 + (r + (T) 0.5 * dr) * cos(theta);
-            vce[3][2] = z0 + (r + (T) 0.5 * dr) * sin(theta);
-
-            typename SegmentSet<T>::Segment tmp;
-
-            tmp[0] = vc;
-            tmp[1] = v[0];
-            tmp[2] = vce[0];
-            segments.push_back(tmp);
-
-            tmp[0] = vc;
-            tmp[1] = vce[0];
-            tmp[2] = v[1];
-            segments.push_back(tmp);
-
-            tmp[0] = vc;
-            tmp[1] = v[1];
-            tmp[2] = vce[1];
-            segments.push_back(tmp);
-
-            tmp[0] = vc;
-            tmp[1] = vce[1];
-            tmp[2] = v[2];
-            segments.push_back(tmp);
-
-            tmp[0] = vc;
-            tmp[1] = v[2];
-            tmp[2] = vce[2];
-            segments.push_back(tmp);
-
-            tmp[0] = vc;
-            tmp[1] = vce[2];
-            tmp[2] = v[3];
-            segments.push_back(tmp);
-
-            tmp[0] = vc;
-            tmp[1] = v[3];
-            tmp[2] = vce[3];
-            segments.push_back(tmp);
-
-            tmp[0] = vc;
-            tmp[1] = vce[3];
-            tmp[2] = v[0];
-            segments.push_back(tmp);
-        }
-    }
-    return SegmentSet<T>(segments);
-}
-template<typename T>
-SegmentSet<T> constructCylinder(Array<T,2> const& inletCenter, T inletRadius, T outletRadius,
-                                 T length, plint nAxial, plint nCirc)
-{
-    static const T eps = std::numeric_limits<T>::epsilon();
-    std::vector<typename SegmentSet<T>::Segment> segments;
-    PLB_ASSERT( inletRadius > (T) 0.0 && !util::fpequal( inletRadius, (T) 0.0, eps) &&
-               outletRadius > (T) 0.0 && !util::fpequal(outletRadius, (T) 0.0, eps) &&
-                     length > (T) 0.0 && !util::fpequal(      length, (T) 0.0, eps) &&
-               nAxial >= 2 && nCirc >= 2);
-
-    segments.resize(0);
-
-    // Construction of the cylindrical grid and triangulation
-
-    T pi = (T) acos((T)(-1.0));
-
-    T dtheta = (T) 2.0*pi / nCirc;
-    T dx = length / (nAxial-1.0);
-    T dr = (outletRadius-inletRadius) / length * dx;
-
-    T x0 = inletCenter[0];
-    T y0 = inletCenter[1];
-    T z0 = inletCenter[2];
-
-    for (plint i = 0; i < nAxial-1; i++) {
-        T x = x0 + i*dx;
-        T r = (outletRadius-inletRadius) * (x-x0) / length + inletRadius;
-        for (plint j = 0; j < nCirc; j++) {
-            T theta = j * dtheta;
-
-            Array<Array<T,2>, 4> v;
-
-            v[0][0] = x;
-            v[0][1] = y0 + r * cos(theta);
-            v[0][2] = z0 + r * sin(theta);
-
-            v[1][0] = x;
-            v[1][1] = y0 + r * cos(theta + dtheta);
-            v[1][2] = z0 + r * sin(theta + dtheta);
-
-            v[2][0] = x + dx;
-            v[2][1] = y0 + (r + dr) * cos(theta + dtheta);
-            v[2][2] = z0 + (r + dr) * sin(theta + dtheta);
-
-            v[3][0] = x + dx;
-            v[3][1] = y0 + (r + dr) * cos(theta);
-            v[3][2] = z0 + (r + dr) * sin(theta);
-
-            Array<T,2> vc;
-
-            vc[0] = x + (T) 0.5 * dx;
-            vc[1] = y0 + (r + (T) 0.5 * dr) * cos(theta + (T) 0.5 * dtheta);
-            vc[2] = z0 + (r + (T) 0.5 * dr) * sin(theta + (T) 0.5 * dtheta);
-
-            Array<Array<T,2>, 4> vce;
-
-            vce[0][0] = x;
-            vce[0][1] = y0 + r * cos(theta + (T) 0.5 * dtheta);
-            vce[0][2] = z0 + r * sin(theta + (T) 0.5 * dtheta);
-
-            vce[1][0] = x + (T) 0.5 * dx;
-            vce[1][1] = y0 + (r + (T) 0.5 * dr) * cos(theta + dtheta);
-            vce[1][2] = z0 + (r + (T) 0.5 * dr) * sin(theta + dtheta);
-
-            vce[2][0] = x + dx;
-            vce[2][1] = y0 + (r + dr) * cos(theta + (T) 0.5 * dtheta);
-            vce[2][2] = z0 + (r + dr) * sin(theta + (T) 0.5 * dtheta);
-
-            vce[3][0] = x + (T) 0.5 * dx;
-            vce[3][1] = y0 + (r + (T) 0.5 * dr) * cos(theta);
-            vce[3][2] = z0 + (r + (T) 0.5 * dr) * sin(theta);
-
-            typename SegmentSet<T>::Segment tmp;
-
-            tmp[0] = vc;
-            tmp[1] = v[0];
-            tmp[2] = vce[0];
-            segments.push_back(tmp);
-
-            tmp[0] = vc;
-            tmp[1] = vce[0];
-            tmp[2] = v[1];
-            segments.push_back(tmp);
-
-            tmp[0] = vc;
-            tmp[1] = v[1];
-            tmp[2] = vce[1];
-            segments.push_back(tmp);
-
-            tmp[0] = vc;
-            tmp[1] = vce[1];
-            tmp[2] = v[2];
-            segments.push_back(tmp);
-
-            tmp[0] = vc;
-            tmp[1] = v[2];
-            tmp[2] = vce[2];
-            segments.push_back(tmp);
-
-            tmp[0] = vc;
-            tmp[1] = vce[2];
-            tmp[2] = v[3];
-            segments.push_back(tmp);
-
-            tmp[0] = vc;
-            tmp[1] = v[3];
-            tmp[2] = vce[3];
-            segments.push_back(tmp);
-
-            tmp[0] = vc;
-            tmp[1] = vce[3];
-            tmp[2] = v[0];
-            segments.push_back(tmp);
-        }
-    }
-    return SegmentSet<T>(segments);
-}
-
-template<typename T>
 void addSurface (
-        Array<T,2> const& lowerCorner,
-        Array<T,2> const& delta1, plint n1, Array<T,2> const& delta2, plint n2,
-        std::vector<typename SegmentSet<T>::Segment>& segments )
+    Array<T,2> const& lowerCorner,
+    Array<T,2> const& delta1, plint n1, Array<T,2> const& delta2, plint n2,
+    std::vector<typename SegmentSet<T>::Segment>& segments )
 {
-    Array<T,2> pos1(lowerCorner);
-    for(plint i1=0; i1<n1; ++i1, pos1+=delta1) {
-        Array<T,2> pos2(pos1);
-        for(plint i2=0; i2<n2; ++i2, pos2+=delta2) {
+    Array<T,2> pos1 ( lowerCorner );
+    for ( plint i1=0; i1<n1; ++i1, pos1+=delta1 )
+    {
+        Array<T,2> pos2 ( pos1 );
+        for ( plint i2=0; i2<n2; ++i2, pos2+=delta2 )
+        {
             typename SegmentSet<T>::Segment segment;
             segment[0] = pos2;
             segment[1] = pos2+delta1;
-            segment[2] = pos2+delta2;
-            segments.push_back(segment);
+            segments.push_back ( segment );
             segment[0] += delta1+delta2;
-            std::swap(segment[1], segment[2]);
-            segments.push_back(segment);
+            std::swap ( segment[1], segment[2] );
+            segments.push_back ( segment );
         }
     }
 }
 
 template<typename T>
-SegmentSet<T> constructCuboid (
-        Array<T,2> const& lowerCorner, Array<T,2> const& upperCorner,
-        Array<plint,3> const& nSegments )
+SegmentSet<T> constructCuboid2D (
+    Array<T,2> const& lowerCorner, Array<T,2> const& upperCorner )
 {
     std::vector<typename SegmentSet<T>::Segment> segments;
-    T lx = upperCorner[0]-lowerCorner[0];
-    T ly = upperCorner[1]-lowerCorner[1];
-    T lz = upperCorner[2]-lowerCorner[2];
-    Array<T,2> deltaX(lx/(T)nSegments[0], T(), T());
-    Array<T,2> deltaY(T(), ly/(T)nSegments[1], T());
-    Array<T,2> deltaZ(T(), T(), lz/(T)nSegments[2]);
 
-    addSurface(lowerCorner,
-               deltaZ, nSegments[2], deltaY, nSegments[1], segments);
-    addSurface(lowerCorner+Array<T,2>(lx,T(),T()),
-               deltaY, nSegments[1], deltaZ, nSegments[2], segments);
+    Array< T, 2  > &pA ( lowerCorner );
+    Array< T, 2  > pB ( upperCorner[0],pA[1] );
+    Array< T, 2  > &pC ( upperCorner );
+    Array< T, 2  > pD ( pA[0],pB[1] );
 
-    addSurface(lowerCorner,
-               deltaX, nSegments[0], deltaZ, nSegments[2], segments);
-    addSurface(lowerCorner+Array<T,2>(T(),ly,T()),
-               deltaZ, nSegments[2], deltaX, nSegments[0], segments);
+    segments.push_back ( SegmentSet<T>::Segment ( pA,pB ) );
+    segments.push_back ( SegmentSet<T>::Segment ( pB,pC ) );
+    segments.push_back ( SegmentSet<T>::Segment ( pC,pD ) );
+    segments.push_back ( SegmentSet<T>::Segment ( pD,pA ) );
 
-    addSurface(lowerCorner,
-               deltaY, nSegments[1], deltaX, nSegments[0], segments);
-    addSurface(lowerCorner+Array<T,2>(T(),T(),lz),
-               deltaX, nSegments[0], deltaY, nSegments[1], segments);
-
-    return SegmentSet<T>(segments);
+    return SegmentSet<T> ( segments );
 }
 
-
 template<typename T>
-SegmentSet<T> constructCylinder( Array<T,2> const& inletCenter, Array<T,2> const& axis,
-                                  T inletRadius, T outletRadius,
-                                  T length, plint nAxial, plint nCirc,
-                                  std::vector<Array<T,2> >& inletPoints )
-{
-    SegmentSet<T> cylinder (
-            constructCylinder(Array<T,2>(T(),T(),T()), inletRadius, outletRadius,
-            length, nAxial, nCirc, inletPoints) );
-    Array<T,2> xAxis((T)1,T(),T());
-    Array<T,2> rotAxis;
-    T alignment = dot(xAxis, axis);
-    T eps = (T)100.*std::numeric_limits<T>::epsilon();
-    if (!util::fpequal(alignment, (T)1., eps)) {
-        crossProduct<T>(xAxis, axis, rotAxis);
-        rotAxis /= norm(rotAxis);
-        T angle = angleBetweenVectors(xAxis, axis);
-        cylinder.rotateAtOrigin(rotAxis, angle);
-        for (pluint i=0; i<inletPoints.size(); ++i) {
-            inletPoints[i] = rotateAtOrigin(inletPoints[i], rotAxis, angle);
-        }
-    }
-    cylinder.translate(inletCenter);
-    for (pluint i=0; i<inletPoints.size(); ++i) {
-        inletPoints[i] += inletCenter;
-    }
-    return cylinder;
-}
-
-
-template<typename T>
-SegmentSet<T> patchTubes(SegmentSet<T> const& geometryWithOpenings, plint sortDirection, std::vector<T> patchLengths)
+SegmentSet<T> patchTubes ( SegmentSet<T> const& geometryWithOpenings, plint sortDirection, std::vector<T> patchLengths )
 {
     typedef typename SegmentSet<T>::Segment Segment;
 
-    std::vector<Segment> fullGeometry( geometryWithOpenings.getSegments() );
+    std::vector<Segment> fullGeometry ( geometryWithOpenings.getSegments() );
 
-    DEFscaledMesh<T>* defMesh = new DEFscaledMesh<T>(geometryWithOpenings);
+    DEFscaledMesh<T>* defMesh = new DEFscaledMesh<T> ( geometryWithOpenings );
     TriangularSurfaceMesh<T>& mesh = defMesh->getMesh();
 
     std::vector<Lid> holes = mesh.closeHoles();
-    std::sort(holes.begin(), holes.end(), LidLessThan<T>(sortDirection, mesh));
+    std::sort ( holes.begin(), holes.end(), LidLessThan2D<T> ( sortDirection, mesh ) );
 
-    PLB_ASSERT( holes.size() == patchLengths.size() );
-    
-    for (pluint iHole=0; iHole<holes.size(); ++iHole) {
-        Array<T,2> baryCenter = computeGeometricCenter(mesh,holes[iHole]);
-        plint numHoleVertices = (plint) holes[iHole].boundaryVertices.size();
+    PLB_ASSERT ( holes.size() == patchLengths.size() );
 
-        Array<T,2> normal = computeNormal(mesh, holes[iHole]);
-        T aveRadius = computeGeometricRadius(mesh,holes[iHole]);
+    for ( pluint iHole=0; iHole<holes.size(); ++iHole )
+    {
+        Array<T,2> baryCenter = computeGeometricCenter2D ( mesh,holes[iHole] );
+        plint numHoleVertices = ( plint ) holes[iHole].boundaryVertices.size();
 
-        Array<T,2> nextCenter = baryCenter + normal*aveRadius*(T)10./(T)numHoleVertices;
+        Array<T,2> normal = computeNormal ( mesh, holes[iHole] );
+        T aveRadius = computeGeometricRadius2D ( mesh,holes[iHole] );
+
+        Array<T,2> nextCenter = baryCenter + normal*aveRadius* ( T ) 10./ ( T ) numHoleVertices;
 
         plint numInletPoints = numHoleVertices;
         bool oddNumber = numHoleVertices%2==1;
-        if (oddNumber) numInletPoints--; // Must be even for cylinder construction algorithm.
+        if ( oddNumber ) numInletPoints--; // Must be even for cylinder construction algorithm.
         std::vector<Array<T,2> > inletPoints;
         plint numPointsOnLength = numInletPoints*patchLengths[iHole]/aveRadius/8;
-        if (numPointsOnLength<3) numPointsOnLength = 3;
-        SegmentSet<T> piece = constructCylinder(nextCenter, normal, aveRadius, aveRadius, patchLengths[iHole],
-                                                 numPointsOnLength, numInletPoints/2, inletPoints);
+        if ( numPointsOnLength<3 ) numPointsOnLength = 3;
+        SegmentSet<T> piece = constructCircle ( nextCenter, normal, aveRadius, aveRadius, patchLengths[iHole],
+                                                numPointsOnLength, numInletPoints/2, inletPoints );
         std::vector<Segment> pieceSegments = piece.getSegments();
 
         plint newId = 0;
         T minDistance = std::numeric_limits<T>::max();
         plint minDistanceId = -1;
-        for (plint i=0; i<numHoleVertices; ++i) {
+        for ( plint i=0; i<numHoleVertices; ++i )
+        {
             plint iVertex = holes[iHole].boundaryVertices[i];
-            Array<T,2> p1 = mesh.getVertex(iVertex);
-            T nextDistance = norm(inletPoints[newId]-p1);
-            if (nextDistance<minDistance) {
+            Array<T,2> p1 = mesh.getVertex ( iVertex );
+            T nextDistance = norm ( inletPoints[newId]-p1 );
+            if ( nextDistance<minDistance )
+            {
                 minDistance = nextDistance;
                 minDistanceId = i;
             }
         }
         plint oldId = minDistanceId;
         plint newId_p1 = 0;
-        for (plint i=0; i<numInletPoints; ++i) {
-            plint newId_p1 = (newId+1) % numInletPoints;
+        for ( plint i=0; i<numInletPoints; ++i )
+        {
+            plint newId_p1 = ( newId+1 ) % numInletPoints;
             plint oldId_p1 = oldId-1;
-            if (oldId_p1<0) oldId_p1 = numHoleVertices-1;
+            if ( oldId_p1<0 ) oldId_p1 = numHoleVertices-1;
 
             plint oldVertex1 = holes[iHole].boundaryVertices[oldId];
             plint oldVertex2 = holes[iHole].boundaryVertices[oldId_p1];
-            Array<T,2> p1 = mesh.getVertex(oldVertex1);
+            Array<T,2> p1 = mesh.getVertex ( oldVertex1 );
             Array<T,2> p2 = inletPoints[newId];
-            Array<T,2> p3 = mesh.getVertex(oldVertex2);
+            Array<T,2> p3 = mesh.getVertex ( oldVertex2 );
             Array<T,2> p4 = inletPoints[newId_p1];
 
-            pieceSegments.push_back(Segment(p1,p3,p2));
-            pieceSegments.push_back(Segment(p2,p3,p4));
+            pieceSegments.push_back ( Segment ( p1,p3,p2 ) );
+            pieceSegments.push_back ( Segment ( p2,p3,p4 ) );
 
-            std::swap(newId, newId_p1);
-            std::swap(oldId, oldId_p1);
+            std::swap ( newId, newId_p1 );
+            std::swap ( oldId, oldId_p1 );
         }
 
-        if (oddNumber) {
+        if ( oddNumber )
+        {
             plint id_a = holes[iHole].boundaryVertices[oldId];
             plint oldId_p2 = oldId-1;
-            if (oldId_p2<0) oldId_p2 = numHoleVertices-1;
+            if ( oldId_p2<0 ) oldId_p2 = numHoleVertices-1;
             plint id_b = holes[iHole].boundaryVertices[oldId_p2];
             plint id_c = newId_p1;
-            Array<T,2> a = mesh.getVertex(id_a);
-            Array<T,2> b = mesh.getVertex(id_b);
+            Array<T,2> a = mesh.getVertex ( id_a );
+            Array<T,2> b = mesh.getVertex ( id_b );
             Array<T,2> c = inletPoints[id_c];
-            pieceSegments.push_back(Segment(a,b,c));
+            pieceSegments.push_back ( Segment ( a,b,c ) );
         }
 
 
-        fullGeometry.insert(fullGeometry.end(), pieceSegments.begin(), pieceSegments.end());
+        fullGeometry.insert ( fullGeometry.end(), pieceSegments.begin(), pieceSegments.end() );
     }
 
-    return SegmentSet<T>(fullGeometry, geometryWithOpenings.getPrecision());
+    return SegmentSet<T> ( fullGeometry, geometryWithOpenings.getPrecision() );
 }
 
 
 template<typename T>
-SegmentSet<T> constructRectangle(T lx, T ly, plint nx, plint ny)
+SegmentSet<T> constructRectangle ( T lx, T ly, plint nx, plint ny )
 {
     static const T eps = std::numeric_limits<T>::epsilon();
-    PLB_ASSERT(lx > (T) 0.0 && !util::fpequal(lx, (T) 0.0, eps) &&
-               ly > (T) 0.0 && !util::fpequal(ly, (T) 0.0, eps) &&
-               nx >= 2 && ny >= 2);
+    PLB_ASSERT ( lx > ( T ) 0.0 && !util::fpequal ( lx, ( T ) 0.0, eps ) &&
+                 ly > ( T ) 0.0 && !util::fpequal ( ly, ( T ) 0.0, eps ) &&
+                 nx >= 2 && ny >= 2 );
 
-    T dx = lx / (T) (nx - 1);
-    T dy = ly / (T) (ny - 1);
+    T dx = lx / ( T ) ( nx - 1 );
+    T dy = ly / ( T ) ( ny - 1 );
 
     std::vector<typename SegmentSet<T>::Segment> segments;
-    T z = (T) 0;
-    for (plint i = 0; i < nx; i++) {
+    T z = ( T ) 0;
+    for ( plint i = 0; i < nx; i++ )
+    {
         T x0 = i * dx;
         T x1 = x0 + dx;
-        for (plint j = 0; j < ny; j++) {
+        for ( plint j = 0; j < ny; j++ )
+        {
             T y0 = j * dy;
             T y1 = y0 + dy;
 
             Array<T,2> v0, v1, v2;
-            v0 = Array<T,2>(x0, y0, z);
-            v1 = Array<T,2>(x1, y0, z);
-            v2 = Array<T,2>(x1, y1, z);
+            v0 = Array<T,2> ( x0, y0, z );
+            v1 = Array<T,2> ( x1, y0, z );
+            v2 = Array<T,2> ( x1, y1, z );
 
             typename SegmentSet<T>::Segment tmp;
             tmp[0] = v0;
             tmp[1] = v1;
             tmp[2] = v2;
 
-            segments.push_back(tmp);
+            segments.push_back ( tmp );
 
-            v1 = Array<T,2>(x0, y1, z);
+            v1 = Array<T,2> ( x0, y1, z );
 
             tmp[1] = v2;
             tmp[2] = v1;
 
-            segments.push_back(tmp);
+            segments.push_back ( tmp );
         }
     }
 
-    return SegmentSet<T>(segments);
+    return SegmentSet<T> ( segments );
 }
 
 
 } // namespace plb
 
 #endif  // SEGMENT_SET_GENERATOR_HH
+
