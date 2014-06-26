@@ -25,6 +25,7 @@
 #ifndef BOUZIDI_OFF_LATTICE_MODEL_2D_HH
 #define BOUZIDI_OFF_LATTICE_MODEL_2D_HH
 
+#include "core/plbTimer.h"
 #include "offLattice/bouzidiOffLatticeModel2D.h"
 #include "latticeBoltzmann/geometricOperationTemplates.h"
 #include "latticeBoltzmann/externalFieldAccess.h"
@@ -47,7 +48,7 @@ BouzidiOffLatticeModel2D<T,Descriptor>::BouzidiOffLatticeModel2D (
     invAB[0] = T();
     for ( plint iPop=1; iPop<D::q; ++iPop )
     {
-        invAB[iPop] = ( T ) 1 / sqrt ( util::sqr ( D::c[iPop][0] ) +util::sqr ( D::c[iPop][1] ) +util::sqr ( D::c[iPop][2] ) );
+        invAB[iPop] = ( T ) 1 / sqrt ( util::sqr ( D::c[iPop][0] ) +util::sqr ( D::c[iPop][1] ) );
     }
 }
 
@@ -96,7 +97,7 @@ void BouzidiOffLatticeModel2D<T,Descriptor>::prepareCell (
                 bool ok =
 #endif
                     this->pointOnSurface (
-                        cellLocation+offset, Dot2D ( D::c[iPop][0],D::c[iPop][1],D::c[iPop][2] ), locatedPoint, distance,
+                        cellLocation+offset, Dot2D ( D::c[iPop][0],D::c[iPop][1] ), locatedPoint, distance,
                         wallNormal, surfaceData, bdType, iTriangle );
                 // In the following, the importance of directions is sorted wrt. how well they
                 //   are aligned with the wall normal. It is better to take the continuous normal,
@@ -209,7 +210,7 @@ void BouzidiOffLatticeModel2D<T,Descriptor>::cellCompletion (
         bool ok =
 #endif
             this->pointOnSurface (
-                boundaryNode+absoluteOffset, Dot2D ( D::c[iPop][0],D::c[iPop][1],D::c[iPop][2] ),
+                boundaryNode+absoluteOffset, Dot2D ( D::c[iPop][0],D::c[iPop][1] ),
                 wallNode, AC, wallNormal, wall_vel, bdType, id );
         PLB_ASSERT ( ok );
         T q = AC * invAB[iPop];
@@ -217,7 +218,7 @@ void BouzidiOffLatticeModel2D<T,Descriptor>::cellCompletion (
         Cell<T,Descriptor>& jCell = lattice.get ( boundaryNode.x-D::c[iPop][0],boundaryNode.y-D::c[iPop][1] );
         if ( bdType==OffBoundary::dirichlet )
         {
-            T u_ci = D::c[iPop][0]*wall_vel[0]+D::c[iPop][1]*wall_vel[1]+D::c[iPop][2]*wall_vel[2];
+            T u_ci = D::c[iPop][0]*wall_vel[0]+D::c[iPop][1]*wall_vel[1];
             if ( hasFluidNeighbor[i] )
             {
                 if ( q< ( T ) 0.5 )
@@ -258,7 +259,6 @@ void BouzidiOffLatticeModel2D<T,Descriptor>::cellCompletion (
         {
             deltaJ[0] = D::c[iPop][0]*iCell[iPop] - D::c[oppPop][0]*cell[oppPop];
             deltaJ[1] = D::c[iPop][1]*iCell[iPop] - D::c[oppPop][1]*cell[oppPop];
-            deltaJ[2] = D::c[iPop][2]*iCell[iPop] - D::c[oppPop][2]*cell[oppPop];
         }
     }
     localForce += deltaJ;

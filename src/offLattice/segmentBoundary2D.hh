@@ -26,12 +26,15 @@
 #define INNER_FLOW_BOUNDARY_2D_HH
 
 #include "core/globalDefs.h"
+#include "dataProcessors/dataInitializerWrapper2D.h"
 #include "offLattice/segmentBoundary2D.h"
 #include "offLattice/segmentPolygonMesh2D.h"
 #include "offLattice/offLatticeBoundaryProfiles2D.h"
 #include "offLattice/segmentToDef.h"
 #include "multiBlock/nonLocalTransfer2D.h"
+#include "multiBlock/defaultMultiBlockPolicy2D.h"
 #include "offLattice/makeSparse2D.h"
+#include "offLattice/voxelizer2D.h"
 #include <cmath>
 #include <limits>
 
@@ -270,7 +273,7 @@ DEFscaledMesh2D<T>::DEFscaledMesh2D (
 {
     plint layer = margin+extraLayer;
     initialize ( segmentSet_, resolution_, referenceDirection_,
-                 Dot2D ( layer,layer,layer ) );
+                 Dot2D ( layer,layer ) );
 }
 
 template<typename T>
@@ -375,17 +378,15 @@ SegmentBoundary2D<T>::SegmentBoundary2D (
     emanatingEdgeLists[1] = emanatingEdgeLists[0];
     edgeLists[1] = edgeLists[0];
 
-    meshes.push_back ( SegmentPolygonMesh2D<T> (
-                           vertexLists[0], emanatingEdgeLists[0], edgeLists[0] ) );
-    meshes.push_back ( SegmentPolygonMesh2D<T> (
-                           vertexLists[0], emanatingEdgeLists[1], edgeLists[1] ) );
+    meshes.push_back ( SegmentPolygonMesh2D<T> (vertexLists[0], emanatingEdgeLists[0], edgeLists[0] ) );
+    meshes.push_back ( SegmentPolygonMesh2D<T> (vertexLists[0], emanatingEdgeLists[1], edgeLists[1] ) );
 
     // Prepare the vector "segment type", which later on will inform on
     //   the type of boundary condition implemented by a given segment.
     //   The default, 0, stands for no-slip.
     segmentTagList.resize ( meshes[1].getNumSegments() );
     std::fill ( segmentTagList.begin(), segmentTagList.end(), 0 );
-
+//TODO: fix the function closeHoles;
     if ( automaticCloseHoles )
     {
         closeHoles();
@@ -1243,8 +1244,7 @@ void VoxelizedDomain2D<T>::computeSparseVoxelMatrix (
 {
     // Initialized to zero.
     MultiScalarField2D<int> domainMatrix ( ( MultiBlock2D const& ) fullVoxelMatrix );
-    setToConstant ( domainMatrix, fullVoxelMatrix,
-                    flowType, domainMatrix.getBoundingBox(), 1 );
+    setToConstant ( domainMatrix, fullVoxelMatrix,flowType, domainMatrix.getBoundingBox(), 1 );
     for ( int iLayer=1; iLayer<=boundary.getMargin(); ++iLayer )
     {
         addLayer ( domainMatrix, domainMatrix.getBoundingBox(), iLayer );

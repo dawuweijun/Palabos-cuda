@@ -26,6 +26,7 @@
 #define OFF_LATTICE_MODEL_2D_HH
 
 #include "offLattice/offLatticeModel2D.h"
+#include "offLattice/voxelizer2D.h"
 #include "latticeBoltzmann/geometricOperationTemplates.h"
 #include "latticeBoltzmann/externalFieldAccess.h"
 #include <algorithm>
@@ -353,7 +354,6 @@ void GetForceOnObjectFunctional2D<T,SurfaceData>::processGenericBlocks (
     Array<T,2> force = offLatticeModel->getLocalForce(*offLatticeInfo);
     this->getStatistics().gatherSum(forceId[0], force[0]);
     this->getStatistics().gatherSum(forceId[1], force[1]);
-    this->getStatistics().gatherSum(forceId[2], force[2]);
 }
 
 template< typename T, class SurfaceData >

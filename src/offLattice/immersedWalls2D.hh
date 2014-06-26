@@ -78,7 +78,6 @@ void ReduceAxialTorqueImmersed2D<T>::processGenericBlocks (
             Array<T,2> torque(crossProduct(r,g[i]));
             this->getStatistics().gatherSum(sum_torque_ids[0], torque[0]);
             this->getStatistics().gatherSum(sum_torque_ids[1], torque[1]);
-            this->getStatistics().gatherSum(sum_torque_ids[2], torque[2]);
         }
     }
 }
@@ -102,8 +101,7 @@ template<typename T>
 Array<T,2> ReduceAxialTorqueImmersed2D<T>::getSumTorque() const {
     return Array<T,2> (
             this->getStatistics().getSum(sum_torque_ids[0]),
-            this->getStatistics().getSum(sum_torque_ids[1]),
-            this->getStatistics().getSum(sum_torque_ids[2]) );
+            this->getStatistics().getSum(sum_torque_ids[1]) );
 }
 
 /* ******** ReduceImmersedForce2D ************************************ */
@@ -142,7 +140,6 @@ void ReduceImmersedForce2D<T>::processGenericBlocks (
         {
             this->getStatistics().gatherSum(sum_g_ids[0], g[i][0]);
             this->getStatistics().gatherSum(sum_g_ids[1], g[i][1]);
-            this->getStatistics().gatherSum(sum_g_ids[2], g[i][2]);
         }
     }
 }
@@ -166,8 +163,7 @@ template<typename T>
 Array<T,2> ReduceImmersedForce2D<T>::getSumG() const {
     return Array<T,2> (
             this->getStatistics().getSum(sum_g_ids[0]),
-            this->getStatistics().getSum(sum_g_ids[1]),
-            this->getStatistics().getSum(sum_g_ids[2]) );
+            this->getStatistics().getSum(sum_g_ids[1]) );
 }
 
 /* ******** ReduceImmersedArea2D ************************************ */
@@ -262,8 +258,7 @@ void InamuroIteration2D<T,VelFunction>::processGenericBlocks (
     // In this iteration, the force is computed for every vertex.
     for (pluint i=0; i<vertices.size(); ++i) {
         Array<T,2> const& vertex = vertices[i];
-        Array<plint,2> intPos (
-                (plint)vertex[0], (plint)vertex[1], (plint)vertex[2] );
+        Array<plint,2> intPos ( (plint)vertex[0], (plint)vertex[1] );
         Array<T,2> averageJ; averageJ.resetToZero();
         T averageRhoBar = T();
         // Use the weighting function to compute the average momentum
@@ -271,15 +266,13 @@ void InamuroIteration2D<T,VelFunction>::processGenericBlocks (
         // x   x . x   x
         for (plint dx=-1; dx<=+2; ++dx) {
             for (plint dy=-1; dy<=+2; ++dy) {
-                for (plint dz=-1; dz<=+2; ++dz) {
-                    Array<plint,2> pos(intPos+Array<plint,2>(dx,dy,dz));
-                    T nextRhoBar = rhoBar->get(pos[0], pos[1], pos[2]);
+                    Array<plint,2> pos(intPos+Array<plint,2>(dx,dy));
+                    T nextRhoBar = rhoBar->get(pos[0], pos[1]);
                     Array<T,2> nextJ = j->get(pos[0]+ofsJ.x, pos[1]+ofsJ.y);
-                    Array<T,2> r(pos[0]-vertex[0],pos[1]-vertex[1],pos[2]-vertex[2]);
+                    Array<T,2> r(pos[0]-vertex[0],pos[1]-vertex[1]);
                     T W = inamuroDeltaFunction<T>().W(r);
                     averageJ += W*nextJ;
                     averageRhoBar += W*nextRhoBar;
-                }
             }
         }
         //averageJ += 0.5*g[i];
@@ -292,18 +285,15 @@ void InamuroIteration2D<T,VelFunction>::processGenericBlocks (
     // In this iteration, the force is applied from every vertex to the grid nodes.
     for (pluint i=0; i<vertices.size(); ++i) {
         Array<T,2> const& vertex = vertices[i];
-        Array<plint,2> intPos (
-                (plint)vertex[0], (plint)vertex[1], (plint)vertex[2] );
+        Array<plint,2> intPos ( (plint)vertex[0], (plint)vertex[1] );
         for (plint dx=-1; dx<=+2; ++dx) {
             for (plint dy=-1; dy<=+2; ++dy) {
-                for (plint dz=-1; dz<=+2; ++dz) {
-                    Array<plint,2> pos(intPos+Array<plint,2>(dx,dy,dz));
+                    Array<plint,2> pos(intPos+Array<plint,2>(dx,dy));
                     Array<T,2> nextJ = j->get(pos[0]+ofsJ.x, pos[1]+ofsJ.y);
-                    Array<T,2> r(pos[0]-vertex[0],pos[1]-vertex[1],pos[2]-vertex[2]);
+                    Array<T,2> r(pos[0]-vertex[0],pos[1]-vertex[1]);
                     T W = inamuroDeltaFunction<T>().W(r);
                     nextJ += tau*W*deltaG[i];
                     j->get(pos[0]+ofsJ.x, pos[1]+ofsJ.y) = nextJ;
-                }
             }
         }
     }
@@ -363,22 +353,19 @@ void IndexedInamuroIteration2D<T,VelFunction>::processGenericBlocks (
 
     for (pluint i=0; i<vertices.size(); ++i) {
         Array<T,2> const& vertex = vertices[i];
-        Array<plint,2> intPos (
-                (plint)vertex[0], (plint)vertex[1], (plint)vertex[2] );
+        Array<plint,2> intPos ( (plint)vertex[0], (plint)vertex[1] );
         Array<T,2> averageJ; averageJ.resetToZero();
         T averageRhoBar = T();
         // x   x . x   x
         for (plint dx=-1; dx<=+2; ++dx) {
             for (plint dy=-1; dy<=+2; ++dy) {
-                for (plint dz=-1; dz<=+2; ++dz) {
-                    Array<plint,2> pos(intPos+Array<plint,2>(dx,dy,dz));
-                    T nextRhoBar = rhoBar->get(pos[0], pos[1], pos[2]);
+                    Array<plint,2> pos(intPos+Array<plint,2>(dx,dy));
+                    T nextRhoBar = rhoBar->get(pos[0], pos[1]);
                     Array<T,2> nextJ = j->get(pos[0]+ofsJ.x, pos[1]+ofsJ.y);
-                    Array<T,2> r(pos[0]-vertex[0],pos[1]-vertex[1],pos[2]-vertex[2]);
+                    Array<T,2> r(pos[0]-vertex[0],pos[1]-vertex[1]);
                     T W = inamuroDeltaFunction<T>().W(r);
                     averageJ += W*nextJ;
                     averageRhoBar += W*nextRhoBar;
-                }
             }
         }
         //averageJ += 0.5*g[i];
@@ -390,18 +377,15 @@ void IndexedInamuroIteration2D<T,VelFunction>::processGenericBlocks (
     
     for (pluint i=0; i<vertices.size(); ++i) {
         Array<T,2> const& vertex = vertices[i];
-        Array<plint,2> intPos (
-                (plint)vertex[0], (plint)vertex[1], (plint)vertex[2] );
+        Array<plint,2> intPos ( (plint)vertex[0], (plint)vertex[1] );
         for (plint dx=-1; dx<=+2; ++dx) {
             for (plint dy=-1; dy<=+2; ++dy) {
-                for (plint dz=-1; dz<=+2; ++dz) {
-                    Array<plint,2> pos(intPos+Array<plint,2>(dx,dy,dz));
+                    Array<plint,2> pos(intPos+Array<plint,2>(dx,dy));
                     Array<T,2> nextJ = j->get(pos[0]+ofsJ.x, pos[1]+ofsJ.y);
-                    Array<T,2> r(pos[0]-vertex[0],pos[1]-vertex[1],pos[2]-vertex[2]);
+                    Array<T,2> r(pos[0]-vertex[0],pos[1]-vertex[1]);
                     T W = inamuroDeltaFunction<T>().W(r);
                     nextJ += tau*W*deltaG[i];
                     j->get(pos[0]+ofsJ.x, pos[1]+ofsJ.y) = nextJ;
-                }
             }
         }
     }
@@ -458,22 +442,19 @@ void ConstVelInamuroIteration2D<T>::processGenericBlocks (
 
     for (pluint i=0; i<vertices.size(); ++i) {
         Array<T,2> const& vertex = vertices[i];
-        Array<plint,2> intPos (
-                (plint)vertex[0], (plint)vertex[1], (plint)vertex[2] );
+        Array<plint,2> intPos ( (plint)vertex[0], (plint)vertex[1] );
         Array<T,2> averageJ; averageJ.resetToZero();
         T averageRhoBar = T();
         // x   x . x   x
         for (plint dx=-1; dx<=+2; ++dx) {
             for (plint dy=-1; dy<=+2; ++dy) {
-                for (plint dz=-1; dz<=+2; ++dz) {
-                    Array<plint,2> pos(intPos+Array<plint,2>(dx,dy,dz));
-                    T nextRhoBar = rhoBar->get(pos[0], pos[1], pos[2]);
+                    Array<plint,2> pos(intPos+Array<plint,2>(dx,dy));
+                    T nextRhoBar = rhoBar->get(pos[0], pos[1]);
                     Array<T,2> nextJ = j->get(pos[0]+ofsJ.x, pos[1]+ofsJ.y);
-                    Array<T,2> r(pos[0]-vertex[0],pos[1]-vertex[1],pos[2]-vertex[2]);
+                    Array<T,2> r(pos[0]-vertex[0],pos[1]-vertex[1]);
                     T W = inamuroDeltaFunction<T>().W(r);
                     averageJ += W*nextJ;
                     averageRhoBar += W*nextRhoBar;
-                }
             }
         }
         //averageJ += 0.5*g[i];
@@ -484,18 +465,15 @@ void ConstVelInamuroIteration2D<T>::processGenericBlocks (
     
     for (pluint i=0; i<vertices.size(); ++i) {
         Array<T,2> const& vertex = vertices[i];
-        Array<plint,2> intPos (
-                (plint)vertex[0], (plint)vertex[1], (plint)vertex[2] );
+        Array<plint,2> intPos ( (plint)vertex[0], (plint)vertex[1] );
         for (plint dx=-1; dx<=+2; ++dx) {
             for (plint dy=-1; dy<=+2; ++dy) {
-                for (plint dz=-1; dz<=+2; ++dz) {
-                    Array<plint,2> pos(intPos+Array<plint,2>(dx,dy,dz));
+                    Array<plint,2> pos(intPos+Array<plint,2>(dx,dy));
                     Array<T,2> nextJ = j->get(pos[0]+ofsJ.x, pos[1]+ofsJ.y);
-                    Array<T,2> r(pos[0]-vertex[0],pos[1]-vertex[1],pos[2]-vertex[2]);
+                    Array<T,2> r(pos[0]-vertex[0],pos[1]-vertex[1]);
                     T W = inamuroDeltaFunction<T>().W(r);
                     nextJ += tau*W*deltaG[i];
                     j->get(pos[0]+ofsJ.x, pos[1]+ofsJ.y) = nextJ;
-                }
             }
         }
     }
@@ -549,16 +527,13 @@ void ComputeImmersedBoundaryForce2D<T>::processGenericBlocks (
 
     for (pluint i=0; i<vertices.size(); ++i) {
         Array<T,2> const& vertex = vertices[i];
-        Array<plint,2> intPos (
-                (plint)vertex[0], (plint)vertex[1], (plint)vertex[2] );
+        Array<plint,2> intPos ( (plint)vertex[0], (plint)vertex[1] );
         for (plint dx=-1; dx<=+2; ++dx) {
             for (plint dy=-1; dy<=+2; ++dy) {
-                for (plint dz=-1; dz<=+2; ++dz) {
-                    Array<plint,2> pos(intPos+Array<plint,2>(dx,dy,dz));
-                    Array<T,2> r(pos[0]-vertex[0],pos[1]-vertex[1],pos[2]-vertex[2]);
+                    Array<plint,2> pos(intPos+Array<plint,2>(dx,dy));
+                    Array<T,2> r(pos[0]-vertex[0],pos[1]-vertex[1]);
                     T W = inamuroDeltaFunction<T>().W(r);
-                    force->get(pos[0], pos[1], pos[2]) += W*g[i];
-                }
+                    force->get(pos[0], pos[1]) += W*g[i];
             }
         }
     }
@@ -680,8 +655,7 @@ void InstantiateImmersedWallDataWithTagging2D<T>::processGenericBlocks (
             wallData->areas.push_back(areas[i]);
             wallData->g.push_back(Array<T,2>(0.,0.,0.));
             wallData->globalVertexIds.push_back(i);
-            Array<plint,2> intPos (
-                    (plint)vertex[0], (plint)vertex[1], (plint)vertex[2] );
+            Array<plint,2> intPos ( (plint)vertex[0], (plint)vertex[1] );
             bool hasFluidNeighbor=false;
             for (plint dx=-1; dx<=+2; ++dx) {
                 for (plint dy=-1; dy<=+2; ++dy) {
@@ -805,23 +779,23 @@ template<typename T>
 Array<plint,2> TwoPhaseInamuroParam2D<T>::intVertex(plint i) const {
     PLB_ASSERT((pluint)i < numVertices);
     Array<T,2> vertex = wallData->vertices[i];
-    return Array<plint,2>((plint)vertex[0], (plint)vertex[1], (plint)vertex[2]);
+    return Array<plint,2>((plint)vertex[0], (plint)vertex[1]);
 }
 
 template<typename T>
-T TwoPhaseInamuroParam2D<T>::rhoBar(plint iX, plint iY, plint iZ) const {
-    int flag = getFlag(iX,iY,iZ);
+T TwoPhaseInamuroParam2D<T>::rhoBar(plint iX, plint iY) const {
+    int flag = getFlag(iX,iY);
     if (flag==twoPhaseFlag::empty) {
         return rhoBar2_->get(iX+ofsRhoBar2.x,iY+ofsRhoBar2.y);
     }
     else {
-        return rhoBar_->get(iX,iY,iZ);
+        return rhoBar_->get(iX,iY);
     }
 }
 
 template<typename T>
-Array<T,2> TwoPhaseInamuroParam2D<T>::j(plint iX, plint iY, plint iZ) const {
-    int flag = getFlag(iX,iY,iZ);
+Array<T,2> TwoPhaseInamuroParam2D<T>::j(plint iX, plint iY) const {
+    int flag = getFlag(iX,iY);
     if (flag==twoPhaseFlag::empty) {
         return j2_->get(iX+ofsJ2.x,iY+ofsJ2.y);
     }
@@ -831,9 +805,9 @@ Array<T,2> TwoPhaseInamuroParam2D<T>::j(plint iX, plint iY, plint iZ) const {
 }
 
 template<typename T>
-void TwoPhaseInamuroParam2D<T>::addToJ(plint iX, plint iY, plint iZ, Array<T,2> deltaJ)
+void TwoPhaseInamuroParam2D<T>::addToJ(plint iX, plint iY, Array<T,2> deltaJ)
 {
-    int flag = getFlag(iX,iY,iZ);
+    int flag = getFlag(iX,iY);
     if (flag==twoPhaseFlag::interface) {
         j_->get(iX+ofsJ.x,iY+ofsJ.y) += deltaJ;
         j2_->get(iX+ofsJ2.x,iY+ofsJ2.y) += deltaJ;
@@ -847,7 +821,7 @@ void TwoPhaseInamuroParam2D<T>::addToJ(plint iX, plint iY, plint iZ, Array<T,2> 
 }
 
 template<typename T>
-int TwoPhaseInamuroParam2D<T>::getFlag(plint iX, plint iY, plint iZ) const {
+int TwoPhaseInamuroParam2D<T>::getFlag(plint iX, plint iY) const {
     return flag_->get(iX+ofsFlag.x,iY+ofsFlag.y);
 }
 
@@ -858,7 +832,7 @@ pluint TwoPhaseInamuroParam2D<T>::getGlobalVertexId(plint i) const {
 }
 
 template<typename T>
-T TwoPhaseInamuroParam2D<T>::getTau(plint iX, plint iY, plint iZ) const {
+T TwoPhaseInamuroParam2D<T>::getTau(plint iX, plint iY) const {
     T vf = volumeFraction_->get(iX+ofsVF.x,iY+ofsVF.y);
     return tau*vf + tau2*(1.-vf);
 }
@@ -924,15 +898,13 @@ void TwoPhaseInamuroIteration2D<T,VelFunction>::processGenericBlocks (
         // x   x . x   x
         for (plint dx=-1; dx<=+2; ++dx) {
             for (plint dy=-1; dy<=+2; ++dy) {
-                for (plint dz=-1; dz<=+2; ++dz) {
-                    Array<plint,2> pos(intPos+Array<plint,2>(dx,dy,dz));
-                    T nextRhoBar = param.rhoBar(pos[0], pos[1], pos[2]);
-                    Array<T,2> nextJ = param.j(pos[0], pos[1], pos[2]);
-                    Array<T,2> r(pos[0]-vertex[0],pos[1]-vertex[1],pos[2]-vertex[2]);
+                    Array<plint,2> pos(intPos+Array<plint,2>(dx,dy));
+                    T nextRhoBar = param.rhoBar(pos[0], pos[1]);
+                    Array<T,2> nextJ = param.j(pos[0], pos[1]);
+                    Array<T,2> r(pos[0]-vertex[0],pos[1]-vertex[1]);
                     T W = inamuroDeltaFunction<T>().W(r);
                     averageJ += W*nextJ;
                     averageRhoBar += W*nextRhoBar;
-                }
             }
         }
         //averageJ += 0.5*param.g(i);
@@ -948,12 +920,10 @@ void TwoPhaseInamuroIteration2D<T,VelFunction>::processGenericBlocks (
 
         for (plint dx=-1; dx<=+2; ++dx) {
             for (plint dy=-1; dy<=+2; ++dy) {
-                for (plint dz=-1; dz<=+2; ++dz) {
-                    Array<plint,2> pos(intPos+Array<plint,2>(dx,dy,dz));
-                    Array<T,2> r(pos[0]-vertex[0],pos[1]-vertex[1],pos[2]-vertex[2]);
+                    Array<plint,2> pos(intPos+Array<plint,2>(dx,dy));
+                    Array<T,2> r(pos[0]-vertex[0],pos[1]-vertex[1]);
                     T W = inamuroDeltaFunction<T>().W(r);
-                    param.addToJ(pos[0],pos[1],pos[2], param.getTau(pos[0],pos[1],pos[2])*W*deltaG[i]);
-                }
+                    param.addToJ(pos[0],pos[1], param.getTau(pos[0],pos[1])*W*deltaG[i]);
             }
         }
     }
@@ -1005,15 +975,13 @@ void TwoPhaseIndexedInamuroIteration2D<T,VelFunction>::processGenericBlocks (
         // x   x . x   x
         for (plint dx=-1; dx<=+2; ++dx) {
             for (plint dy=-1; dy<=+2; ++dy) {
-                for (plint dz=-1; dz<=+2; ++dz) {
-                    Array<plint,2> pos(intPos+Array<plint,2>(dx,dy,dz));
-                    T nextRhoBar = param.rhoBar(pos[0], pos[1], pos[2]);
-                    Array<T,2> nextJ = param.j(pos[0], pos[1], pos[2]);
-                    Array<T,2> r(pos[0]-vertex[0],pos[1]-vertex[1],pos[2]-vertex[2]);
+                    Array<plint,2> pos(intPos+Array<plint,2>(dx,dy));
+                    T nextRhoBar = param.rhoBar(pos[0], pos[1]);
+                    Array<T,2> nextJ = param.j(pos[0], pos[1]);
+                    Array<T,2> r(pos[0]-vertex[0],pos[1]-vertex[1]);
                     T W = inamuroDeltaFunction<T>().W(r);
                     averageJ += W*nextJ;
                     averageRhoBar += W*nextRhoBar;
-                }
             }
         }
         //averageJ += 0.5*param.g(i);
@@ -1029,12 +997,10 @@ void TwoPhaseIndexedInamuroIteration2D<T,VelFunction>::processGenericBlocks (
 
         for (plint dx=-1; dx<=+2; ++dx) {
             for (plint dy=-1; dy<=+2; ++dy) {
-                for (plint dz=-1; dz<=+2; ++dz) {
-                    Array<plint,2> pos(intPos+Array<plint,2>(dx,dy,dz));
-                    Array<T,2> r(pos[0]-vertex[0],pos[1]-vertex[1],pos[2]-vertex[2]);
+                    Array<plint,2> pos(intPos+Array<plint,2>(dx,dy));
+                    Array<T,2> r(pos[0]-vertex[0],pos[1]-vertex[1]);
                     T W = inamuroDeltaFunction<T>().W(r);
-                    param.addToJ(pos[0],pos[1],pos[2], param.getTau(pos[0],pos[1],pos[2])*W*deltaG[i]);
-                }
+                    param.addToJ(pos[0],pos[1], param.getTau(pos[0],pos[1])*W*deltaG[i]);
             }
         }
     }
@@ -1086,15 +1052,13 @@ void TwoPhaseConstVelInamuroIteration2D<T>::processGenericBlocks (
         // x   x . x   x
         for (plint dx=-1; dx<=+2; ++dx) {
             for (plint dy=-1; dy<=+2; ++dy) {
-                for (plint dz=-1; dz<=+2; ++dz) {
-                    Array<plint,2> pos(intPos+Array<plint,2>(dx,dy,dz));
-                    T nextRhoBar = param.rhoBar(pos[0], pos[1], pos[2]);
-                    Array<T,2> nextJ = param.j(pos[0], pos[1], pos[2]);
-                    Array<T,2> r(pos[0]-vertex[0],pos[1]-vertex[1],pos[2]-vertex[2]);
+                    Array<plint,2> pos(intPos+Array<plint,2>(dx,dy));
+                    T nextRhoBar = param.rhoBar(pos[0], pos[1]);
+                    Array<T,2> nextJ = param.j(pos[0], pos[1]);
+                    Array<T,2> r(pos[0]-vertex[0],pos[1]-vertex[1]);
                     T W = inamuroDeltaFunction<T>().W(r);
                     averageJ += W*nextJ;
                     averageRhoBar += W*nextRhoBar;
-                }
             }
         }
         //averageJ += 0.5*param.g(i);
@@ -1109,12 +1073,10 @@ void TwoPhaseConstVelInamuroIteration2D<T>::processGenericBlocks (
 
         for (plint dx=-1; dx<=+2; ++dx) {
             for (plint dy=-1; dy<=+2; ++dy) {
-                for (plint dz=-1; dz<=+2; ++dz) {
-                    Array<plint,2> pos(intPos+Array<plint,2>(dx,dy,dz));
-                    Array<T,2> r(pos[0]-vertex[0],pos[1]-vertex[1],pos[2]-vertex[2]);
+                    Array<plint,2> pos(intPos+Array<plint,2>(dx,dy));
+                    Array<T,2> r(pos[0]-vertex[0],pos[1]-vertex[1]);
                     T W = inamuroDeltaFunction<T>().W(r);
-                    param.addToJ(pos[0],pos[1],pos[2], param.getTau(pos[0],pos[1],pos[2])*W*deltaG[i]);
-                }
+                    param.addToJ(pos[0],pos[1], param.getTau(pos[0],pos[1])*W*deltaG[i]);
             }
         }
     }

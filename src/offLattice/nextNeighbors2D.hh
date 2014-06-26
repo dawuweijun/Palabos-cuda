@@ -81,7 +81,7 @@ NextNeighborPop<T,Descriptor>::NextNeighborPop()
         int const* c = NextNeighbor<T>::c[iNeighbor];
         ids[iNeighbor] = -1;
         for (plint iPop=0; iPop<D::q; ++iPop) {
-            if (D::c[iPop][0]==c[0] && D::c[iPop][1]==c[1] && D::c[iPop][2]==c[2]) {
+            if (D::c[iPop][0]==c[0] && D::c[iPop][1]==c[1]) {
                 ids[iNeighbor] = iPop;
                 break;
             }

@@ -273,7 +273,6 @@ void ExtrapolatedGeneralizedOffLatticeModel2D<T,Descriptor>::cellCompletion (
             plint oppPop = indexTemplates::opposite<D>(iPop);
             deltaJ[0] += D::c[oppPop][0]*cell[oppPop];
             deltaJ[1] += D::c[oppPop][1]*cell[oppPop];
-            deltaJ[2] += D::c[oppPop][2]*cell[oppPop];
         }
     }
     
@@ -305,7 +304,6 @@ void ExtrapolatedGeneralizedOffLatticeModel2D<T,Descriptor>::cellCompletion (
         if (iPop>=0) {
             deltaJ[0] -= D::c[iPop][0]*cellCopy[iPop];
             deltaJ[1] -= D::c[iPop][1]*cellCopy[iPop];
-            deltaJ[2] -= D::c[iPop][2]*cellCopy[iPop];
         }
     }
     localForce += deltaJ;
@@ -620,7 +618,6 @@ void InterpolatedGeneralizedOffLatticeModel2D<T,Descriptor>::cellCompletion (
         if (iPop>=0) {
             deltaJ[0] += D::c[iPop][0]*cell[iPop];
             deltaJ[1] += D::c[iPop][1]*cell[iPop];
-            deltaJ[2] += D::c[iPop][2]*cell[iPop];
         }
     }
     

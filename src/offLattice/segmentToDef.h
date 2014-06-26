@@ -22,7 +22,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-/* Main author: Dimitrios Kontaxakis */
+/* Main author: Huijie Zhang */
 
 #ifndef SEGMENT_TO_DEF_H
 #define SEGMENT_TO_DEF_H
@@ -42,7 +42,7 @@ template<typename T>
 class SegmentToDef {
 public:
     typedef typename SegmentSet<T>::Segment Segment;
-private:  // This class should only be used by the function constructSurfaceMesh().
+private:  // This class should only be used by the function \sa constructSurfaceMesh().
     SegmentToDef(std::vector<Segment> const& segments, T epsilon=std::numeric_limits<float>::epsilon());
     void generateOnce (
         std::vector<Array<T,2> >& vertexList_,
@@ -129,7 +129,7 @@ private:
     void fixOrientationOfNeighbors(plint iSegment, std::queue<plint>& segmentsToFixNeighbors,
                                    char* visitedSegments, bool& flag);
 private:
-    std::vector<Array<plint,3> > segmentIndices;
+    std::vector<Array<plint,2> > segmentIndices;
     VertexSet vertexSet;
     std::vector<std::vector<EdgeListNode> > edgeTable;
     BoundaryVertexMap boundaryVertexMap;

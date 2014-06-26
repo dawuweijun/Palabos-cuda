@@ -29,6 +29,7 @@
 #include "core/array.h"
 #include "atomicBlock/dataProcessingFunctional2D.h"
 #include "atomicBlock/dataField2D.h"
+#include "multiPhysics/freeSurfaceUtil.h"
 
 namespace plb {
 
@@ -68,7 +69,7 @@ public:
         return samples[position];
     }
     T W(Array<T,2> const& r) const {
-        return w(r[0])*w(r[1])*w(r[2]);
+        return w(r[0])*w(r[1]);
     }
 private:
     void sampleFunction() {
@@ -450,12 +451,12 @@ public:
     Array<T,2> vertex(plint i) const;
     Array<T,2> absoluteVertex(plint i) const;
     Array<plint,2> intVertex(plint i) const;
-    T rhoBar(plint iX, plint iY, plint iZ) const;
-    Array<T,2> j(plint iX, plint iY, plint iZ) const;
-    void addToJ(plint iX, plint iY, plint iZ, Array<T,2> deltaJ);
-    T getTau(plint iX, plint iY, plint iZ) const;
+    T rhoBar(plint iX, plint iY) const;
+    Array<T,2> j(plint iX, plint iY) const;
+    void addToJ(plint iX, plint iY, Array<T,2> deltaJ);
+    T getTau(plint iX, plint iY) const;
 private:
-    int getFlag(plint iX, plint iY, plint iZ) const;
+    int getFlag(plint iX, plint iY) const;
     pluint getGlobalVertexId(plint i) const;
 private:
     ScalarField2D<T> *rhoBar_, *rhoBar2_;

@@ -29,7 +29,9 @@
 #include "offLattice/offLatticeBoundaryCondition3D.h"
 #include "offLattice/triangularSurfaceMesh.h"
 #include "offLattice/offLatticeBoundaryProfiles3D.h"
-#include "triangleToDef.h"
+#include "offLattice/triangleToDef.h"
+#include "offLattice/voxelizer3D.h"
+#include "dataProcessors/dataInitializerWrapper3D.h"
 
 namespace plb {
 

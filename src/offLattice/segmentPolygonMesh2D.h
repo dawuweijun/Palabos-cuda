@@ -390,8 +390,8 @@ public:
         // Compare on bary-center for main coordinate, and, in the unlikely
         //   case that these two floats are equal, on the two subsequent
         //   coordinates.
-        Array<T,2> baryCenter1 = computeBaryCenter(mesh, lid1);
-        Array<T,2> baryCenter2 = computeBaryCenter(mesh, lid2);
+        Array<T,2> baryCenter1 = computeBaryCenter2D(mesh, lid1);
+        Array<T,2> baryCenter2 = computeBaryCenter2D(mesh, lid2);
         return
           (baryCenter1[dim1] < baryCenter2[dim1]) || (
                   equiv(baryCenter1[dim1],baryCenter2[dim1]) && (
@@ -423,6 +423,14 @@ void toLatticeUnits2D (
 
 template<typename T>
 Array<T,2> computeBaryCenter2D (
+        SegmentPolygonMesh2D<T> const& mesh, Curve2D const& lid );
+
+template<typename T>
+Array<T,2> computeGeometricCenter2D (
+        SegmentPolygonMesh2D<T> const& mesh, Curve2D const& lid );
+
+template<typename T>
+T computeGeometricRadius2D (
         SegmentPolygonMesh2D<T> const& mesh, Curve2D const& lid );
 
 template<typename T>

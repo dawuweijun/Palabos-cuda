@@ -40,7 +40,8 @@
 #include "parallelism/mpiManager.h"
 #include "core/util.h"
 #include "io/parallelIO.h"
-
+#include "stdio.h"
+#include <iomanip>
 #define FPEQUAL_ABS(x, y, eps) (fabs((x)-(y)) <= (eps)) // Macro definition for the function
                                                         // util::fpequal_abs<T>(T x, T y, T eps)
 
@@ -92,7 +93,7 @@ inline void SegmentPolygonMesh2D<T>::assertVertex(Array<T,2> const& vertex) cons
 #ifdef PLB_DEBUG
     if (global::IOpolicy().stlFilesHaveLowerBound()) {
         double bound = global::IOpolicy().getLowerBoundForStlFiles();
-        PLB_ASSERT( !(vertex[0]<bound && vertex[1]<bound && vertex[2]<bound) );
+        PLB_ASSERT( !(vertex[0]<bound && vertex[1]<bound) );
     }
 #endif // PLB_DEBUG
 }
@@ -131,7 +132,7 @@ bool SegmentPolygonMesh2D<T>::isValidVertex (
         double bound = global::IOpolicy().getLowerBoundForStlFiles();
         Array<T,2> const& vertex (
                 vertices()[ edges()[ 3*iSegment + ((localVertex == 0) ? 2 : localVertex-1) ].pv ] );
-        return !(vertex[0]<bound && vertex[1]<bound && vertex[2]<bound);
+        return !(vertex[0]<bound && vertex[1]<bound);
     }
     else {
         return true;
@@ -166,7 +167,7 @@ inline bool SegmentPolygonMesh2D<T>::isValidVertex (
     if (global::IOpolicy().stlFilesHaveLowerBound()) {
         Array<T,2> const& vertex(vertices()[iVertex]);
         double bound = global::IOpolicy().getLowerBoundForStlFiles();
-        return !(vertex[0]<bound && vertex[1]<bound && vertex[2]<bound);
+        return !(vertex[0]<bound && vertex[1]<bound);
     }
     else {
         return true;
@@ -484,7 +485,7 @@ std::vector<plint> SegmentPolygonMesh2D<T>::getAdjacentSegmentIds(
 #ifdef PLB_DEBUG
     std::vector<plint> neighborVertexIds = getNeighborVertexIds(iVertex);
     std::vector<plint>::iterator vit;
-    vit = find(neighborVertexIds.begin(), neighborVertexIds.end(), jVertex);
+    vit = std::find(neighborVertexIds.begin(), neighborVertexIds.end(), jVertex);
     PLB_ASSERT(vit != neighborVertexIds.end()); // Vertices do not belong to the same edge.
 #endif // PLB_DEBUG
 
@@ -542,7 +543,7 @@ Array<T,2> SegmentPolygonMesh2D<T>::computeSegmentNormal(
 
     std::vector<plint> neighborVertexIds = getNeighborVertexIds(iVertex);
     std::vector<plint>::iterator it;
-    it = find(neighborVertexIds.begin(), neighborVertexIds.end(), jVertex);
+    it = std::find(neighborVertexIds.begin(), neighborVertexIds.end(), jVertex);
     PLB_ASSERT(it != neighborVertexIds.end()); // Vertices do not belong to the same triangle.
 
     plint prevVertex, nextVertex;
@@ -678,7 +679,7 @@ T SegmentPolygonMesh2D<T>::computeSegmentArea(
 #ifdef PLB_DEBUG
     std::vector<plint> neighborVertexIds = getNeighborVertexIds(iVertex);
     std::vector<plint>::iterator it;
-    it = find(neighborVertexIds.begin(), neighborVertexIds.end(), jVertex);
+    it = std::find(neighborVertexIds.begin(), neighborVertexIds.end(), jVertex);
     PLB_ASSERT(it != neighborVertexIds.end()); // Vertices do not belong to the same triangle.
 
     plint prevVertex, nextVertex;
@@ -737,7 +738,7 @@ T SegmentPolygonMesh2D<T>::computeEdgeLength(plint iVertex, plint jVertex) const
 #ifdef PLB_DEBUG
     std::vector<plint> neighborVertexIds = getNeighborVertexIds(iVertex);
     std::vector<plint>::iterator it;
-    it = find(neighborVertexIds.begin(), neighborVertexIds.end(), jVertex);
+    it = std::find(neighborVertexIds.begin(), neighborVertexIds.end(), jVertex);
     PLB_ASSERT(it != neighborVertexIds.end()); // Vertices do not belong to the same edge.
 #endif // PLB_DEBUG
 
@@ -794,16 +795,16 @@ void SegmentPolygonMesh2D<T>::writeAsciiSTL(std::string fname) const
     FILE *fp = fopen(fname.c_str(), "w");
     PLB_ASSERT(fp != NULL);
 
-    char fmt1[64] = "  facet normal ";
+    char fmt1[64] = "  segment normal ";
     char fmt2[64] = "      vertex ";
     if (sizeof(T) == sizeof(long double)) {
-        strcat(fmt1, "% Le % Le % Le\n");
-        strcat(fmt2, "% Le % Le % Le\n");
+        strcat(fmt1, "% Le % Le\n");
+        strcat(fmt2, "% Le % Le\n");
     }
     else if (sizeof(T) == sizeof(float) ||
              sizeof(T) == sizeof(double)) {
-        strcat(fmt1, "% e % e % e\n");
-        strcat(fmt2, "% e % e % e\n");
+        strcat(fmt1, "% e % e\n");
+        strcat(fmt2, "% e % e\n");
     }
     else {
         PLB_ASSERT(false);
@@ -813,14 +814,12 @@ void SegmentPolygonMesh2D<T>::writeAsciiSTL(std::string fname) const
     for (plint i = 0; i < numSegments; i++) {
         Array<T,2> n = computeSegmentNormal(i);
         Array<T,2> v;
-        fprintf(fp, fmt1, n[0], n[1], n[2]);
+        fprintf(fp, fmt1, n[0], n[1]);
         fprintf(fp, "    outer loop\n");
         v = getVertex(i, 0);
-        fprintf(fp, fmt2, v[0], v[1], v[2]);
+        fprintf(fp, fmt2, v[0], v[1]);
         v = getVertex(i, 1);
-        fprintf(fp, fmt2, v[0], v[1], v[2]);
-        v = getVertex(i, 2);
-        fprintf(fp, fmt2, v[0], v[1], v[2]);
+        fprintf(fp, fmt2, v[0], v[1]);
         fprintf(fp, "    endloop\n");
         fprintf(fp, "  endfacet\n");
     }
@@ -851,27 +850,19 @@ void SegmentPolygonMesh2D<T>::writeBinarySTL(std::string fname) const
     for (plint i = 0; i < numSegments; i++) {
         Array<T,2> vertex;
         Array<T,2> normal = computeSegmentNormal(i);
-        float n[3];
+        float n[2];
         n[0] = normal[0];
         n[1] = normal[1];
-        n[2] = normal[2];
-        fwrite((void *) n, sizeof(float), 3, fp);
+        fwrite((void *) n, sizeof(float), 2, fp);
         vertex = getVertex(i, 0);
-        float v[3];
+        float v[2];
         v[0] = vertex[0];
         v[1] = vertex[1];
-        v[2] = vertex[2];
-        fwrite((void *) v, sizeof(float), 3, fp);
+        fwrite((void *) v, sizeof(float), 2, fp);
         vertex = getVertex(i, 1);
         v[0] = vertex[0];
         v[1] = vertex[1];
-        v[2] = vertex[2];
-        fwrite((void *) v, sizeof(float), 3, fp);
-        vertex = getVertex(i, 2);
-        v[0] = vertex[0];
-        v[1] = vertex[1];
-        v[2] = vertex[2];
-        fwrite((void *) v, sizeof(float), 3, fp);
+        fwrite((void *) v, sizeof(float), 2, fp);
         fwrite(&abc, sizeof(unsigned short), 1, fp);
     }
 
@@ -988,10 +979,9 @@ int SegmentPolygonMesh2D<T>::pointOnSegment (
     a[1][0] = a[0][1];
     a[1][1] = dot(e1, e1);
 
-    T tmp[3];
+    T tmp[2];
     tmp[0] = intersection[0] - v0[0];
     tmp[1] = intersection[1] - v0[1];
-    tmp[2] = intersection[2] - v0[2];
 
     T b[2];
     b[0] = dot(tmp, e0);
@@ -1056,36 +1046,31 @@ bool SegmentPolygonMesh2D<T>::segmentIntersectsSegment (
 {
     PLB_ASSERT(iSegment >= 0 && iSegment < numSegments);
 
-    T v0[3], v1[3], v2[3]; // Segment vertex coordinates
+    T v0[2], v1[2], v2[2]; // Segment vertex coordinates
 
     Array<T,2> tv0 = getVertex(iSegment, 0); tv0.to_cArray(v0);
     Array<T,2> tv1 = getVertex(iSegment, 1); tv1.to_cArray(v1);
-    Array<T,2> tv2 = getVertex(iSegment, 2); tv2.to_cArray(v2);
 
-    T e0[3], e1[3]; // Segment edge vectors starting at v0
+    T e0[2], e1[2]; // Segment edge vectors starting at v0
 
     e0[0] = v1[0] - v0[0];
     e0[1] = v1[1] - v0[1];
-    e0[2] = v1[2] - v0[2];
 
     e1[0] = v2[0] - v0[0];
     e1[1] = v2[1] - v0[1];
-    e1[2] = v2[2] - v0[2];
 
-    T normal[3]; // Segment normal
+    T normal[2]; // Segment normal
 
     normal[0] = e0[1]*e1[2] - e0[2]*e1[1];
     normal[1] = e0[2]*e1[0] - e0[0]*e1[2];
-    normal[2] = e0[0]*e1[1] - e0[1]*e1[0];
 
-    T direction[3], p1[3], p2[3];
+    T direction[2], p1[2], p2[2];
 
     point1.to_cArray(p1);
     point2.to_cArray(p2);
 
     direction[0] = p2[0] - p1[0];
     direction[1] = p2[1] - p1[1];
-    direction[2] = p2[2] - p1[2];
 
     T denom = direction[0]*normal[0] + direction[1]*normal[1] + direction[2]*normal[2];
 
@@ -1109,14 +1094,12 @@ bool SegmentPolygonMesh2D<T>::segmentIntersectsSegment (
         T norm_normal = sqrt(util::sqr(normal[0])+util::sqr(normal[1])+util::sqr(normal[2]));
         normal[0] /= norm_normal;
         normal[1] /= norm_normal;
-        normal[2] /= norm_normal;
         // Shift the vertex, and recompute everything that needs to be
         //   recomputed. v1 and v2 are not used any more, so there is no
         //   need to recompute them.
         T tmp = (T)2*eps1;
         v0[0] += tmp*normal[0];
         v0[1] += tmp*normal[1];
-        v0[2] += tmp*normal[2];
         num = (v0[0]-p1[0])*normal[0] + (v0[1]-p1[1])*normal[1] + (v0[2]-p1[2])*normal[2];
         t = num / denom;
     }
@@ -1125,11 +1108,10 @@ bool SegmentPolygonMesh2D<T>::segmentIntersectsSegment (
         (t > (T) 1.0 && !FPEQUAL_ABS(t, (T) 1.0, eps1)))
         return false;
 
-    T intersection[3];
+    T intersection[2];
 
     intersection[0] = p1[0] + direction[0]*t; // Intersection point with the plane
     intersection[1] = p1[1] + direction[1]*t;
-    intersection[2] = p1[2] + direction[2]*t;
 
     T a[2][2];
     a[0][0] = e0[0]*e0[0] + e0[1]*e0[1] + e0[2]*e0[2];
@@ -1137,10 +1119,9 @@ bool SegmentPolygonMesh2D<T>::segmentIntersectsSegment (
     a[1][0] = a[0][1];
     a[1][1] = e1[0]*e1[0] + e1[1]*e1[1] + e1[2]*e1[2];
 
-    T tmp[3];
+    T tmp[2];
     tmp[0] = intersection[0] - v0[0];
     tmp[1] = intersection[1] - v0[1];
-    tmp[2] = intersection[2] - v0[2];
 
     T b[2];
     b[0] = tmp[0]*e0[0] + tmp[1]*e0[1] + tmp[2]*e0[2];
@@ -1632,7 +1613,7 @@ template<typename T>
 void reCenter (
         SegmentPolygonMesh2D<T>& mesh, Curve2D const& lid )
 {
-    Array<T,2> newCenter = computeBaryCenter(mesh,lid);
+    Array<T,2> newCenter = computeBaryCenter2D(mesh,lid);
     mesh.replaceVertex(lid.centerVertex, newCenter);
 }
 

@@ -26,10 +26,12 @@
 #define OFF_LATTICE_BOUNDARY_CONDITION_2D_HH
 
 #include "core/globalDefs.h"
+#include "dataProcessors/dataInitializerWrapper2D.h"
 #include "offLattice/offLatticeBoundaryCondition2D.h"
 #include "offLattice/triangularSurfaceMesh.h"
 #include "offLattice/offLatticeBoundaryProfiles2D.h"
-#include "triangleToDef.h"
+#include "offLattice/segmentToDef.h"
+#include "offLattice/voxelizer2D.h"
 
 namespace plb {
 

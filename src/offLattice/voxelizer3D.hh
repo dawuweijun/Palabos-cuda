@@ -28,9 +28,12 @@
 #define VOXELIZER_HH
 
 #include "core/globalDefs.h"
+#include "core/plbTimer.h"
 #include "offLattice/voxelizer3D.h"
 #include "atomicBlock/dataField3D.h"
 #include "multiBlock/multiBlockGenerator3D.h"
+#include "dataProcessors/dataInitializerWrapper3D.h"
+#include "dataProcessors/metaStuffWrapper3D.h"
 
 namespace plb {
 

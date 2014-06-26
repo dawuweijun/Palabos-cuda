@@ -26,6 +26,9 @@
 #define OFF_LATTICE_MODEL_3D_H
 
 #include "core/globalDefs.h"
+#include "core/array.h"
+#include "core/geometry3D.h"
+#include "offLattice/boundaryShapes3D.h"
 
 namespace plb {
 

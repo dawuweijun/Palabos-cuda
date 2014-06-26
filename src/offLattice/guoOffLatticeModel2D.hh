@@ -331,7 +331,6 @@ void GuoAlgorithm2D<T,Descriptor>::finalize()
                 plint oppPop = indexTemplates::opposite<D>(iPop);
                 deltaJ[0] += D::c[oppPop][0]*cell[oppPop];
                 deltaJ[1] += D::c[oppPop][1]*cell[oppPop];
-                deltaJ[2] += D::c[oppPop][2]*cell[oppPop];
             }
         }
     }
@@ -349,7 +348,6 @@ void GuoAlgorithm2D<T,Descriptor>::finalize()
             if (iPop>=0) {
                 deltaJ[0] -= D::c[iPop][0]*collidedCell[iPop];
                 deltaJ[1] -= D::c[iPop][1]*collidedCell[iPop];
-                deltaJ[2] -= D::c[iPop][2]*collidedCell[iPop];
             }
         }
         // Don't divide by rho. Here we just divide by rho0=1. Remember that,

@@ -81,7 +81,7 @@ void FilippovaHaenelModel2D<T,Descriptor>::prepareCell (
                 bool ok =
 #endif
                     this->pointOnSurface (
-                            cellLocation+offset, Dot2D(D::c[iPop][0],D::c[iPop][1],D::c[iPop][2]), locatedPoint, distance,
+                            cellLocation+offset, Dot2D(D::c[iPop][0],D::c[iPop][1]), locatedPoint, distance,
                             wallNormal, surfaceData, bdType, iTriangle );
                 // In the following, the importance of directions is sorted wrt. how well they
                 //   are aligned with the wall normal. It is better to take the continuous normal,
@@ -166,7 +166,7 @@ void FilippovaHaenelModel2D<T,Descriptor>::cellCompletion (
     {
         int iOpp = dryNodeFluidDirections[iDirection];
         int iPop = indexTemplates::opposite<Descriptor<T> >(iOpp);
-        Dot2D fluidDirection(D::c[iOpp][0],D::c[iOpp][1],D::c[iOpp][2]);
+        Dot2D fluidDirection(D::c[iOpp][0],D::c[iOpp][1]);
         plint dryNodeId = dryNodeIds[iDirection];
 
         Array<T,2> wallNode, wall_vel;
@@ -227,10 +227,9 @@ void FilippovaHaenelModel2D<T,Descriptor>::cellCompletion (
         }
 
         T c_i_wf_j_f_j = D::c[iPop][0]*(wf_j[0]-f_j[0]) +
-                         D::c[iPop][1]*(wf_j[1]-f_j[1]) +
-                         D::c[iPop][2]*(wf_j[2]-f_j[2]) ;
+                         D::c[iPop][1]*(wf_j[1]-f_j[1]) ;
 
-        T c_i_w_j     = D::c[iPop][0]*w_j[0] + D::c[iPop][1]*w_j[1] + D::c[iPop][2]*w_j[2];
+        T c_i_w_j     = D::c[iPop][0]*w_j[0] + D::c[iPop][1]*w_j[1];
 
 
         T f_ieq = f_cell.getDynamics().computeEquilibrium(iPop, f_rhoBar, f_j, f_jSqr) +
@@ -239,7 +238,6 @@ void FilippovaHaenelModel2D<T,Descriptor>::cellCompletion (
 
         localForce[0] += D::c[iPop][0]*(s_cell[iPop]+s_cell[iOpp]);
         localForce[1] += D::c[iPop][1]*(s_cell[iPop]+s_cell[iOpp]);
-        localForce[2] += D::c[iPop][2]*(s_cell[iPop]+s_cell[iOpp]);
     }
 }
 

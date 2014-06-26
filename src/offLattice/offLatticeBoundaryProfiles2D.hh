@@ -27,7 +27,7 @@
 
 #include "core/globalDefs.h"
 #include "offLattice/offLatticeBoundaryProfiles2D.h"
-
+#include "offLattice/boundaryShapes2D.h"
 namespace plb {
 
 template<typename T>

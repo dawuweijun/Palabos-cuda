@@ -30,6 +30,7 @@
 #include "offLattice/triangularSurfaceMesh.h"
 #include "offLattice/offLatticeBoundaryProfiles3D.h"
 #include "offLattice/triangleToDef.h"
+#include "offLattice/voxelizer3D.h"
 #include "multiBlock/nonLocalTransfer3D.h"
 #include "offLattice/makeSparse3D.h"
 #include <cmath>

@@ -30,7 +30,7 @@
 #include "core/globalDefs.h"
 #include "offLattice/triangleSetGenerator.h"
 #include "offLattice/triangularSurfaceMesh.h"
-
+#include "offLattice/triangularSurfaceMesh.h"
 namespace plb {
 
 template<typename T>
@@ -514,7 +514,7 @@ TriangleSet<T> patchTubes(TriangleSet<T> const& geometryWithOpenings, plint sort
     PLB_ASSERT( holes.size() == patchLengths.size() );
     
     for (pluint iHole=0; iHole<holes.size(); ++iHole) {
-        Array<T,3> baryCenter = computeGeometricCenter(mesh,holes[iHole]);
+        Array<T,3> baryCenter = computeGeometricCenter3D(mesh,holes[iHole]);
         plint numHoleVertices = (plint) holes[iHole].boundaryVertices.size();
 
         Array<T,3> normal = computeNormal(mesh, holes[iHole]);

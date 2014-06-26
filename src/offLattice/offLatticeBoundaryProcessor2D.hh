@@ -173,7 +173,7 @@ void CheckVoxelizationFunctional2D<T>::computeCell (
                 Array<T,3> wall_u, wallNormal;
                 OffBoundary::Type bdType;
                 plint id=-1; // No optimization.
-                bool ok = shape->pointOnSurface ( cellLocation+offset, Dot2D ( c[0],c[1],c[2] ),
+                bool ok = shape->pointOnSurface ( cellLocation+offset, Dot2D ( c[0],c[1] ),
                                                   wallNode, wallDistance, wallNormal,
                                                   wall_u, bdType, id );
                 if ( !ok )

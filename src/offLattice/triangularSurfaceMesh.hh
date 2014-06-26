@@ -33,6 +33,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <iomanip>
 #include "offLattice/triangularSurfaceMesh.h"
 #include "latticeBoltzmann/geometricOperationTemplates.h"
 #include "core/globalDefs.h"
@@ -1554,7 +1555,7 @@ Array<T,3> computeBaryCenter (
 }
 
 template<typename T>
-Array<T,3> computeGeometricCenter (
+Array<T,3> computeGeometricCenter3D (
         TriangularSurfaceMesh<T> const& mesh, Lid const& lid )
 {
     typedef typename TriangularSurfaceMesh<T>::Edge Edge;
@@ -1581,7 +1582,7 @@ T computeGeometricRadius (
         TriangularSurfaceMesh<T> const& mesh, Lid const& lid )
 {
     typedef typename TriangularSurfaceMesh<T>::Edge Edge;
-    Array<T,3> center= computeGeometricCenter(mesh, lid);
+    Array<T,3> center= computeGeometricCenter3D(mesh, lid);
     T radius = T();
     T circumference = T();
     for ( plint iBoundary=0;

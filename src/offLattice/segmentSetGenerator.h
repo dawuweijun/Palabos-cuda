@@ -39,11 +39,6 @@ namespace plb {
 template<typename T>
 SegmentSet<T> constructCircle(Array<T,2> const& center, T radius, plint minNumOfSegments);
 
-template<typename T>
-SegmentSet<T> constructCuboid2D (
-        Array<T,2> const& lowerCorner, Array<T,2> const& upperCorner,
-        Array<plint,3> const& nSegments );
-
 
 template<typename T>
 SegmentSet<T> patchTubes(SegmentSet<T> const& geometryWithOpenings, plint sortDirection, std::vector<T> patchLengths);
@@ -53,7 +48,7 @@ SegmentSet<T> patchTubes(SegmentSet<T> const& geometryWithOpenings, plint sortDi
 ///   the number of points for the segment are "nx" and "ny" on the x and y axis,
 ///   respectively. This means that the total number of segments is 2*(nx-1)*(ny-1).
 template<typename T>
-SegmentSet<T> constructRectangle(T lx, T ly, plint nx, plint ny);
+SegmentSet<T> constructRectangle(T lx, T ly);
 
 } // namespace plb
 

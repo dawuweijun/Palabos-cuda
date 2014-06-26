@@ -31,6 +31,9 @@
 #include "offLattice/voxelizer2D.h"
 #include "atomicBlock/dataField2D.h"
 #include "multiBlock/multiBlockGenerator2D.h"
+#include "dataProcessors/dataInitializerWrapper2D.h"
+#include "dataProcessors/metaStuffWrapper2D.h"
+#include "core/plbTimer.h"
 
 namespace plb
 {
@@ -426,10 +429,8 @@ void VoxelizeMeshFunctional2D<T>::printOffender (
         std::cout << "Segment " << *it << " [" << std::flush;
         Array<T,2> p0 = mesh.getVertex ( *it, 0 );
         Array<T,2> p1 = mesh.getVertex ( *it, 1 );
-        Array<T,2> p2 = mesh.getVertex ( *it, 2 );
-        std::cout << p0[0] << " " << p1[0] << " " << p2[0] << " " << p0[0] << "], ["
-                  << p0[1] << " " << p1[1] << " " << p2[1] << " " << p0[1] << "], ["
-                  << p0[2] << " " << p1[2] << " " << p2[2] << " " << p0[2] << "]" << std::endl;
+        std::cout << p0[0] << " " << p1[0] << " " << p0[0] << "], ["
+                  << p0[1] << " " << p1[1] << " " << p0[1] << "]" << std::endl;
     }
 }
 

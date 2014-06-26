@@ -136,25 +136,6 @@ void addSurface (
 }
 
 template<typename T>
-SegmentSet<T> constructCuboid2D (
-    Array<T,2> const& lowerCorner, Array<T,2> const& upperCorner )
-{
-    std::vector<typename SegmentSet<T>::Segment> segments;
-
-    Array< T, 2  > &pA ( lowerCorner );
-    Array< T, 2  > pB ( upperCorner[0],pA[1] );
-    Array< T, 2  > &pC ( upperCorner );
-    Array< T, 2  > pD ( pA[0],pB[1] );
-
-    segments.push_back ( SegmentSet<T>::Segment ( pA,pB ) );
-    segments.push_back ( SegmentSet<T>::Segment ( pB,pC ) );
-    segments.push_back ( SegmentSet<T>::Segment ( pC,pD ) );
-    segments.push_back ( SegmentSet<T>::Segment ( pD,pA ) );
-
-    return SegmentSet<T> ( segments );
-}
-
-template<typename T>
 SegmentSet<T> patchTubes ( SegmentSet<T> const& geometryWithOpenings, plint sortDirection, std::vector<T> patchLengths )
 {
     typedef typename SegmentSet<T>::Segment Segment;
@@ -247,47 +228,19 @@ SegmentSet<T> patchTubes ( SegmentSet<T> const& geometryWithOpenings, plint sort
 
 
 template<typename T>
-SegmentSet<T> constructRectangle ( T lx, T ly, plint nx, plint ny )
+SegmentSet<T> constructRectangle ( T lx, T ly )
 {
-    static const T eps = std::numeric_limits<T>::epsilon();
-    PLB_ASSERT ( lx > ( T ) 0.0 && !util::fpequal ( lx, ( T ) 0.0, eps ) &&
-                 ly > ( T ) 0.0 && !util::fpequal ( ly, ( T ) 0.0, eps ) &&
-                 nx >= 2 && ny >= 2 );
-
-    T dx = lx / ( T ) ( nx - 1 );
-    T dy = ly / ( T ) ( ny - 1 );
-
     std::vector<typename SegmentSet<T>::Segment> segments;
-    T z = ( T ) 0;
-    for ( plint i = 0; i < nx; i++ )
-    {
-        T x0 = i * dx;
-        T x1 = x0 + dx;
-        for ( plint j = 0; j < ny; j++ )
-        {
-            T y0 = j * dy;
-            T y1 = y0 + dy;
 
-            Array<T,2> v0, v1, v2;
-            v0 = Array<T,2> ( x0, y0, z );
-            v1 = Array<T,2> ( x1, y0, z );
-            v2 = Array<T,2> ( x1, y1, z );
+    Array< T, 2  > &pA ( 0.,0. );
+    Array< T, 2  >  pB ( lx,0. );
+    Array< T, 2  > &pC ( lx,ly );
+    Array< T, 2  >  pD ( 0 ,ly );
 
-            typename SegmentSet<T>::Segment tmp;
-            tmp[0] = v0;
-            tmp[1] = v1;
-            tmp[2] = v2;
-
-            segments.push_back ( tmp );
-
-            v1 = Array<T,2> ( x0, y1, z );
-
-            tmp[1] = v2;
-            tmp[2] = v1;
-
-            segments.push_back ( tmp );
-        }
-    }
+    segments.push_back ( SegmentSet<T>::Segment ( pA,pB ) );
+    segments.push_back ( SegmentSet<T>::Segment ( pB,pC ) );
+    segments.push_back ( SegmentSet<T>::Segment ( pC,pD ) );
+    segments.push_back ( SegmentSet<T>::Segment ( pD,pA ) );
 
     return SegmentSet<T> ( segments );
 }
