@@ -96,31 +96,31 @@ public:
     /// Export the mesh as an binary STL file.
     void writeBinarySTL(std::string fname) const;
 
-    /// Cut the current segment set mesh by a plane "plane" which is
+    /// Cut the current segment set mesh by a line "line" which is
     ///   defined by a point and a normal. This cutting operation will
     ///   produce a new segment set "newSegmentSet" which is
     ///   the one that belongs to the half-space that the normal of the
-    ///   cutting plane points outside of. The function returns 1 if
+    ///   cutting line points outside of. The function returns 1 if
     ///   the cut was successful, 0 if there was no intersection between
-    ///   the original segment set and the plane provided, and -1 if an
+    ///   the original segment set and the line provided, and -1 if an
     ///   error occured.
-    int cutWithLine(Line2D<T> const& plane, SegmentSet<T>& newSegmentSet) const;
+    int cutWithLine(Line2D<T> const& line, SegmentSet<T>& newSegmentSet) const;
 
-    /// Cut the current segment set mesh by a plane "plane" which is
+    /// Cut the current segment set mesh by a line "line" which is
     ///   defined by a point and a normal and a cuboid "cuboid" which is
     ///   defined by a lower left corner and a right upper corner. This
     ///   cutting operation will cut off all segments, or parts of segments
     ///   that are fully contained in the cuboid and are positioned in
-    ///   the half-space that the normal of the cutting plane points into.
+    ///   the half-space that the normal of the cutting line points into.
     ///   Caution is needed, because this function does not use the cuboid
     ///   to cut, but only to select parts of the original segment set,
-    ///   to be then cut by the plane. Obviously, at least a part of the
-    ///   cutting plane must be contained in the cuboid, for the cutting
+    ///   to be then cut by the line. Obviously, at least a part of the
+    ///   cutting line must be contained in the cuboid, for the cutting
     ///   to make any sense. If not used wisely, this function can lead to
     ///   broken STL files. The function returns 1 if the cut was successful,
     ///   0 if there was no intersection between the original segment set
-    ///   the plane and the cuboid provided, and -1 if an error occured.
-    int cutWithLine(Line2D<T> const& plane, Cuboid2D<T> const& cuboid,
+    ///   the line and the cuboid provided, and -1 if an error occured.
+    int cutWithLine(Line2D<T> const& line, Cuboid2D<T> const& cuboid,
             SegmentSet<T>& newSegmentSet) const;
 
     T getMinEdgeLength() const { return minSegLength; }
@@ -137,14 +137,14 @@ private:
     void computeSegmentLength(pluint iSegment, T& segLength) const;
     void computeMinMaxSegments();
     void computeBoundingCuboid();
-    /// Cut the current segment by a plane "plane" which is
+    /// Cut the current segment by a line "line" which is
     ///   defined by a point and a normal. This cutting operation will
     ///   add or not one or more segments to the segment set "newSegmentSet".
     ///   The segments added belong to the half-space that the normal of
-    ///   the plane given points outside of. The function returns 1 if the
+    ///   the line given points outside of. The function returns 1 if the
     ///   cut was successful, 0 if there was no intersection between the
-    ///   original segment set and the plane and -1 if an error occured.
-    int cutSegmentWithLine(Line2D<T> const& plane, Segment const& segment,
+    ///   original segment set and the line and -1 if an error occured.
+    int cutSegmentWithLine(Line2D<T> const& line, Segment const& segment,
             SegmentSet<T>& newSegmentSet) const;
 
 private:

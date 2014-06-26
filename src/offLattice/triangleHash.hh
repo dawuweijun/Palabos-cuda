@@ -96,7 +96,7 @@ void TriangleHash<T>::getTriangles (
             }
         }
         std::sort(foundTriangles.begin(), foundTriangles.end());
-        foundTriangles.erase( unique(foundTriangles.begin(), foundTriangles.end()),
+        foundTriangles.erase( std::unique(foundTriangles.begin(), foundTriangles.end()),
                               foundTriangles.end() );
     }
 }

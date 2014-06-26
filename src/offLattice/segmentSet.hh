@@ -516,8 +516,8 @@ void SegmentSet<T>::writeAsciiSTL ( std::string fname ) const
             Array<T,2> v1 = segments[i][1];
 
             Array<T,2> e01 = v1 - v0;
-
-            Array<T,2> n ( e01[1],-e01[0] );
+	    //顺着线段的正方向看，左侧为正，右侧为负
+            Array<T,2> n ( -e01[1],e01[0] );
             n /= sqrt ( VectorTemplateImpl<T,2>::normSqr ( n ) );
             fprintf ( fp, "  segment normal % e % e\n", ( double ) n[0], ( double ) n[1] );
             fprintf ( fp, "    outer loop\n" );
@@ -554,8 +554,8 @@ void SegmentSet<T>::writeBinarySTL ( std::string fname ) const
             Array<T,2> v1 = segments[i][1];
 
             Array<T,2> e01 = v1 - v0;
-
-            Array<T,2> nrml(e01[1],-e01[0]);
+	    //顺着线段的正方向看，左侧为正，右侧为负
+            Array<T,2> nrml(-e01[1],e01[0]);
             nrml /= sqrt ( VectorTemplateImpl<T,2>::normSqr ( nrml ) );
 
             float n[2];

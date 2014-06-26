@@ -44,29 +44,25 @@ SegmentSet<T> constructCircle ( Array<T,2> const& center, T radius, plint minNum
     static const T eps = std::numeric_limits<T>::epsilon();
 #endif
     PLB_ASSERT ( radius > ( T ) 0.0 && !util::fpequal ( radius, ( T ) 0.0, eps ) &&
-                 minNumOfSegments >= 3 );
+                 minNumOfSegments > 3 );
 
-    // Create a triangularized unit sphere
+    // Create a triangularized unit circle
 
-    // Initial 6 vertices
+    // Initial 4 vertices
 
-    Array<T,2> va;
-    va[0] = ( T ) 1.0;
-    va[1] = ( T ) 0.0;
+    Array<T,2> va(1.0,0.0);
 
-    Array<T,2> vb;
-    vb[0] = ( T ) 0.0;
-    vb[1] = ( T ) 1.0;
+    Array<T,2> vb( 0.0,1.0);
 
-    Array<T,2> vc;
-    vc[0] = ( T ) ( -1.0 );
-    vc[1] = ( T ) 0.0;
+    Array<T,2> vc(-1.0,0.0);
+    
+    Array<T,2> vd(0.0 ,-1 );
 
-    // Initial 8 segments
+    // Initial 4 segments
 
     typename SegmentSet<T>::Segment tmp;
 
-    tmp[0] = vc;
+    tmp[0] = vd;
     tmp[1] = va;
     segments.push_back ( tmp );
 
@@ -76,6 +72,10 @@ SegmentSet<T> constructCircle ( Array<T,2> const& center, T radius, plint minNum
 
     tmp[0] = vb;
     tmp[1] = vc;
+    segments.push_back ( tmp );
+
+    tmp[0] = vc;
+    tmp[1] = vd;
     segments.push_back ( tmp );
 
     // Perform refinement iterations
