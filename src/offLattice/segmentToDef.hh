@@ -192,7 +192,7 @@ void SegmentToDef<T>::bvmLabel()
 template<typename T>
 plint& SegmentToDef<T>::globalVertex ( plint segment, plint localVertex )
 {
-    return edgeList [ 3*segment + ( ( localVertex == 0 ) ? 2 : localVertex-1 ) ].pv;
+    return edgeList [ 2*segment + localVertex ].pv;
 }
 
 template<typename T>
@@ -365,9 +365,6 @@ plint SegmentToDef<T>::uniqueVertices ( std::vector<Segment> const& segments )
 
         vsAdd ( segments[iSegment][1], index, count );
         segmentIndices[iSegment][1] = index;
-
-        vsAdd ( segments[iSegment][2], index, count );
-        segmentIndices[iSegment][2] = index;
     }
     return count;
 }
@@ -379,7 +376,6 @@ void SegmentToDef<T>::computePointingVertex()
     {
         globalVertex ( iSegment,0 ) = segmentIndices[iSegment][0];
         globalVertex ( iSegment,1 ) = segmentIndices[iSegment][1];
-        globalVertex ( iSegment,2 ) = segmentIndices[iSegment][2];
     }
 }
 
@@ -448,8 +444,7 @@ void SegmentToDef<T>::findBoundaryVertices()
     plint jVertex, segment;
     plint iVertex;
     int lock;
-    for ( iVertex=0, lock=1;
-            iVertex< ( plint ) edgeTable.size(); ++iVertex, lock=1 )
+    for ( iVertex=0, lock=1;iVertex< ( plint ) edgeTable.size(); ++iVertex, lock=1 )
     {
         for ( pluint iEdge=0; iEdge<edgeTable[iVertex].size(); ++iEdge )
         {
@@ -471,8 +466,6 @@ void SegmentToDef<T>::findBoundaryVertices()
                     localVertex_i = 0;
                 else if ( iVertex == globalVertex ( segment, 1 ) )
                     localVertex_i = 1;
-                else if ( iVertex == globalVertex ( segment, 2 ) )
-                    localVertex_i = 2;
                 else
                     PLB_ASSERT ( false ); // Problem with the boundary of the surface mesh.
 
@@ -481,8 +474,6 @@ void SegmentToDef<T>::findBoundaryVertices()
                     localVertex_j = 0;
                 else if ( jVertex == globalVertex ( segment, 1 ) )
                     localVertex_j = 1;
-                else if ( jVertex == globalVertex ( segment, 2 ) )
-                    localVertex_j = 2;
                 else
                     PLB_ASSERT ( false ); // Problem with the boundary of the surface mesh.
 
