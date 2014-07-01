@@ -8,13 +8,13 @@
 #include "memory"
 namespace plb
 {
-template <typename T1,typename T2=T1>
+template <typename T1,typename T2>
 void computeLocalInvK2D ( MultiTensorField2D< T1, 2  >& orient,
                           MultiTensorField2D< T2, 4  >& localInvK,
                           const Array<T1,4>& rawInvK,
                           const Array<T1, 2>& rawDir );
 
-template <typename T1,typename T2=T1>
+template <typename T1,typename T2>
 std::auto_ptr<MultiTensorField2D<T2,4> > computeLocalInvK2D (
     MultiTensorField2D<T1,2>& orient,
     const Array<T1,4> &rawInvK,
