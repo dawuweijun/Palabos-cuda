@@ -1,0 +1,24 @@
+Document: paraview-online-documentation
+Title: ParaView documentation
+Author: Kitware
+Abstract: Parallel Visualization Application. Comprehensive documentation 
+ ParaView is an open-source, multi-platform application designed to
+ visualize data sets of size varying from small to very large. The
+ goals of the ParaView project include the following:
+ .
+     * Develop an open-source, multi-platform visualization application.
+     * Support distributed computation models to process large data sets.
+     * Create an open, flexible, and intuitive user interface.
+     * Develop an extensible architecture based on open standards.
+ .
+ ParaView runs on distributed and shared memory parallel as well as
+ single processor systems and has been successfully tested on Windows,
+ Mac OS X, Linux and various Unix workstations, clusters and
+ supercomputers. Under the hood, ParaView uses the Visualization
+ Toolkit as the data processing and rendering engine and has a user
+ interface written using Qt.
+Section: Science/Data Analysis
+
+Format: HTML
+Index: /usr/share/doc/paraview-doc/Book/Book_Chapter_01_Intro.html
+Files: /usr/share/doc/paraview-doc/Book/*

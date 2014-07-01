@@ -1,0 +1,9 @@
+# These embedded libraries, seems, have different versions than in repository.
+# The code is incompatible with repo-versions.
+paraview: embedded-library usr/lib/paraview/libvtkftgl.so.1: ftgl
+paraview: postinst-has-useless-call-to-ldconfig
+paraview: postrm-has-useless-call-to-ldconfig
+paraview: binary-or-shlib-defines-rpath 
+
+# Seems this issue due to --as-needed flag
+paraview: library-not-linked-against-libc

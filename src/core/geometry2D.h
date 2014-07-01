@@ -33,6 +33,7 @@
 #include <algorithm>
 #include <iterator>
 #include <vector>
+#include "latticeBoltzmann/geometricOperationTemplates.h"
 
 namespace plb {
 
@@ -347,6 +348,69 @@ inline void adjustEqualSize(Box2D& fromDomain, Box2D& toDomain)
     toDomain = intersection.shift(-deltaX,-deltaY);
 }
 
+/// Definition of a 2D unbounded line.
+template<typename T>
+struct Line2D {
+    Line2D(Array<T,2> point_, Array<T,2> normal_)
+        : point(point_),
+          normal(normal_)
+    { }
+    Line2D() {
+        point.resetToZero();
+        normal.resetToZero();
+    }
+    Array<T,2> point;
+    Array<T,2> normal;
+};
+/// Definition of a 2D cuboid (rectangular parallelepiped).
+template<typename T>
+struct Cuboid2D {
+    Cuboid2D(Array<T,2> lowerLeftCorner_, Array<T,2> upperRightCorner_)
+        : lowerLeftCorner(lowerLeftCorner_),
+          upperRightCorner(upperRightCorner_)
+    { }
+    Cuboid2D() {
+        lowerLeftCorner.resetToZero();
+        upperRightCorner.resetToZero();
+    }
+    Array<T,2> lowerLeftCorner;
+    Array<T,2> upperRightCorner;
+};
+
+/// Function to compute the intersection between a line "line" which is defined by
+///   a point and a unit normal, and a line segment between points "point1"
+///   and "point2". "intersection" is the object whose state is changed by this function.
+///   This state is undefined, and cannot be used by the caller function, when the
+///   return value of this function is not 1. This function returns 1 if a unique
+///   intersection is found, -1 if the line belongs to the line or does not intersect
+///   it, and 0 otherwise.
+template<typename T>
+inline int lineIntersectionWithLine (
+        Line2D<T> const& line, Array<T,2> const& point1,
+        Array<T,2> const& point2, Precision precision, Array<T,2>& intersection )
+{
+    T epsilon = getEpsilon<T>(precision);
+
+    Array<T,2> direction = point2 - point1;
+
+    T num = dot(line.point, line.normal) - dot(point1, line.normal);
+    T denom = dot(direction, line.normal);
+
+    if (fabs(denom) <=  epsilon) {
+        return -1; // Line belongs to the line or does not intersect it.
+    }
+
+    T t = num / denom;
+
+    if ((t < 0.0 && !(fabs(t) <= epsilon)) ||
+        (t > 1.0 && !(fabs(t - 1.0) <= epsilon))) {
+        return 0;
+    }
+
+    intersection = point1 + direction * t; // Intersection point with the line.
+
+    return 1;
+}
 } // namespace plb
 
 #endif  // GEOMETRY_2D_H

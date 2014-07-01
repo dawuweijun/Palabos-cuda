@@ -30,7 +30,9 @@
 #include "offLattice/triangularSurfaceMesh.h"
 #include "offLattice/offLatticeBoundaryProfiles3D.h"
 #include "offLattice/triangleToDef.h"
+#include "offLattice/voxelizer3D.h"
 #include "multiBlock/nonLocalTransfer3D.h"
+#include "offLattice/makeSparse3D.h"
 #include <cmath>
 #include <limits>
 
@@ -637,7 +639,7 @@ std::vector<Lid>
 {
     PLB_PRECONDITION( topology.top()==1 );
     std::vector<Lid> lids_copy(lids);
-    std::sort(lids_copy.begin(), lids_copy.end(), LidLessThan<T>(sortDirection, getMesh()));
+    std::sort(lids_copy.begin(), lids_copy.end(), LidLessThan3D<T>(sortDirection, getMesh()));
     return lids_copy;
 }
 
@@ -648,7 +650,7 @@ std::vector<plint> TriangleBoundary3D<T>::getInletOutletIds(plint sortDirection)
         triangleToOriginalLid[lids[iLid].firstTriangle] = iLid;
     }
     std::vector<Lid> tmpLids(lids);
-    std::sort(tmpLids.begin(), tmpLids.end(), LidLessThan<T>(sortDirection, getMesh()));
+    std::sort(tmpLids.begin(), tmpLids.end(), LidLessThan3D<T>(sortDirection, getMesh()));
     std::vector<plint> ids(tmpLids.size());
     for (pluint iLid=0; iLid<tmpLids.size(); ++iLid) {
         plint originalId = triangleToOriginalLid[tmpLids[iLid].firstTriangle];
@@ -665,7 +667,7 @@ void TriangleBoundary3D<T>::getLidProperties (
     // Lid properties can only be computed in a closed mesh, by definition.
     PLB_PRECONDITION( topology.top()==1 );
     std::vector<Lid> tmpLids(lids);
-    std::sort(tmpLids.begin(), tmpLids.end(), LidLessThan<T>(sortDirection, getMesh()));
+    std::sort(tmpLids.begin(), tmpLids.end(), LidLessThan3D<T>(sortDirection, getMesh()));
     normal.resize(tmpLids.size());
     center.resize(tmpLids.size());
     radius.resize(tmpLids.size());

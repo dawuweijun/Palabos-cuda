@@ -27,6 +27,7 @@
 
 #include "offLattice/guoOffLatticeModel3D.h"
 #include "offLattice/nextNeighbors3D.h"
+#include "offLattice/boundaryShapes.h"
 #include "latticeBoltzmann/geometricOperationTemplates.h"
 #include "latticeBoltzmann/externalFieldAccess.h"
 #include <algorithm>

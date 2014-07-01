@@ -41,11 +41,11 @@ public:
     plint getTag(plint id) const;
     bool pointOnSurface (
             Dot2D const& fromPoint, Dot2D const& direction,
-            Array<T,3>& locatedPoint, T& distance,
-            Array<T,3>& wallNormal, SurfaceData& surfaceData,
+            Array<T,2>& locatedPoint, T& distance,
+            Array<T,2>& wallNormal, SurfaceData& surfaceData,
             OffBoundary::Type& bdType, plint& id ) const;
-    Array<T,3> computeContinuousNormal (
-            Array<T,3> const& p, plint id, bool isAreaWeighted = false ) const;
+    Array<T,2> computeContinuousNormal (
+            Array<T,2> const& p, plint id, bool isAreaWeighted = false ) const;
     bool intersectsSurface (
             Dot2D const& p1, Dot2D const& p2, plint& id ) const;
     bool isFluid(Dot2D const& location) const;
@@ -62,7 +62,7 @@ public:
             AtomicContainerBlock2D& container,
             std::vector<AtomicBlock2D const*> const& args ) =0;
     virtual ContainerBlockData* generateOffLatticeInfo() const =0;
-    virtual Array<T,3> getLocalForce(AtomicContainerBlock2D& container) const =0;
+    virtual Array<T,2> getLocalForce(AtomicContainerBlock2D& container) const =0;
 private:
     BoundaryShape2D<T,SurfaceData>* shape;
     int flowType;
@@ -139,10 +139,10 @@ public:
     virtual GetForceOnObjectFunctional2D<T,SurfaceData>* clone() const;
     virtual void getTypeOfModification(std::vector<modif::ModifT>& modified) const;
     virtual BlockDomain::DomainT appliesTo() const;
-    Array<T,3> getForce() const;
+    Array<T,2> getForce() const;
 private:
-    OffLatticeModel2D<T,Array<T,3> >* offLatticeModel;
-    Array<plint,3> forceId;
+    OffLatticeModel2D<T,Array<T,2> >* offLatticeModel;
+    Array<plint,2> forceId;
 };
 
 }  // namespace plb

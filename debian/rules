@@ -1,0 +1,34 @@
+#! /usr/bin/make -f
+#export DH_VERBOSE=1
+
+DESTDIR = $(CURDIR)/debian/tmp
+UPSTREAM_VERSION = $(shell dpkg-parsechangelog | awk '/^Version:/ { sub("-[^-]*$$", "", $$2); print $$2}')
+include /usr/share/dpkg/default.mk
+
+#Disable parallel on i386 due to http://pad.lv/1263493
+
+%:
+	dh $@ --with python2 $(if $(filter $(DEB_HOST_ARCH),i386),,--parallel)
+
+export LD_LIBRARY_PATH+=:$(CURDIR)/debian/palabos/usr/lib/palabos
+
+export DEB_CFLAGS_MAINT_APPEND  = -Wall -pedantic
+export DEB_LDFLAGS_MAINT_APPEND = -Wl,--as-needed
+
+# Explicit settings of MPI_* is required see
+# http://www.vtk.org/Bug/view.php?id=12572
+PYVER = $(shell pyversions -dv)
+extra_flags += -Wno-dev \
+	-DCMAKE_CXX_FLAGS=-std=c++0x
+
+override_dh_auto_configure:
+	dh_auto_configure -- $(extra_flags)
+
+override_dh_compress:
+	dh_compress -X.qch
+
+override_dh_install:
+	dh_install --list-missing
+
+override_dh_makeshlibs:
+	dh_makeshlibs -V'palabos (>= $(UPSTREAM_VERSION)), palabos (<< $(UPSTREAM_VERSION).)'

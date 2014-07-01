@@ -5,7 +5,7 @@
  * 1010 Lausanne, Switzerland
  * E-mail contact: contact@flowkit.com
  *
- * The most recent release of Palabos can be downloaded at 
+ * The most recent release of Palabos can be downloaded at
  * <http://www.palabos.org/>
  *
  * The library Palabos is free software: you can redistribute it and/or
@@ -30,15 +30,16 @@
 #include <algorithm>
 #include <cmath>
 
-namespace plb {
+namespace plb
+{
 
 template<typename T>
 CheckVoxelizationFunctional2D<T>::
-    CheckVoxelizationFunctional2D (
-            BoundaryShape2D<T,Array<T,3> >* shape_, int flowType_ )
-  : numErrorsId(this->getStatistics().subscribeIntSum()),
-    shape(shape_),
-    flowType(flowType_)
+CheckVoxelizationFunctional2D (
+    BoundaryShape2D<T,Array<T,3> >* shape_, int flowType_ )
+    : numErrorsId ( this->getStatistics().subscribeIntSum() ),
+      shape ( shape_ ),
+      flowType ( flowType_ )
 { }
 
 template<typename T>
@@ -49,20 +50,20 @@ CheckVoxelizationFunctional2D<T>::~CheckVoxelizationFunctional2D()
 
 template<typename T>
 CheckVoxelizationFunctional2D<T>::
-    CheckVoxelizationFunctional2D (
-            CheckVoxelizationFunctional2D<T> const& rhs)
-    : PlainReductiveBoxProcessingFunctional2D(rhs),
-      numErrorsId(rhs.numErrorsId),
-      shape(rhs.shape->clone()),
-      flowType(rhs.flowType)
+CheckVoxelizationFunctional2D (
+    CheckVoxelizationFunctional2D<T> const& rhs )
+    : PlainReductiveBoxProcessingFunctional2D ( rhs ),
+      numErrorsId ( rhs.numErrorsId ),
+      shape ( rhs.shape->clone() ),
+      flowType ( rhs.flowType )
 { }
 
 template<typename T>
 CheckVoxelizationFunctional2D<T>&
-    CheckVoxelizationFunctional2D<T>::operator= (
-            CheckVoxelizationFunctional2D<T> const& rhs )
+CheckVoxelizationFunctional2D<T>::operator= (
+    CheckVoxelizationFunctional2D<T> const& rhs )
 {
-    PlainReductiveBoxProcessingFunctional2D::operator=(rhs);
+    PlainReductiveBoxProcessingFunctional2D::operator= ( rhs );
     numErrorsId = rhs.numErrorsId;
     shape = rhs.shape->clone();
     flowType = rhs.flowType;
@@ -72,18 +73,19 @@ CheckVoxelizationFunctional2D<T>&
 
 template<typename T>
 CheckVoxelizationFunctional2D<T>*
-    CheckVoxelizationFunctional2D<T>::clone() const
+CheckVoxelizationFunctional2D<T>::clone() const
 {
-    return new CheckVoxelizationFunctional2D<T>(*this);
+    return new CheckVoxelizationFunctional2D<T> ( *this );
 }
 
 template<typename T>
 void CheckVoxelizationFunctional2D<T>::getTypeOfModification (
-        std::vector<modif::ModifT>& modified) const
+    std::vector<modif::ModifT>& modified ) const
 {
     modified[0] = modif::staticVariables;  // Flag matrix.
     // Possible additional parameters for the shape function are read-only.
-    for (pluint i=1; i<modified.size(); ++i) {
+    for ( pluint i=1; i<modified.size(); ++i )
+    {
         modified[i] = modif::nothing;
     }
 }
@@ -95,46 +97,51 @@ BlockDomain::DomainT CheckVoxelizationFunctional2D<T>::appliesTo() const
 }
 
 template<typename T>
-bool CheckVoxelizationFunctional2D<T>::isFluid(Dot2D const& location) const
+bool CheckVoxelizationFunctional2D<T>::isFluid ( Dot2D const& location ) const
 {
-    if (flowType==voxelFlag::inside) {
-        return shape->isInside(location);
+    if ( flowType==voxelFlag::inside )
+    {
+        return shape->isInside ( location );
     }
-    else {
-        return !shape->isInside(location);
+    else
+    {
+        return !shape->isInside ( location );
     }
 }
 
 template<typename T>
 void CheckVoxelizationFunctional2D<T>::processGenericBlocks (
-        Box2D domain, std::vector<AtomicBlock2D*> fields )
+    Box2D domain, std::vector<AtomicBlock2D*> fields )
 {
-    PLB_PRECONDITION( fields.size() >= 1 );
+    PLB_PRECONDITION ( fields.size() >= 1 );
     ScalarField2D<int>* flagMatrix =
-        dynamic_cast<ScalarField2D<int>*>(fields[0]);
-    PLB_ASSERT( flagMatrix );
+        dynamic_cast<ScalarField2D<int>*> ( fields[0] );
+    PLB_ASSERT ( flagMatrix );
     Dot2D absoluteOffset = flagMatrix->getLocation();
 
-    BoundaryShape2D<T,Array<T,3> >* newShape=0;
-    if (fields.size()>1) {
-        std::vector<AtomicBlock2D*> shapeParameters(fields.size()-1);
-        for (pluint i=0; i<shapeParameters.size(); ++i) {
+    BoundaryShape2D<T,Array<T,2> >* newShape=0;
+    if ( fields.size() >1 )
+    {
+        std::vector<AtomicBlock2D*> shapeParameters ( fields.size()-1 );
+        for ( pluint i=0; i<shapeParameters.size(); ++i )
+        {
             shapeParameters[i] = fields[i+1];
         }
-        newShape=shape->clone(shapeParameters);
-        std::swap(shape,newShape);
+        newShape=shape->clone ( shapeParameters );
+        std::swap ( shape,newShape );
     }
 
-    for (plint iX=domain.x0; iX<=domain.x1; ++iX) {
-        for (plint iY=domain.y0; iY<=domain.y1; ++iY) {
-            for (plint iZ=domain.z0; iZ<=domain.z1; ++iZ) {
-                computeCell(Dot2D(iX,iY,iZ), *flagMatrix, absoluteOffset);
-            }
+    for ( plint iX=domain.x0; iX<=domain.x1; ++iX )
+    {
+        for ( plint iY=domain.y0; iY<=domain.y1; ++iY )
+        {
+            computeCell ( Dot2D ( iX,iY ), *flagMatrix, absoluteOffset );
         }
     }
 
-    if (newShape) {
-        std::swap(shape,newShape);
+    if ( newShape )
+    {
+        std::swap ( shape,newShape );
         delete newShape;
     }
 }
@@ -142,51 +149,59 @@ void CheckVoxelizationFunctional2D<T>::processGenericBlocks (
 
 template<typename T>
 void CheckVoxelizationFunctional2D<T>::computeCell (
-        Dot2D const& cellLocation,
-        ScalarField2D<int>& flagMatrix,
-        Dot2D const& offset)
+    Dot2D const& cellLocation,
+    ScalarField2D<int>& flagMatrix,
+    Dot2D const& offset )
 {
     //  Non-Fluid nodes.
-    if (!isFluid(cellLocation+offset)) {
+    if ( !isFluid ( cellLocation+offset ) )
+    {
         plint numNeighbors=0;
         plint numShallow=0;
         plint numFailures=0;
-        for (int iNeighbor=0; iNeighbor<NextNeighbor<T>::numNeighbors; ++iNeighbor) {
+        for ( int iNeighbor=0; iNeighbor<NextNeighbor<T>::numNeighbors; ++iNeighbor )
+        {
             int const* c = NextNeighbor<T>::c[iNeighbor];
-            Dot2D neighbor(cellLocation.x+c[0], cellLocation.y+c[1], cellLocation.z+c[2]);
-            Dot2D nextNeighbor(cellLocation.x+2*c[0], cellLocation.y+2*c[1], cellLocation.z+2*c[2]);
+            Dot2D neighbor ( cellLocation.x+c[0], cellLocation.y+c[1] );
+            Dot2D nextNeighbor ( cellLocation.x+2*c[0], cellLocation.y+2*c[1] );
             // If the non-fluid node has a fluid neighbor ...
-            if (isFluid(neighbor+offset)) {
+            if ( isFluid ( neighbor+offset ) )
+            {
                 ++numNeighbors;
                 Array<T,3> wallNode;
                 T wallDistance;
                 Array<T,3> wall_u, wallNormal;
                 OffBoundary::Type bdType;
                 plint id=-1; // No optimization.
-                bool ok = shape->pointOnSurface(cellLocation+offset, Dot2D(c[0],c[1],c[2]),
-                                                wallNode, wallDistance, wallNormal,
-                                                wall_u, bdType, id);
-                if (!ok) {
+                bool ok = shape->pointOnSurface ( cellLocation+offset, Dot2D ( c[0],c[1] ),
+                                                  wallNode, wallDistance, wallNormal,
+                                                  wall_u, bdType, id );
+                if ( !ok )
+                {
                     ++numFailures;
                 }
-                if (!isFluid(nextNeighbor+offset)) {
+                if ( !isFluid ( nextNeighbor+offset ) )
+                {
                     ++numShallow;
                 }
             }
         }
-        if (numFailures>0) {
-            this->getStatistics().gatherIntSum(numErrorsId, 1);
-            flagMatrix.get(cellLocation.x,cellLocation.y,cellLocation.z) = 1;
+        if ( numFailures>0 )
+        {
+            this->getStatistics().gatherIntSum ( numErrorsId, 1 );
+            flagMatrix.get ( cellLocation.x,cellLocation.y ) = 1;
         }
-        if (numNeighbors>0 && numNeighbors==numShallow) {
-            flagMatrix.get(cellLocation.x,cellLocation.y,cellLocation.z) = 2;
+        if ( numNeighbors>0 && numNeighbors==numShallow )
+        {
+            flagMatrix.get ( cellLocation.x,cellLocation.y ) = 2;
         }
     }
 }
 
 template<typename T>
-plint CheckVoxelizationFunctional2D<T>::getNumErrors() const {
-    return this->getStatistics().getIntSum(numErrorsId);
+plint CheckVoxelizationFunctional2D<T>::getNumErrors() const
+{
+    return this->getStatistics().getIntSum ( numErrorsId );
 }
 
 }  // namespace plb

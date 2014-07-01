@@ -36,9 +36,9 @@ template<typename T, class SurfaceData>
 class BoundaryProfile2D {
 public:
     virtual ~BoundaryProfile2D() { }
-    virtual void setNormal(Array<T,3> const& normal_) =0;
-    virtual void defineCircularShape(Array<T,3> const& radius_, T center_) =0;
-    virtual void getData( Array<T,3> const& pos, plint id, AtomicBlock2D const* argument,
+    virtual void setNormal(Array<T,2> const& normal_) =0;
+    virtual void defineCircularShape(Array<T,2> const& radius_, T center_) =0;
+    virtual void getData( Array<T,2> const& pos, plint id, AtomicBlock2D const* argument,
                           SurfaceData& data, OffBoundary::Type& bdType ) const =0;
     virtual BoundaryProfile2D<T,SurfaceData>* clone() const =0;
 };
@@ -58,166 +58,166 @@ BoundaryProfile2D<T, SurfaceData>* generateDefaultWallProfile2D() {
 }
 
 template<typename T>
-class NoSlipProfile2D : public BoundaryProfile2D<T, Array<T,3> >
+class NoSlipProfile2D : public BoundaryProfile2D<T, Array<T,2> >
 {
 public:
-    virtual void setNormal(Array<T,3> const& normal_);
-    virtual void defineCircularShape(Array<T,3> const& center_, T radius_);
-    virtual void getData( Array<T,3> const& pos, plint id, AtomicBlock2D const* argument,
-                          Array<T,3>& data, OffBoundary::Type& bdType ) const;
+    virtual void setNormal(Array<T,2> const& normal_);
+    virtual void defineCircularShape(Array<T,2> const& center_, T radius_);
+    virtual void getData( Array<T,2> const& pos, plint id, AtomicBlock2D const* argument,
+                          Array<T,2>& data, OffBoundary::Type& bdType ) const;
     virtual NoSlipProfile2D<T>* clone() const;
 };
 
 template<typename T>
-class FreeSlipProfile2D : public BoundaryProfile2D<T, Array<T,3> >
+class FreeSlipProfile2D : public BoundaryProfile2D<T, Array<T,2> >
 {
 public:
-    virtual void setNormal(Array<T,3> const& normal_);
-    virtual void defineCircularShape(Array<T,3> const& center_, T radius_);
-    virtual void getData( Array<T,3> const& pos, plint id, AtomicBlock2D const* argument,
-                          Array<T,3>& data, OffBoundary::Type& bdType ) const;
+    virtual void setNormal(Array<T,2> const& normal_);
+    virtual void defineCircularShape(Array<T,2> const& center_, T radius_);
+    virtual void getData( Array<T,2> const& pos, plint id, AtomicBlock2D const* argument,
+                          Array<T,2>& data, OffBoundary::Type& bdType ) const;
     virtual FreeSlipProfile2D<T>* clone() const;
 };
 
 template<typename T>
-class ConstantVelocityProfile2D : public BoundaryProfile2D<T, Array<T,3> >
+class ConstantVelocityProfile2D : public BoundaryProfile2D<T, Array<T,2> >
 {
 public:
-    ConstantVelocityProfile2D(Array<T,3> const& u_);
-    virtual void setNormal(Array<T,3> const& normal_);
-    virtual void defineCircularShape(Array<T,3> const& center_, T radius_);
-    virtual void getData( Array<T,3> const& pos, plint id, AtomicBlock2D const* argument,
-                          Array<T,3>& data, OffBoundary::Type& bdType ) const;
+    ConstantVelocityProfile2D(Array<T,2> const& u_);
+    virtual void setNormal(Array<T,2> const& normal_);
+    virtual void defineCircularShape(Array<T,2> const& center_, T radius_);
+    virtual void getData( Array<T,2> const& pos, plint id, AtomicBlock2D const* argument,
+                          Array<T,2>& data, OffBoundary::Type& bdType ) const;
     virtual ConstantVelocityProfile2D<T>* clone() const;
 private:
-    Array<T,3> u;
+    Array<T,2> u;
 };
 
 template<typename T>
-class VelocityPlugProfile2D : public BoundaryProfile2D<T, Array<T,3> >
+class VelocityPlugProfile2D : public BoundaryProfile2D<T, Array<T,2> >
 {
 public:
     VelocityPlugProfile2D(T uMax_);
-    virtual void setNormal(Array<T,3> const& normal_);
-    virtual void defineCircularShape(Array<T,3> const& center_, T radius_);
-    virtual void getData( Array<T,3> const& pos, plint id, AtomicBlock2D const* argument,
-                          Array<T,3>& data, OffBoundary::Type& bdType ) const;
+    virtual void setNormal(Array<T,2> const& normal_);
+    virtual void defineCircularShape(Array<T,2> const& center_, T radius_);
+    virtual void getData( Array<T,2> const& pos, plint id, AtomicBlock2D const* argument,
+                          Array<T,2>& data, OffBoundary::Type& bdType ) const;
     virtual VelocityPlugProfile2D<T>* clone() const;
 private:
     T uMax;
-    Array<T,3> normal;
+    Array<T,2> normal;
 };
 
 template< typename T, template<typename U> class Descriptor>
-class OscillatingPoiseuilleProfile2D : public BoundaryProfile2D<T, Array<T,3> >
+class OscillatingPoiseuilleProfile2D : public BoundaryProfile2D<T, Array<T,2> >
 {
 public:
     OscillatingPoiseuilleProfile2D(T minUave_, T maxUave_, T period_);
-    virtual void setNormal(Array<T,3> const& normal_);
-    virtual void defineCircularShape(Array<T,3> const& center_, T radius_);
-    virtual void getData( Array<T,3> const& pos, plint id, AtomicBlock2D const* argument,
-                          Array<T,3>& data, OffBoundary::Type& bdType ) const;
+    virtual void setNormal(Array<T,2> const& normal_);
+    virtual void defineCircularShape(Array<T,2> const& center_, T radius_);
+    virtual void getData( Array<T,2> const& pos, plint id, AtomicBlock2D const* argument,
+                          Array<T,2>& data, OffBoundary::Type& bdType ) const;
     virtual OscillatingPoiseuilleProfile2D<T,Descriptor>* clone() const;
 private:
     T minUave, maxUave, period;
-    Array<T,3> normal;
-    Array<T,3> center;
+    Array<T,2> normal;
+    Array<T,2> center;
     T radius;
 };
 
 template< typename T, template<typename U> class Descriptor>
-class IncreasingPoiseuilleProfile2D : public BoundaryProfile2D<T, Array<T,3> >
+class IncreasingPoiseuilleProfile2D : public BoundaryProfile2D<T, Array<T,2> >
 {
 public:
     IncreasingPoiseuilleProfile2D(T uAverage_, plint maxT_);
-    virtual void setNormal(Array<T,3> const& normal_);
-    virtual void defineCircularShape(Array<T,3> const& center_, T radius_);
-    virtual void getData( Array<T,3> const& pos, plint id, AtomicBlock2D const* argument,
-                          Array<T,3>& data, OffBoundary::Type& bdType ) const;
+    virtual void setNormal(Array<T,2> const& normal_);
+    virtual void defineCircularShape(Array<T,2> const& center_, T radius_);
+    virtual void getData( Array<T,2> const& pos, plint id, AtomicBlock2D const* argument,
+                          Array<T,2>& data, OffBoundary::Type& bdType ) const;
     virtual IncreasingPoiseuilleProfile2D<T,Descriptor>* clone() const;
 private:
     T uAverage;
     plint maxT;
-    Array<T,3> normal;
-    Array<T,3> center;
+    Array<T,2> normal;
+    Array<T,2> center;
     T radius;
 };
 
 template< typename T, template<typename U> class Descriptor>
-class IncreasingVelocityProfile2D : public BoundaryProfile2D<T, Array<T,3> >
+class IncreasingVelocityProfile2D : public BoundaryProfile2D<T, Array<T,2> >
 {
 public:
-    IncreasingVelocityProfile2D(Array<T,3> const& u_, plint maxT_);
-    virtual void setNormal(Array<T,3> const& normal_);
-    virtual void defineCircularShape(Array<T,3> const& center_, T radius_);
-    virtual void getData( Array<T,3> const& pos, plint id, AtomicBlock2D const* argument,
-                          Array<T,3>& data, OffBoundary::Type& bdType ) const;
+    IncreasingVelocityProfile2D(Array<T,2> const& u_, plint maxT_);
+    virtual void setNormal(Array<T,2> const& normal_);
+    virtual void defineCircularShape(Array<T,2> const& center_, T radius_);
+    virtual void getData( Array<T,2> const& pos, plint id, AtomicBlock2D const* argument,
+                          Array<T,2>& data, OffBoundary::Type& bdType ) const;
     virtual IncreasingVelocityProfile2D<T,Descriptor>* clone() const;
 private:
-    Array<T,3> u;
+    Array<T,2> u;
     plint maxT;
 };
 
 template< typename T, template<typename U> class Descriptor>
-class TimeDependentVelocityProfile2D : public BoundaryProfile2D<T, Array<T,3> >
+class TimeDependentVelocityProfile2D : public BoundaryProfile2D<T, Array<T,2> >
 {
 public:
-    TimeDependentVelocityProfile2D(util::TimeDependentFunction<T,3>* velocity_);
+    TimeDependentVelocityProfile2D(util::TimeDependentFunction<T,2>* velocity_);
     TimeDependentVelocityProfile2D(TimeDependentVelocityProfile2D<T,Descriptor> const& rhs);
     TimeDependentVelocityProfile2D<T,Descriptor>& operator= (
             TimeDependentVelocityProfile2D<T,Descriptor> const& rhs );
     void swap(TimeDependentVelocityProfile2D<T,Descriptor>& rhs);
-    virtual void setNormal(Array<T,3> const& normal_);
-    virtual void defineCircularShape(Array<T,3> const& center_, T radius_);
-    virtual void getData( Array<T,3> const& pos, plint id, AtomicBlock2D const* argument,
-                          Array<T,3>& data, OffBoundary::Type& bdType ) const;
+    virtual void setNormal(Array<T,2> const& normal_);
+    virtual void defineCircularShape(Array<T,2> const& center_, T radius_);
+    virtual void getData( Array<T,2> const& pos, plint id, AtomicBlock2D const* argument,
+                          Array<T,2>& data, OffBoundary::Type& bdType ) const;
     virtual TimeDependentVelocityProfile2D<T,Descriptor>* clone() const;
 private:
-    util::TimeDependentFunction<T,3>* velocity;
+    util::TimeDependentFunction<T,2>* velocity;
 };
 
 template<typename T>
-class PoiseuilleProfile2D : public BoundaryProfile2D<T, Array<T,3> >
+class PoiseuilleProfile2D : public BoundaryProfile2D<T, Array<T,2> >
 {
 public:
     PoiseuilleProfile2D(T uAverage_);
-    virtual void setNormal(Array<T,3> const& normal_);
-    virtual void defineCircularShape(Array<T,3> const& center_, T radius_);
-    virtual void getData( Array<T,3> const& pos, plint id, AtomicBlock2D const* argument,
-                          Array<T,3>& data, OffBoundary::Type& bdType ) const;
+    virtual void setNormal(Array<T,2> const& normal_);
+    virtual void defineCircularShape(Array<T,2> const& center_, T radius_);
+    virtual void getData( Array<T,2> const& pos, plint id, AtomicBlock2D const* argument,
+                          Array<T,2>& data, OffBoundary::Type& bdType ) const;
     virtual PoiseuilleProfile2D<T>* clone() const;
 private:
     T uAverage;
-    Array<T,3> normal;
-    Array<T,3> center;
+    Array<T,2> normal;
+    Array<T,2> center;
     T radius;
 };
 
 template<typename T>
-class NeumannBoundaryProfile2D : public BoundaryProfile2D<T, Array<T,3> >
+class NeumannBoundaryProfile2D : public BoundaryProfile2D<T, Array<T,2> >
 {
 public:
-    virtual void setNormal(Array<T,3> const& normal_);
-    virtual void defineCircularShape(Array<T,3> const& center_, T radius_);
-    virtual void getData( Array<T,3> const& pos, plint id, AtomicBlock2D const* argument,
-                          Array<T,3>& data, OffBoundary::Type& bdType ) const;
+    virtual void setNormal(Array<T,2> const& normal_);
+    virtual void defineCircularShape(Array<T,2> const& center_, T radius_);
+    virtual void getData( Array<T,2> const& pos, plint id, AtomicBlock2D const* argument,
+                          Array<T,2>& data, OffBoundary::Type& bdType ) const;
     virtual NeumannBoundaryProfile2D<T>* clone() const;
 private:
-    Array<T,3> normal;
+    Array<T,2> normal;
 };
 
 template<typename T>
-class DensityNeumannBoundaryProfile2D : public BoundaryProfile2D<T, Array<T,3> >
+class DensityNeumannBoundaryProfile2D : public BoundaryProfile2D<T, Array<T,2> >
 {
 public:
     DensityNeumannBoundaryProfile2D(T rho_ = (T)1);
-    virtual void setNormal(Array<T,3> const& normal_);
-    virtual void defineCircularShape(Array<T,3> const& center_, T radius_);
-    virtual void getData( Array<T,3> const& pos, plint id, AtomicBlock2D const* argument,
-                          Array<T,3>& data, OffBoundary::Type& bdType ) const;
+    virtual void setNormal(Array<T,2> const& normal_);
+    virtual void defineCircularShape(Array<T,2> const& center_, T radius_);
+    virtual void getData( Array<T,2> const& pos, plint id, AtomicBlock2D const* argument,
+                          Array<T,2>& data, OffBoundary::Type& bdType ) const;
     virtual DensityNeumannBoundaryProfile2D<T>* clone() const;
 private:
-    Array<T,3> normal;
+    Array<T,2> normal;
     T rho;
 };
 
@@ -225,13 +225,13 @@ template<typename T>
 class ScalarNeumannProfile2D : public BoundaryProfile2D<T,Array<T,2> >
 {
 public:
-    virtual void setNormal(Array<T,3> const& normal_);
-    virtual void defineCircularShape(Array<T,3> const& center_, T radius_);
-    virtual void getData( Array<T,3> const& pos, plint id, AtomicBlock2D const* argument,
+    virtual void setNormal(Array<T,2> const& normal_);
+    virtual void defineCircularShape(Array<T,2> const& center_, T radius_);
+    virtual void getData( Array<T,2> const& pos, plint id, AtomicBlock2D const* argument,
                           Array<T,2>& data, OffBoundary::Type& bdType ) const;
     virtual ScalarNeumannProfile2D<T>* clone() const;
 private:
-    Array<T,3> normal;
+    Array<T,2> normal;
 };
 
 template<typename T>
@@ -239,9 +239,9 @@ class ScalarDirichletProfile2D : public BoundaryProfile2D<T,Array<T,2> >
 {
 public:
     ScalarDirichletProfile2D(T value_);
-    virtual void setNormal(Array<T,3> const& normal_);
-    virtual void defineCircularShape(Array<T,3> const& center_, T radius_);
-    virtual void getData( Array<T,3> const& pos, plint id, AtomicBlock2D const* argument,
+    virtual void setNormal(Array<T,2> const& normal_);
+    virtual void defineCircularShape(Array<T,2> const& center_, T radius_);
+    virtual void getData( Array<T,2> const& pos, plint id, AtomicBlock2D const* argument,
                           Array<T,2>& data, OffBoundary::Type& bdType ) const;
     virtual ScalarDirichletProfile2D<T>* clone() const;
 private:
@@ -253,13 +253,13 @@ class ScalarFluxProfile2D : public BoundaryProfile2D<T,Array<T,2> >
 {
 public:
     ScalarFluxProfile2D(T gradVal_);
-    virtual void setNormal(Array<T,3> const& normal_);
-    virtual void defineCircularShape(Array<T,3> const& center_, T radius_);
-    virtual void getData( Array<T,3> const& pos, plint id, AtomicBlock2D const* argument,
+    virtual void setNormal(Array<T,2> const& normal_);
+    virtual void defineCircularShape(Array<T,2> const& center_, T radius_);
+    virtual void getData( Array<T,2> const& pos, plint id, AtomicBlock2D const* argument,
                           Array<T,2>& data, OffBoundary::Type& bdType ) const;
     virtual ScalarFluxProfile2D<T>* clone() const;
 private:
-    Array<T,3> normal;
+    Array<T,2> normal;
     T gradVal;
 };
 
@@ -269,13 +269,13 @@ class ScalarIsolationProfile2D : public BoundaryProfile2D<T,Array<T,2> >
 {
 public:
     ScalarIsolationProfile2D(T asymptoticRho_, T kappa_);
-    virtual void setNormal(Array<T,3> const& normal_);
-    virtual void defineCircularShape(Array<T,3> const& center_, T radius_);
-    virtual void getData( Array<T,3> const& pos, plint id, AtomicBlock2D const* argument,
+    virtual void setNormal(Array<T,2> const& normal_);
+    virtual void defineCircularShape(Array<T,2> const& center_, T radius_);
+    virtual void getData( Array<T,2> const& pos, plint id, AtomicBlock2D const* argument,
                           Array<T,2>& data, OffBoundary::Type& bdType ) const;
     virtual ScalarIsolationProfile2D<T>* clone() const;
 private:
-    Array<T,3> normal;
+    Array<T,2> normal;
     T asymptoticRho, kappa;
 };
 

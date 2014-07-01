@@ -33,6 +33,7 @@
  */
 #ifndef MRT_LATTICES_HH
 #define MRT_LATTICES_HH
+#include "latticeBoltzmann/mrtLattices.h"
 
 namespace plb {
 namespace descriptors {

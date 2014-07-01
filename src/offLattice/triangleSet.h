@@ -121,13 +121,13 @@ public:
     ///   broken STL files. The function returns 1 if the cut was successful,
     ///   0 if there was no intersection between the original triangle set
     ///   the plane and the cuboid provided, and -1 if an error occured.
-    int cutWithPlane(Plane<T> const& plane, Cuboid<T> const& cuboid,
+    int cutWithPlane(Plane<T> const& plane, Cuboid3D<T> const& cuboid,
             TriangleSet<T>& newTriangleSet) const;
 
     T getMinEdgeLength() const { return minEdgeLength; }
     T getMaxEdgeLength() const { return maxEdgeLength; }
 
-    Cuboid<T> getBoundingCuboid() const { return boundingCuboid; }
+    Cuboid3D<T> getBoundingCuboid() const { return boundingCuboid; }
 
 private:
     void readSTL(std::string fname);
@@ -151,7 +151,7 @@ private:
 private:
     std::vector<Triangle> triangles;
     T minEdgeLength, maxEdgeLength;
-    Cuboid<T> boundingCuboid;
+    Cuboid3D<T> boundingCuboid;
     /// Enumeration constant that sets the precision for triangle set checks.
     /// Single precision (float): FLT
     /// Double precision (double): DBL

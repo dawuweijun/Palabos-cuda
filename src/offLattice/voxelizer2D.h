@@ -29,7 +29,7 @@
 
 #include "core/globalDefs.h"
 #include "atomicBlock/dataProcessingFunctional2D.h"
-#include "offLattice/triangleHash.h"
+#include "offLattice/segmentHash.h"
 
 namespace plb {
 
@@ -57,22 +57,22 @@ namespace voxelFlag {
 
 template<typename T>
 std::auto_ptr<MultiScalarField2D<int> > voxelize (
-        TriangularSurfaceMesh<T> const& mesh,
+        SegmentPolygonMesh2D<T> const& mesh,
         plint symmetricLayer, plint borderWidth );
 
 template<typename T>
 std::auto_ptr<MultiScalarField2D<int> > voxelize (
-        TriangularSurfaceMesh<T> const& mesh,
+        SegmentPolygonMesh2D<T> const& mesh,
         Box2D const& domain, plint borderWidth );
 
 template<typename T>
 std::auto_ptr<MultiScalarField2D<int> > voxelize (
-        TriangularSurfaceMesh<T> const& mesh,
+        SegmentPolygonMesh2D<T> const& mesh,
         Box2D const& domain, plint borderWidth, Box2D seed );
 
 template<typename T>
 std::auto_ptr<MultiScalarField2D<int> > revoxelize (
-        TriangularSurfaceMesh<T> const& mesh,
+        SegmentPolygonMesh2D<T> const& mesh,
         MultiScalarField2D<int>& oldVoxelMatrix,
         MultiContainerBlock2D& hashContainer, plint borderWidth );
 
@@ -80,7 +80,7 @@ template<typename T>
 class VoxelizeMeshFunctional2D : public BoxProcessingFunctional2D {
 public:
     VoxelizeMeshFunctional2D (
-            TriangularSurfaceMesh<T> const& mesh_ );
+            SegmentPolygonMesh2D<T> const& mesh_ );
     virtual void processGenericBlocks (
         Box2D domain, std::vector<AtomicBlock2D*> blocks );
     virtual VoxelizeMeshFunctional2D<T>* clone() const;
@@ -89,14 +89,14 @@ public:
 private:
     bool checkIfFacetsCrossed (
             AtomicContainerBlock2D& hashContainer,
-            Array<T,3> const& point1, Array<T,3> const& point2,
+            Array<T,2> const& point1, Array<T,2> const& point2,
             T& distance, plint& whichTriangle );
     bool distanceToSurface (
             AtomicContainerBlock2D& hashContainer,
-            Array<T,3> const& point, T& distance, bool& isBehind ) const;
+            Array<T,2> const& point, T& distance, bool& isBehind ) const;
     bool createVoxelizationRange (
             Box2D const& domain, ScalarField2D<int>& voxels,
-            Array<plint,2>& xRange, Array<plint,2>& yRange, Array<plint,2>& zRange );
+            Array<plint,2>& xRange, Array<plint,2>& yRange );
     bool voxelizeFromNeighbor (
         ScalarField2D<int> const& voxels, AtomicContainerBlock2D& hashContainer,
         Dot2D pos, Dot2D neighbor, int& voxelType );
@@ -104,7 +104,7 @@ private:
             ScalarField2D<int> const& voxels,
             AtomicContainerBlock2D& hashContainer, Dot2D pos );
 private:
-    TriangularSurfaceMesh<T> const& mesh;
+    SegmentPolygonMesh2D<T> const& mesh;
 };
 
 /// Convert inside flags to innerBoundary, and outside flags to outerBoundary,

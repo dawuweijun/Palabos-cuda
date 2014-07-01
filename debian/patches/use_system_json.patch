@@ -1,0 +1,32 @@
+Description: Use packaged version of json instead of embedded one.
+Author: Anton Gladky <gladk@debian.org>
+Last-Update: 2013-06-13
+
+--- a/VTK/IO/Geometry/module.cmake
++++ b/VTK/IO/Geometry/module.cmake
+@@ -7,7 +7,6 @@
+     vtkCommonMisc
+     vtkIOCore
+     vtkzlib
+-    vtkjsoncpp
+   TEST_DEPENDS
+     vtkIOAMR
+     vtkIOLegacy
+--- a/VTK/IO/Geometry/CMakeLists.txt
++++ b/VTK/IO/Geometry/CMakeLists.txt
+@@ -41,3 +41,4 @@
+   )
+ 
+ vtk_module_library(vtkIOGeometry ${Module_SRCS})
++target_link_libraries(vtkIOGeometry jsoncpp)
+--- a/VTK/IO/Geometry/vtkPlot3DMetaReader.cxx
++++ b/VTK/IO/Geometry/vtkPlot3DMetaReader.cxx
+@@ -32,7 +32,7 @@
+ #if defined(WIN32) && defined(VTK_BUILD_SHARED_LIBS)
+ # define JSON_DLL
+ #endif
+-#include <json/json.h>
++#include <jsoncpp/json/json.h>
+ 
+ #define CALL_MEMBER_FN(object,ptrToMember)  ((object).*(ptrToMember))
+ 

@@ -1,0 +1,591 @@
+Description: rough editing of manpages, shipped with sources to fix 
+  lintian-warnnings.
+Author: Anton Gladky <gladky.anton@gmail.com>
+Last-Update: 2012-11-25
+
+--- a/ThirdParty/IceT/vtkicet/doc/man/man3/icetCreateContext.3
++++ b/ThirdParty/IceT/vtkicet/doc/man/man3/icetCreateContext.3
+@@ -29,8 +29,7 @@
+ 
+ .PP
+ The \fBicetCreateContext\fP
+-function creates a new 
+-.igcontext!\fBIceT \fP\fBIceT \fP
++function creates a new .igcontext!\fBIceT \fP\fBIceT \fP
+ context, makes it current, and returns a 
+ handle to the new context. The handle returned is of type 
+ \fBIceTContext\fP\&.
+--- a/ThirdParty/IceT/vtkicet/doc/man/man3/icetSingleImageStrategy.3
++++ b/ThirdParty/IceT/vtkicet/doc/man/man3/icetSingleImageStrategy.3
+@@ -46,7 +46,7 @@
+  Automatically 
+ chooses which single image strategy to use based on the number of 
+ processes participating in the composition. 
+-.igsingle image strategy!automatic
++
+ .TP
+ \fBICET_SINGLE_IMAGE_STRATEGY_BSWAP\fP
+  The classic binary swap 
+@@ -55,7 +55,6 @@
+ receives the opposite half from its partner. The processes are then 
+ partitioned into two groups that each have the same image part, and the 
+ algorithm recurses. 
+-.igsingle image strategy!binary swap
+ .TP
+ \fBICET_SINGLE_IMAGE_STRATEGY_RADIXK\fP
+  The radix\-k 
+@@ -71,7 +70,6 @@
+ process partners with another, and one of the processes sends its entire 
+ image to the other. The algorithm recurses with the group of processes 
+ that received images until only one process has an image. 
+-.igsingle image strategy!tree
+ .PP
+ By default \fBIceT \fPsets the single image strategy to 
+ \fBICET_SINGLE_IMAGE_STRATEGY_AUTOMATIC\fP
+--- a/ThirdParty/IceT/vtkicet/doc/man/man3/icetImageGetDepthf.3
++++ b/ThirdParty/IceT/vtkicet/doc/man/man3/icetImageGetDepthf.3
+@@ -15,8 +15,6 @@
+ 
+ \fBicetImageGetColor , \fBicetImageGetDepth\fP\-\- retrieve pixel data buffer from image\fP
+ .PP
+-.igmanpage:icetImageGetDepth
+-.igicetImageGetDepth|(textbf
+ .PP
+ .SH Synopsis
+ 
+@@ -154,6 +152,5 @@
+ \fIicetImageGetColorFormat\fP(3),
+ \fIicetImageGetDepthFormat\fP(3)
+ .PP
+-.igicetImageGetDepth|)textbf
+ .PP
+ .\" NOTE: This file is generated, DO NOT EDIT.
+--- a/ThirdParty/IceT/vtkicet/doc/man/man3/icetImageGetDepthFormat.3
++++ b/ThirdParty/IceT/vtkicet/doc/man/man3/icetImageGetDepthFormat.3
+@@ -15,8 +15,6 @@
+ 
+ \fBicetImageGetColorFormat\fP,\fBicetImageGetDepthFormat\fP\-\- get the format of image buffers 
+ .PP
+-.igmanpage:icetImageGetDepthFormat
+-.igicetImageGetDepthFormat|(textbf
+ .PP
+ .SH Synopsis
+ 
+@@ -109,6 +107,5 @@
+ \fIicetSetColorFormat\fP(3),
+ \fIicetSetDepthFormat\fP(3)
+ .PP
+-.igicetImageGetDepthFormat|)textbf
+ .PP
+ .\" NOTE: This file is generated, DO NOT EDIT.
+--- a/ThirdParty/IceT/vtkicet/doc/man/man3/icetCompositeMode.3
++++ b/ThirdParty/IceT/vtkicet/doc/man/man3/icetCompositeMode.3
+@@ -45,8 +45,7 @@
+ .PP
+ .TP
+ \fBICET_COMPOSITE_MODE_Z_BUFFER\fP
+- Use the 
+-.igz\-bufferz\-buffer
++ Use the .igz\-bufferz\-buffer
+ hidden\-surface removal operation. The 
+ compositing operation compares the distance of pixel fragments from the 
+ viewpoint and passes the fragment closest to the user. In order for 
+@@ -55,8 +54,7 @@
+ .TP
+ \fBICET_COMPOSITE_MODE_BLEND\fP
+  Blend two fragments together 
+-using the standard 
+-.igover operator.igunder operatorover/under
++using the standard .igover operator.igunder operatorover/under
+ operator. in 
+ order for this operation to work, images must have a color buffer (set 
+ with \fBicetSetColorFormat\fP)that has an alpha channel and there must be 
+--- a/ThirdParty/IceT/vtkicet/doc/man/man3/icetImageGetHeight.3
++++ b/ThirdParty/IceT/vtkicet/doc/man/man3/icetImageGetHeight.3
+@@ -15,11 +15,7 @@
+ 
+ \fBicetImageGetWidth\fP,\fBicetImageGetHeight\fP,\fBicetImageGetNumPixels\fP\-\- get dimensions of an image 
+ .PP
+-.igmanpage:icetImageGetWidth
+-.igicetImageGetWidth|(textbf
+ .PP
+-.igmanpage:icetImageGetHeight
+-.igicetImageGetHeight|(textbf
+ .PP
+ .SH Synopsis
+ 
+@@ -85,8 +81,6 @@
+ \fIicetImageGetColor\fP(3),
+ \fIicetImageGetDepth\fP(3)
+ .PP
+-.igicetImageGetWidth|)textbf
+ .PP
+-.igicetImageGetHeight|)textbf
+ .PP
+ .\" NOTE: This file is generated, DO NOT EDIT.
+--- a/ThirdParty/IceT/vtkicet/doc/man/man3/icetSetColorFormat.3
++++ b/ThirdParty/IceT/vtkicet/doc/man/man3/icetSetColorFormat.3
+@@ -15,8 +15,6 @@
+ 
+ \fBicetSetColorFormat\fP,\fBicetSetDepthFormat\fP\-\- specifies the buffer formats for \fBIceT \fPto use when creating images 
+ .PP
+-.igmanpage:icetSetDepthFormat
+-.igicetSetDepthFormat|(textbf
+ .PP
+ .SH Synopsis
+ 
+@@ -134,6 +132,5 @@
+ \fIicetImageGetColorFormat\fP(3),
+ \fIicetImageGetDepthFormat\fP(3)
+ .PP
+-.igicetSetDepthFormat|)textbf
+ .PP
+ .\" NOTE: This file is generated, DO NOT EDIT.
+--- a/ThirdParty/IceT/vtkicet/doc/man/man3/icetImageGetColorui.3
++++ b/ThirdParty/IceT/vtkicet/doc/man/man3/icetImageGetColorui.3
+@@ -15,8 +15,6 @@
+ 
+ \fBicetImageGetColor , \fBicetImageGetDepth\fP\-\- retrieve pixel data buffer from image\fP
+ .PP
+-.igmanpage:icetImageGetDepth
+-.igicetImageGetDepth|(textbf
+ .PP
+ .SH Synopsis
+ 
+@@ -154,6 +152,5 @@
+ \fIicetImageGetColorFormat\fP(3),
+ \fIicetImageGetDepthFormat\fP(3)
+ .PP
+-.igicetImageGetDepth|)textbf
+ .PP
+ .\" NOTE: This file is generated, DO NOT EDIT.
+--- a/ThirdParty/IceT/vtkicet/doc/man/man3/icetDisable.3
++++ b/ThirdParty/IceT/vtkicet/doc/man/man3/icetDisable.3
+@@ -15,8 +15,7 @@
+ 
+ \fBicetEnable\fP,\fBicetDisable\fP\-\- enable/disable an \fBIceT \fPfeature. 
+ .PP
+-.igmanpage:icetDisable
+-.igicetDisable|(textbf
++
+ .PP
+ .SH Synopsis
+ 
+@@ -177,6 +176,5 @@
+ .PP
+ \fIicetIsEnabled\fP(3)
+ .PP
+-.igicetDisable|)textbf
+ .PP
+ .\" NOTE: This file is generated, DO NOT EDIT.
+--- a/ThirdParty/IceT/vtkicet/doc/man/man3/icetDrawCallback.3
++++ b/ThirdParty/IceT/vtkicet/doc/man/man3/icetDrawCallback.3
+@@ -18,18 +18,6 @@
+ .SH Synopsis
+ 
+ .PP
+-#include <IceT.h>
+-.PP
+-.TS H
+-l l l .
+-typedef void (*\fBIceTDrawCallbackType\fP)(
+-	const IceTDouble *	\fIprojection_matrix\fP,
+-	const IceTDouble *	\fImodelview_matrix\fP,
+-	const IceTFloat *	\fIbackground_color\fP,
+-	const IceTInt *	\fIreadback_viewport\fP,
+-	\fBIceTImage\fP	\fIresult\fP  )
+-.TE
+-.PP
+ .TS H
+ l l l .
+ void \fBicetDrawCallback\fP(	\fBIceTDrawCallbackType\fP	\fIcallback\fP  );
+@@ -70,8 +58,7 @@
+ and \fImodelview_matrix\fP\&.
+ Each of these arguments is a 16\-value 
+ array that represents a $4 *4$ transformation of homogeneous 
+-coordinates. The arrays store the matrices in 
+-.igcolumn\-major ordercolumn\-major
++coordinates. The arrays store the matrices in .igcolumn\-major ordercolumn\-major
+ order. 
+ .PP
+ Note that the \fIprojection_matrix\fP
+--- a/ThirdParty/IceT/vtkicet/doc/man/man3/icetEnable.3
++++ b/ThirdParty/IceT/vtkicet/doc/man/man3/icetEnable.3
+@@ -15,8 +15,7 @@
+ 
+ \fBicetEnable\fP,\fBicetDisable\fP\-\- enable/disable an \fBIceT \fPfeature. 
+ .PP
+-.igmanpage:icetDisable
+-.igicetDisable|(textbf
++
+ .PP
+ .SH Synopsis
+ 
+@@ -177,6 +176,5 @@
+ .PP
+ \fIicetIsEnabled\fP(3)
+ .PP
+-.igicetDisable|)textbf
+ .PP
+ .\" NOTE: This file is generated, DO NOT EDIT.
+--- a/ThirdParty/IceT/vtkicet/doc/man/man3/icetImageCopyColorub.3
++++ b/ThirdParty/IceT/vtkicet/doc/man/man3/icetImageCopyColorub.3
+@@ -15,8 +15,6 @@
+ 
+ \fBicetImageCopyColor\fP,\fBicetImageCopyDepth\fP\-\- retrieve pixel data from image 
+ .PP
+-.igmanpage:icetImageCopyDepth
+-.igicetImageCopyDepth|(textbf
+ .PP
+ .SH Synopsis
+ 
+@@ -129,6 +127,5 @@
+ \fIicetImageGetColor\fP(3),
+ \fIicetImageGetDepth\fP(3)
+ .PP
+-.igicetImageCopyDepth|)textbf
+ .PP
+ .\" NOTE: This file is generated, DO NOT EDIT.
+--- a/ThirdParty/IceT/vtkicet/doc/man/man3/icetImageCopyDepthf.3
++++ b/ThirdParty/IceT/vtkicet/doc/man/man3/icetImageCopyDepthf.3
+@@ -15,8 +15,6 @@
+ 
+ \fBicetImageCopyColor\fP,\fBicetImageCopyDepth\fP\-\- retrieve pixel data from image 
+ .PP
+-.igmanpage:icetImageCopyDepth
+-.igicetImageCopyDepth|(textbf
+ .PP
+ .SH Synopsis
+ 
+@@ -129,6 +127,5 @@
+ \fIicetImageGetColor\fP(3),
+ \fIicetImageGetDepth\fP(3)
+ .PP
+-.igicetImageCopyDepth|)textbf
+ .PP
+ .\" NOTE: This file is generated, DO NOT EDIT.
+--- a/ThirdParty/IceT/vtkicet/doc/man/man3/icetImageGetDepth.3
++++ b/ThirdParty/IceT/vtkicet/doc/man/man3/icetImageGetDepth.3
+@@ -15,8 +15,6 @@
+ 
+ \fBicetImageGetColor , \fBicetImageGetDepth\fP\-\- retrieve pixel data buffer from image\fP
+ .PP
+-.igmanpage:icetImageGetDepth
+-.igicetImageGetDepth|(textbf
+ .PP
+ .SH Synopsis
+ 
+@@ -154,6 +152,5 @@
+ \fIicetImageGetColorFormat\fP(3),
+ \fIicetImageGetDepthFormat\fP(3)
+ .PP
+-.igicetImageGetDepth|)textbf
+ .PP
+ .\" NOTE: This file is generated, DO NOT EDIT.
+--- a/ThirdParty/IceT/vtkicet/doc/man/man3/icetImageGetColorub.3
++++ b/ThirdParty/IceT/vtkicet/doc/man/man3/icetImageGetColorub.3
+@@ -15,8 +15,6 @@
+ 
+ \fBicetImageGetColor , \fBicetImageGetDepth\fP\-\- retrieve pixel data buffer from image\fP
+ .PP
+-.igmanpage:icetImageGetDepth
+-.igicetImageGetDepth|(textbf
+ .PP
+ .SH Synopsis
+ 
+@@ -154,6 +152,5 @@
+ \fIicetImageGetColorFormat\fP(3),
+ \fIicetImageGetDepthFormat\fP(3)
+ .PP
+-.igicetImageGetDepth|)textbf
+ .PP
+ .\" NOTE: This file is generated, DO NOT EDIT.
+--- a/ThirdParty/IceT/vtkicet/doc/man/man3/icetImageGetColorFormat.3
++++ b/ThirdParty/IceT/vtkicet/doc/man/man3/icetImageGetColorFormat.3
+@@ -15,8 +15,6 @@
+ 
+ \fBicetImageGetColorFormat\fP,\fBicetImageGetDepthFormat\fP\-\- get the format of image buffers 
+ .PP
+-.igmanpage:icetImageGetDepthFormat
+-.igicetImageGetDepthFormat|(textbf
+ .PP
+ .SH Synopsis
+ 
+@@ -109,6 +107,5 @@
+ \fIicetSetColorFormat\fP(3),
+ \fIicetSetDepthFormat\fP(3)
+ .PP
+-.igicetImageGetDepthFormat|)textbf
+ .PP
+ .\" NOTE: This file is generated, DO NOT EDIT.
+--- a/ThirdParty/IceT/vtkicet/doc/man/man3/icetImageGetColorf.3
++++ b/ThirdParty/IceT/vtkicet/doc/man/man3/icetImageGetColorf.3
+@@ -15,8 +15,6 @@
+ 
+ \fBicetImageGetColor , \fBicetImageGetDepth\fP\-\- retrieve pixel data buffer from image\fP
+ .PP
+-.igmanpage:icetImageGetDepth
+-.igicetImageGetDepth|(textbf
+ .PP
+ .SH Synopsis
+ 
+@@ -154,6 +152,5 @@
+ \fIicetImageGetColorFormat\fP(3),
+ \fIicetImageGetDepthFormat\fP(3)
+ .PP
+-.igicetImageGetDepth|)textbf
+ .PP
+ .\" NOTE: This file is generated, DO NOT EDIT.
+--- a/ThirdParty/IceT/vtkicet/doc/man/man3/icetImageCopyColorf.3
++++ b/ThirdParty/IceT/vtkicet/doc/man/man3/icetImageCopyColorf.3
+@@ -15,8 +15,6 @@
+ 
+ \fBicetImageCopyColor\fP,\fBicetImageCopyDepth\fP\-\- retrieve pixel data from image 
+ .PP
+-.igmanpage:icetImageCopyDepth
+-.igicetImageCopyDepth|(textbf
+ .PP
+ .SH Synopsis
+ 
+@@ -129,6 +127,5 @@
+ \fIicetImageGetColor\fP(3),
+ \fIicetImageGetDepth\fP(3)
+ .PP
+-.igicetImageCopyDepth|)textbf
+ .PP
+ .\" NOTE: This file is generated, DO NOT EDIT.
+--- a/ThirdParty/IceT/vtkicet/doc/man/man3/icetImageGetWidth.3
++++ b/ThirdParty/IceT/vtkicet/doc/man/man3/icetImageGetWidth.3
+@@ -15,11 +15,7 @@
+ 
+ \fBicetImageGetWidth\fP,\fBicetImageGetHeight\fP,\fBicetImageGetNumPixels\fP\-\- get dimensions of an image 
+ .PP
+-.igmanpage:icetImageGetWidth
+-.igicetImageGetWidth|(textbf
+ .PP
+-.igmanpage:icetImageGetHeight
+-.igicetImageGetHeight|(textbf
+ .PP
+ .SH Synopsis
+ 
+@@ -85,8 +81,6 @@
+ \fIicetImageGetColor\fP(3),
+ \fIicetImageGetDepth\fP(3)
+ .PP
+-.igicetImageGetWidth|)textbf
+ .PP
+-.igicetImageGetHeight|)textbf
+ .PP
+ .\" NOTE: This file is generated, DO NOT EDIT.
+--- a/ThirdParty/IceT/vtkicet/doc/man/man3/icetStrategy.3
++++ b/ThirdParty/IceT/vtkicet/doc/man/man3/icetStrategy.3
+@@ -48,7 +48,6 @@
+ compositing for more than one tile, but is recommended for the single 
+ tile case because it bypasses some of the communication necessary for 
+ the other multi\-tile strategies. 
+-.igstrategy!sequential
+ .TP
+ \fBICET_STRATEGY_DIRECT\fP
+  As each process renders an image 
+@@ -56,7 +55,7 @@
+ display that tile. This usually results in a few processes receiving 
+ and processing the majority of the data, and is therefore usually an 
+ inefficient strategy. 
+-.igstrategy!direct
++
+ .TP
+ \fBICET_STRATEGY_SPLIT\fP
+  Like \fBICET_STRATEGY_DIRECT\fP,
+@@ -65,7 +64,7 @@
+ about the same amount of data. This strategy is often very efficient, 
+ but due to the large amount of messages passed, it has not proven to be 
+ very scalable or robust. 
+-.igstrategy!split
++
+ .TP
+ \fBICET_STRATEGY_REDUCE\fP
+  A two phase algorithm. In the 
+@@ -77,7 +76,6 @@
+ well in a wide variety of multi\-tile applications. (However, in the 
+ special case where only one tile is defined, the sequential strategy is 
+ probably better.) 
+-.igstrategy!reduce
+ .TP
+ \fBICET_STRATEGY_VTREE\fP
+  An extension to the binary tree 
+@@ -89,7 +87,7 @@
+ or \fBICET_STRATEGY_SPLIT\fP,
+ but 
+ has very well behaved network communication. 
+-.igstrategy!virtual trees
++
+ .PP
+ Not all of the strategies support ordered image composition. 
+ \fBICET_STRATEGY_SEQUENTIAL\fP,
+--- a/ThirdParty/IceT/vtkicet/doc/man/man3/icetImageCopyColor.3
++++ b/ThirdParty/IceT/vtkicet/doc/man/man3/icetImageCopyColor.3
+@@ -15,8 +15,6 @@
+ 
+ \fBicetImageCopyColor\fP,\fBicetImageCopyDepth\fP\-\- retrieve pixel data from image 
+ .PP
+-.igmanpage:icetImageCopyDepth
+-.igicetImageCopyDepth|(textbf
+ .PP
+ .SH Synopsis
+ 
+@@ -129,6 +127,5 @@
+ \fIicetImageGetColor\fP(3),
+ \fIicetImageGetDepth\fP(3)
+ .PP
+-.igicetImageCopyDepth|)textbf
+ .PP
+ .\" NOTE: This file is generated, DO NOT EDIT.
+--- a/ThirdParty/IceT/vtkicet/doc/man/man3/icetImageCopyDepth.3
++++ b/ThirdParty/IceT/vtkicet/doc/man/man3/icetImageCopyDepth.3
+@@ -15,8 +15,6 @@
+ 
+ \fBicetImageCopyColor\fP,\fBicetImageCopyDepth\fP\-\- retrieve pixel data from image 
+ .PP
+-.igmanpage:icetImageCopyDepth
+-.igicetImageCopyDepth|(textbf
+ .PP
+ .SH Synopsis
+ 
+@@ -129,6 +127,5 @@
+ \fIicetImageGetColor\fP(3),
+ \fIicetImageGetDepth\fP(3)
+ .PP
+-.igicetImageCopyDepth|)textbf
+ .PP
+ .\" NOTE: This file is generated, DO NOT EDIT.
+--- a/ThirdParty/IceT/vtkicet/doc/man/man3/icetImageGetNumPixels.3
++++ b/ThirdParty/IceT/vtkicet/doc/man/man3/icetImageGetNumPixels.3
+@@ -15,11 +15,7 @@
+ 
+ \fBicetImageGetWidth\fP,\fBicetImageGetHeight\fP,\fBicetImageGetNumPixels\fP\-\- get dimensions of an image 
+ .PP
+-.igmanpage:icetImageGetWidth
+-.igicetImageGetWidth|(textbf
+ .PP
+-.igmanpage:icetImageGetHeight
+-.igicetImageGetHeight|(textbf
+ .PP
+ .SH Synopsis
+ 
+@@ -85,8 +81,6 @@
+ \fIicetImageGetColor\fP(3),
+ \fIicetImageGetDepth\fP(3)
+ .PP
+-.igicetImageGetWidth|)textbf
+ .PP
+-.igicetImageGetHeight|)textbf
+ .PP
+ .\" NOTE: This file is generated, DO NOT EDIT.
+--- a/ThirdParty/IceT/vtkicet/doc/man/man3/icetSetDepthFormat.3
++++ b/ThirdParty/IceT/vtkicet/doc/man/man3/icetSetDepthFormat.3
+@@ -15,8 +15,6 @@
+ 
+ \fBicetSetColorFormat\fP,\fBicetSetDepthFormat\fP\-\- specifies the buffer formats for \fBIceT \fPto use when creating images 
+ .PP
+-.igmanpage:icetSetDepthFormat
+-.igicetSetDepthFormat|(textbf
+ .PP
+ .SH Synopsis
+ 
+@@ -134,6 +132,5 @@
+ \fIicetImageGetColorFormat\fP(3),
+ \fIicetImageGetDepthFormat\fP(3)
+ .PP
+-.igicetSetDepthFormat|)textbf
+ .PP
+ .\" NOTE: This file is generated, DO NOT EDIT.
+--- a/ThirdParty/IceT/vtkicet/doc/man/man3/icetImageGetColor.3
++++ b/ThirdParty/IceT/vtkicet/doc/man/man3/icetImageGetColor.3
+@@ -15,8 +15,6 @@
+ 
+ \fBicetImageGetColor , \fBicetImageGetDepth\fP\-\- retrieve pixel data buffer from image\fP
+ .PP
+-.igmanpage:icetImageGetDepth
+-.igicetImageGetDepth|(textbf
+ .PP
+ .SH Synopsis
+ 
+@@ -154,6 +152,5 @@
+ \fIicetImageGetColorFormat\fP(3),
+ \fIicetImageGetDepthFormat\fP(3)
+ .PP
+-.igicetImageGetDepth|)textbf
+ .PP
+ .\" NOTE: This file is generated, DO NOT EDIT.
+--- a/ThirdParty/IceT/vtkicet/doc/man/man3/icetImageGetColorcf.3
++++ b/ThirdParty/IceT/vtkicet/doc/man/man3/icetImageGetColorcf.3
+@@ -15,8 +15,6 @@
+ 
+ \fBicetImageGetColor , \fBicetImageGetDepth\fP\-\- retrieve pixel data buffer from image\fP
+ .PP
+-.igmanpage:icetImageGetDepth
+-.igicetImageGetDepth|(textbf
+ .PP
+ .SH Synopsis
+ 
+@@ -154,6 +152,5 @@
+ \fIicetImageGetColorFormat\fP(3),
+ \fIicetImageGetDepthFormat\fP(3)
+ .PP
+-.igicetImageGetDepth|)textbf
+ .PP
+ .\" NOTE: This file is generated, DO NOT EDIT.
+--- a/ThirdParty/IceT/vtkicet/doc/man/man3/icetImageGetDepthcf.3
++++ b/ThirdParty/IceT/vtkicet/doc/man/man3/icetImageGetDepthcf.3
+@@ -15,8 +15,6 @@
+ 
+ \fBicetImageGetColor , \fBicetImageGetDepth\fP\-\- retrieve pixel data buffer from image\fP
+ .PP
+-.igmanpage:icetImageGetDepth
+-.igicetImageGetDepth|(textbf
+ .PP
+ .SH Synopsis
+ 
+@@ -154,6 +152,5 @@
+ \fIicetImageGetColorFormat\fP(3),
+ \fIicetImageGetDepthFormat\fP(3)
+ .PP
+-.igicetImageGetDepth|)textbf
+ .PP
+ .\" NOTE: This file is generated, DO NOT EDIT.
+--- a/ThirdParty/IceT/vtkicet/doc/man/man3/icetImageGetColorcui.3
++++ b/ThirdParty/IceT/vtkicet/doc/man/man3/icetImageGetColorcui.3
+@@ -15,8 +15,6 @@
+ 
+ \fBicetImageGetColor , \fBicetImageGetDepth\fP\-\- retrieve pixel data buffer from image\fP
+ .PP
+-.igmanpage:icetImageGetDepth
+-.igicetImageGetDepth|(textbf
+ .PP
+ .SH Synopsis
+ 
+@@ -154,6 +152,5 @@
+ \fIicetImageGetColorFormat\fP(3),
+ \fIicetImageGetDepthFormat\fP(3)
+ .PP
+-.igicetImageGetDepth|)textbf
+ .PP
+ .\" NOTE: This file is generated, DO NOT EDIT.
+--- a/ThirdParty/IceT/vtkicet/doc/man/man3/icetImageGetColorcub.3
++++ b/ThirdParty/IceT/vtkicet/doc/man/man3/icetImageGetColorcub.3
+@@ -15,8 +15,6 @@
+ 
+ \fBicetImageGetColor , \fBicetImageGetDepth\fP\-\- retrieve pixel data buffer from image\fP
+ .PP
+-.igmanpage:icetImageGetDepth
+-.igicetImageGetDepth|(textbf
+ .PP
+ .SH Synopsis
+ 
+@@ -154,6 +152,5 @@
+ \fIicetImageGetColorFormat\fP(3),
+ \fIicetImageGetDepthFormat\fP(3)
+ .PP
+-.igicetImageGetDepth|)textbf
+ .PP
+ .\" NOTE: This file is generated, DO NOT EDIT.

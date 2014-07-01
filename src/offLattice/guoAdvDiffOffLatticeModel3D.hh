@@ -25,6 +25,7 @@
 #ifndef GUO_ADV_DIFF_OFF_LATTICE_MODEL_3D_HH
 #define GUO_ADV_DIFF_OFF_LATTICE_MODEL_3D_HH
 
+#include "core/plbTimer.h"
 #include "offLattice/guoAdvDiffOffLatticeModel3D.h"
 #include "offLattice/nextNeighbors3D.h"
 #include "latticeBoltzmann/geometricOperationTemplates.h"

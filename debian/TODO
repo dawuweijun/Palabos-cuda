@@ -1,0 +1,8 @@
+TODO:
+
+- What should I do with ParaView User's Guide 3.10:
+http://www.paraview.org/paraview/help/download/ParaView%20User's%20Guide%20v3.10.pdf
+- Need to document building of vtk-python plugins, since paraview-python and python-vtk conflicts.
+Changes is that vtk-python plugins will be not binary compatible (maybe VTK 5.8.0 should provide a good alternative)
+- Need to check vtkedge & gdcm paraview plugins still builds even after:
+http://www.paraview.org/pipermail/paraview/2011-September/022615.html

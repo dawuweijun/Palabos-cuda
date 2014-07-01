@@ -57,10 +57,10 @@ void BoxTensorRotationFunctional2D<T1,T2>::process ( Box2D domain, TensorField2D
                 rmat[1][0]=sinTheta;
                 rmat[1][1]=cosTheta;
                 //计算渗透率矩阵的逆矩阵
-                tmpinvk[0]=rawTensor[0][0]*rmat[0][0]+rawTensor[0][1]*rmat[1][0];
-                tmpinvk[1]=rawTensor[0][0]*rmat[0][1]+rawTensor[0][1]*rmat[1][1];
-                tmpinvk[2]=rawTensor[1][0]*rmat[0][0]+rawTensor[1][1]*rmat[1][0];
-                tmpinvk[3]=rawTensor[1][0]*rmat[0][1]+rawTensor[1][1]*rmat[1][1];
+                tmpinvk[0]=rawTensor[0]*rmat[0][0]+rawTensor[1]*rmat[1][0];
+                tmpinvk[1]=rawTensor[0]*rmat[0][1]+rawTensor[1]*rmat[1][1];
+                tmpinvk[2]=rawTensor[2]*rmat[0][0]+rawTensor[3]*rmat[1][0];
+                tmpinvk[3]=rawTensor[2]*rmat[0][1]+rawTensor[3]*rmat[1][1];
             }
         }
     }

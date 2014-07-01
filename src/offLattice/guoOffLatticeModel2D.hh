@@ -37,13 +37,13 @@ namespace plb {
 
 template<typename T, template<typename U> class Descriptor>
 GuoOffLatticeModel2D<T,Descriptor>::LiquidNeighbor::LiquidNeighbor
-            (plint iNeighbor_, plint depth_, plint iTriangle_, Array<T,2> wallNormal)
+            (plint iNeighbor_, plint depth_, plint iSegment_, Array<T,2> wallNormal)
         : iNeighbor(iNeighbor_),
           depth(depth_),
-          iTriangle(iTriangle_)
+          iSegment(iSegment_)
 {
     int const* c = NextNeighbor<T>::c[iNeighbor];
-    Array<T,2> neighborVect(c[0],c[1],c[2]);
+    Array<T,2> neighborVect(c[0],c[1]);
     cosAngle = fabs(dot(neighborVect,wallNormal))*NextNeighbor<T>::invD[iNeighbor];
 }
 
@@ -102,7 +102,7 @@ void GuoOffLatticeModel2D<T,Descriptor>::prepareCell (
                         break;
                     }
                 }
-                plint iTriangle=-1;
+                plint iSegment=-1;
                 global::timer("intersect").start();
                 Array<T,2> locatedPoint;
                 T distance;
@@ -113,17 +113,17 @@ void GuoOffLatticeModel2D<T,Descriptor>::prepareCell (
                 bool ok =
 #endif
                     this->pointOnSurface (
-                            cellLocation+offset, Dot2D(c[0],c[1],c[2]), locatedPoint, distance,
-                            wallNormal, surfaceData, bdType, iTriangle );
+                            cellLocation+offset, Dot2D(c[0],c[1]), locatedPoint, distance,
+                            wallNormal, surfaceData, bdType, iSegment );
                 // In the following, the importance of directions is sorted wrt. how well they
                 //   are aligned with the wall normal. It is better to take the continuous normal,
                 //   because it is not sensitive to the choice of the triangle when we shoot at
                 //   an edge.
-                //wallNormal = this->computeContinuousNormal(locatedPoint, iTriangle);
+                //wallNormal = this->computeContinuousNormal(locatedPoint, iSegment);
                 global::timer("intersect").stop();
                 PLB_ASSERT( ok );
                 // ... then add this node to the list.
-                liquidNeighbors.push_back(LiquidNeighbor(iNeighbor, depth, iTriangle, wallNormal));
+                liquidNeighbors.push_back(LiquidNeighbor(iNeighbor, depth, iSegment, wallNormal));
             }
         }
         if (!liquidNeighbors.empty()) {
@@ -134,13 +134,13 @@ void GuoOffLatticeModel2D<T,Descriptor>::prepareCell (
             if (useAllDirections) {
                 for (pluint i=0; i<liquidNeighbors.size(); ++i) {
                     neighborDepthPairs.push_back(std::make_pair(liquidNeighbors[i].iNeighbor, liquidNeighbors[i].depth));
-                    ids.push_back(liquidNeighbors[i].iTriangle);
+                    ids.push_back(liquidNeighbors[i].iSegment);
                 }
             }
             else {
                 plint i = liquidNeighbors.size()-1;
                 neighborDepthPairs.push_back(std::make_pair(liquidNeighbors[i].iNeighbor, liquidNeighbors[i].depth));
-                ids.push_back(liquidNeighbors[i].iTriangle);
+                ids.push_back(liquidNeighbors[i].iSegment);
             }
             info->getDryNodeFluidDirections().push_back(neighborDepthPairs);
             info->getDryNodeIds().push_back(ids);
@@ -275,7 +275,7 @@ bool GuoAlgorithm2D<T,Descriptor>::computeNeighborData()
     for (plint iDirection=0; iDirection<numDirections; ++iDirection) {
         int iNeighbor = dryNodeFluidDirections[iDirection].first;
         int const* c = NextNeighbor<T>::c[iNeighbor];
-        Dot2D fluidDirection(c[0],c[1],c[2]);
+        Dot2D fluidDirection(c[0],c[1]);
         plint dryNodeId = dryNodeIds[iDirection];
         int depth = dryNodeFluidDirections[iDirection].second;
 
@@ -331,7 +331,6 @@ void GuoAlgorithm2D<T,Descriptor>::finalize()
                 plint oppPop = indexTemplates::opposite<D>(iPop);
                 deltaJ[0] += D::c[oppPop][0]*cell[oppPop];
                 deltaJ[1] += D::c[oppPop][1]*cell[oppPop];
-                deltaJ[2] += D::c[oppPop][2]*cell[oppPop];
             }
         }
     }
@@ -349,7 +348,6 @@ void GuoAlgorithm2D<T,Descriptor>::finalize()
             if (iPop>=0) {
                 deltaJ[0] -= D::c[iPop][0]*collidedCell[iPop];
                 deltaJ[1] -= D::c[iPop][1]*collidedCell[iPop];
-                deltaJ[2] -= D::c[iPop][2]*collidedCell[iPop];
             }
         }
         // Don't divide by rho. Here we just divide by rho0=1. Remember that,

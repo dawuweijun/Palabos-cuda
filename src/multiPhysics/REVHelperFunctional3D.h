@@ -33,10 +33,8 @@ class BoxTensorRotationFunctional3D:public BoxProcessingFunctional3D_TT<T1,3,T2,
 {
 
 public:
-    typedef Array< T1, 3  > Vector3D;
-    typedef Array< BoxTensorRotationFunctional3D::Vector3D,3 > Matrix3D;
 
-    BoxTensorRotationFunctional3D ( const Matrix3D& rawTensor_,const Vector3D& dir_ ) :rawTensor ( rawTensor_ ),rawKDir ( dir_ )
+    BoxTensorRotationFunctional3D ( const Array<T1,9>& rawTensor_,const Array<T1,3>& dir_ ) :rawTensor ( rawTensor_ ),rawKDir ( dir_ )
     {
         PLB_PRECONDITION ( rawKDir[0]*rawKDir[0]+rawKDir[1]*rawKDir[1]+rawKDir[2]*rawKDir[2]==1. );
     };
@@ -53,8 +51,8 @@ public:
     };
 
 private:
-    Matrix3D rawTensor;
-    Vector3D rawKDir;
+    Array<T1,9> rawTensor;
+    Array<T1,3> rawKDir;
 };
 }//namespace plb
 #endif

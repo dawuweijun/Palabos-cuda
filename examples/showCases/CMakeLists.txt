@@ -1,0 +1,2 @@
+add_subdirectory(externalFlowAroundObstacle2D)
+add_subdirectory(externalFlowAroundObstacle3D)

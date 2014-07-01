@@ -26,6 +26,7 @@
 #define OFF_LATTICE_MODEL_2D_HH
 
 #include "offLattice/offLatticeModel2D.h"
+#include "offLattice/voxelizer2D.h"
 #include "latticeBoltzmann/geometricOperationTemplates.h"
 #include "latticeBoltzmann/externalFieldAccess.h"
 #include <algorithm>
@@ -87,8 +88,8 @@ plint OffLatticeModel2D<T,SurfaceData>::getTag(plint id) const {
 template<typename T, class SurfaceData>
 bool OffLatticeModel2D<T,SurfaceData>::pointOnSurface (
         Dot2D const& fromPoint, Dot2D const& direction,
-        Array<T,3>& locatedPoint, T& distance,
-        Array<T,3>& wallNormal, SurfaceData& surfaceData,
+        Array<T,2>& locatedPoint, T& distance,
+        Array<T,2>& wallNormal, SurfaceData& surfaceData,
         OffBoundary::Type& bdType, plint& id ) const
 {
     return shape->gridPointOnSurface (
@@ -96,8 +97,8 @@ bool OffLatticeModel2D<T,SurfaceData>::pointOnSurface (
 }
 
 template<typename T, class SurfaceData>
-Array<T,3> OffLatticeModel2D<T,SurfaceData>::computeContinuousNormal (
-            Array<T,3> const& p, plint id, bool isAreaWeighted ) const
+Array<T,2> OffLatticeModel2D<T,SurfaceData>::computeContinuousNormal (
+            Array<T,2> const& p, plint id, bool isAreaWeighted ) const
 {
     return shape->computeContinuousNormal(p, id, isAreaWeighted);
 }
@@ -301,9 +302,7 @@ void OffLatticePatternFunctional2D<T,SurfaceData>::processGenericBlocks (
 
     for (plint iX=domain.x0; iX<=domain.x1; ++iX) {
         for (plint iY=domain.y0; iY<=domain.y1; ++iY) {
-            for (plint iZ=domain.z0; iZ<=domain.z1; ++iZ) {
-                offLatticeModel->prepareCell(Dot2D(iX,iY,iZ), *container);
-            }
+                offLatticeModel->prepareCell(Dot2D(iX,iY), *container);
         }
     }
 }
@@ -314,7 +313,6 @@ GetForceOnObjectFunctional2D<T,SurfaceData>::GetForceOnObjectFunctional2D (
     OffLatticeModel2D<T,SurfaceData>* offLatticeModel_ )
         : offLatticeModel(offLatticeModel_),
           forceId (
-                this->getStatistics().subscribeSum(),
                 this->getStatistics().subscribeSum(),
                 this->getStatistics().subscribeSum() )
 { }
@@ -353,10 +351,9 @@ void GetForceOnObjectFunctional2D<T,SurfaceData>::processGenericBlocks (
         dynamic_cast<AtomicContainerBlock2D*>(fields[0]);
     PLB_ASSERT( offLatticeInfo );
 
-    Array<T,3> force = offLatticeModel->getLocalForce(*offLatticeInfo);
+    Array<T,2> force = offLatticeModel->getLocalForce(*offLatticeInfo);
     this->getStatistics().gatherSum(forceId[0], force[0]);
     this->getStatistics().gatherSum(forceId[1], force[1]);
-    this->getStatistics().gatherSum(forceId[2], force[2]);
 }
 
 template< typename T, class SurfaceData >
@@ -378,11 +375,10 @@ BlockDomain::DomainT GetForceOnObjectFunctional2D<T,SurfaceData>::appliesTo() co
 }
 
 template< typename T, class SurfaceData >
-Array<T,3> GetForceOnObjectFunctional2D<T,SurfaceData>::getForce() const {
-    return Array<T,3> (
+Array<T,2> GetForceOnObjectFunctional2D<T,SurfaceData>::getForce() const {
+    return Array<T,2> (
             this->getStatistics().getSum(forceId[0]),
-            this->getStatistics().getSum(forceId[1]),
-            this->getStatistics().getSum(forceId[2]) );
+            this->getStatistics().getSum(forceId[1]) );
 }
 
 }  // namespace plb

@@ -1,0 +1,16 @@
+.TH PVBATCH 1
+.SH NAME
+pvbatch \- pvbatch
+.SH SYNOPSIS
+.B pvbatch
+.br
+.SH DESCRIPTION
+The
+.BR pvbatch
+distributed with the ParaView application suite, is a Python application designed to run batch scripts on distributed servers. When ParaView is compiled with MPI, pvbatch can be launched as an MPI program. In this mode, the first node will load a Python script specified as a command-line argument and execute it using a special built-in connection on all nodes. This application does not support interactive execution.
+
+You can find information in the paraview manual page and on the
+paraview web page http://www.paraview.org.
+
+.SH AUTHOR
+The Debian Scientific Computing Team

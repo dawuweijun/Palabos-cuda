@@ -29,12 +29,8 @@
 #include "atomicBlock/atomicBlock3D.h"
 #include "core/geometry3D.h"
 #include "core/array.h"
-
+#include "offLattice/boundaryShapes.h"
 namespace plb {
-
-struct OffBoundary {
-    enum Type {dirichlet, neumann, freeSlip, constRhoInlet, densityNeumann, flux, isolation};
-};
 
 /// Description of a shape as the boundary of a given volume.
 template<typename T, class SurfaceData>

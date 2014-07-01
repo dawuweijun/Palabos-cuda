@@ -26,10 +26,12 @@
 #define OFF_LATTICE_BOUNDARY_CONDITION_2D_HH
 
 #include "core/globalDefs.h"
+#include "dataProcessors/dataInitializerWrapper2D.h"
 #include "offLattice/offLatticeBoundaryCondition2D.h"
 #include "offLattice/triangularSurfaceMesh.h"
 #include "offLattice/offLatticeBoundaryProfiles2D.h"
-#include "triangleToDef.h"
+#include "offLattice/segmentToDef.h"
+#include "offLattice/voxelizer2D.h"
 
 namespace plb {
 
@@ -55,7 +57,7 @@ OffLatticeBoundaryCondition2D<T,Descriptor,BoundaryType>::
     offLatticeIniArg.push_back(&offLatticePattern);
     // Remaining arguments for inner-flow-shape.
     offLatticeIniArg.push_back(&voxelizedDomain.getVoxelMatrix());
-    offLatticeIniArg.push_back(&voxelizedDomain.getTriangleHash());
+    offLatticeIniArg.push_back(&voxelizedDomain.getSegmentHash());
     offLatticeIniArg.push_back(&boundaryShapeArg);
     applyProcessingFunctional (
             new OffLatticePatternFunctional2D<T,BoundaryType> (
@@ -83,7 +85,7 @@ OffLatticeBoundaryCondition2D<T,Descriptor,BoundaryType>::
     offLatticeIniArg.push_back(&offLatticePattern);
     // Remaining arguments for inner-flow-shape.
     offLatticeIniArg.push_back(&voxelizedDomain.getVoxelMatrix());
-    offLatticeIniArg.push_back(&voxelizedDomain.getTriangleHash());
+    offLatticeIniArg.push_back(&voxelizedDomain.getSegmentHash());
     offLatticeIniArg.push_back(&boundaryShapeArg);
     applyProcessingFunctional (
             new OffLatticePatternFunctional2D<T,BoundaryType> (
@@ -123,7 +125,7 @@ void OffLatticeBoundaryCondition2D<T,Descriptor,BoundaryType>::insert()
     offLatticeArg.push_back(&offLatticePattern);
     // Remaining arguments for inner-flow-shape.
     offLatticeArg.push_back(&voxelizedDomain.getVoxelMatrix());
-    offLatticeArg.push_back(&voxelizedDomain.getTriangleHash());
+    offLatticeArg.push_back(&voxelizedDomain.getSegmentHash());
     offLatticeArg.push_back(&boundaryShapeArg);
     plint processorLevel = 1;
     plint numShapeArgs = 3;
@@ -146,7 +148,7 @@ void OffLatticeBoundaryCondition2D<T,Descriptor,BoundaryType>::insert (
     offLatticeArg.push_back(&offLatticePattern);
     // Next arguments for inner-flow-shape.
     offLatticeArg.push_back(&voxelizedDomain.getVoxelMatrix());
-    offLatticeArg.push_back(&voxelizedDomain.getTriangleHash());
+    offLatticeArg.push_back(&voxelizedDomain.getSegmentHash());
     offLatticeArg.push_back(&boundaryShapeArg);
     // Remaining are optional arguments for completion algorithm.
     plint numCompletionArgs = (plint)completionArg.size();
@@ -172,7 +174,7 @@ void OffLatticeBoundaryCondition2D<T,Descriptor,BoundaryType>::apply()
     offLatticeArg.push_back(&offLatticePattern);
     // Remaining arguments for inner-flow-shape.
     offLatticeArg.push_back(&voxelizedDomain.getVoxelMatrix());
-    offLatticeArg.push_back(&voxelizedDomain.getTriangleHash());
+    offLatticeArg.push_back(&voxelizedDomain.getSegmentHash());
     offLatticeArg.push_back(&boundaryShapeArg);
     plint numShapeArgs = 3;
     plint numCompletionArgs = 0;
@@ -194,7 +196,7 @@ void OffLatticeBoundaryCondition2D<T,Descriptor,BoundaryType>::apply (
     offLatticeArg.push_back(&offLatticePattern);
     // Next arguments for inner-flow-shape.
     offLatticeArg.push_back(&voxelizedDomain.getVoxelMatrix());
-    offLatticeArg.push_back(&voxelizedDomain.getTriangleHash());
+    offLatticeArg.push_back(&voxelizedDomain.getSegmentHash());
     offLatticeArg.push_back(&boundaryShapeArg);
     // Remaining are optional arguments for completion algorithm.
     plint numCompletionArgs = (plint)completionArg.size();
@@ -233,9 +235,9 @@ std::auto_ptr<MultiTensorField2D<T,2> >
     int solidFlag = voxelFlag::invert(flowType);
     int solidBorderFlag = voxelFlag::borderFlag(solidFlag);
     setToConstant<T,2>(*velocity, voxelizedDomain.getVoxelMatrix(), solidFlag,
-                       domain, Array<T,2>(T(),T(),T()));
+                       domain, Array<T,2>(T(),T()));
     setToConstant<T,2>(*velocity, voxelizedDomain.getVoxelMatrix(), solidBorderFlag,
-                       domain, Array<T,2>(T(),T(),T()));
+                       domain, Array<T,2>(T(),T()));
     return velocity;
 }
 

@@ -34,6 +34,7 @@
 #define MRT_TEMPLATES_2D_H
 
 #include "core/globalDefs.h"
+#include "latticeBoltzmann/mrtTemplates.h"
 
 namespace plb {
 

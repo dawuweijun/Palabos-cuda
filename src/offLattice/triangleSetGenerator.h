@@ -37,7 +37,7 @@ namespace plb {
 ///   must be provided as well. This number is suggestive for the resolution. The
 ///   actual number of triangles can be greater than the one provided.
 template<typename T>
-TriangleSet<T> constructSphere(Array<T,3> const& center, T radius, plint minNumOfTriangles);
+TriangleSet<T>* constructSphere(Array<T,3> const& center, T radius, plint minNumOfTriangles);
 
 /// Create and return a circular tapered cylinder. The axis of the cylinder is parallel
 ///   to the x-axis. The center of the inlet disk must be given as argument, as well as
@@ -47,35 +47,35 @@ TriangleSet<T> constructSphere(Array<T,3> const& center, T radius, plint minNumO
 ///   The final number of points will be 2*nAxial-1 and 2*nCirc in the axial
 ///   and circumferential directions, respectively.
 template<typename T>
-TriangleSet<T> constructCylinder(Array<T,3> const& inletCenter, T inletRadius, T outletRadius,
+TriangleSet<T>* constructCylinder(Array<T,3> const& inletCenter, T inletRadius, T outletRadius,
                                  T length, plint nAxial, plint nCirc);
 
 template<typename T>
-TriangleSet<T> constructCylinder( Array<T,3> const& inletCenter, T inletRadius, T outletRadius,
+TriangleSet<T>* constructCylinder( Array<T,3> const& inletCenter, T inletRadius, T outletRadius,
                                   T length, plint nAxial, plint nCirc,
                                   std::vector<Array<T,3> >& inletPoints );
 
 template<typename T>
-TriangleSet<T> constructCylinder( Array<T,3> const& inletCenter, Array<T,3> const& axis,
+TriangleSet<T>* constructCylinder( Array<T,3> const& inletCenter, Array<T,3> const& axis,
                                   T inletRadius, T outletRadius,
                                   T length, plint nAxial, plint nCirc,
                                   std::vector<Array<T,3> >& inletPoints );
 
 template<typename T>
-TriangleSet<T> constructCuboid (
+TriangleSet<T>* constructCuboid (
         Array<T,3> const& lowerCorner, Array<T,3> const& upperCorner,
         Array<plint,3> const& nSegments );
 
 
 template<typename T>
-TriangleSet<T> patchTubes(TriangleSet<T> const& geometryWithOpenings, plint sortDirection, std::vector<T> patchLengths);
+TriangleSet<T>* patchTubes(TriangleSet<T> const& geometryWithOpenings, plint sortDirection, std::vector<T> patchLengths);
 
 /// Create and return a rectangle. The rectangle is on the x-y plane, and its lower left
 ///   corner is at the origin of the axes. It's sides have length "lx" and "ly", while
 ///   the number of points for the triangulation are "nx" and "ny" on the x and y axis,
 ///   respectively. This means that the total number of triangles is 2*(nx-1)*(ny-1).
 template<typename T>
-TriangleSet<T> constructRectangle(T lx, T ly, plint nx, plint ny);
+TriangleSet<T>* constructRectangle(T lx, T ly, plint nx, plint ny);
 
 } // namespace plb
 

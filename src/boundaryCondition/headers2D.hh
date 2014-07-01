@@ -40,6 +40,7 @@
 #include "boundaryCondition/neumannCondition2D.hh"
 #include "boundaryCondition/bounceBackModels.hh"
 #include "boundaryCondition/bounceBackModels2D.hh"
+#include "boundaryCondition/spongeZones2D.hh"
 
 #ifndef PLB_BGP
 #include "boundaryCondition/generalizedBoundaryDynamics.hh"

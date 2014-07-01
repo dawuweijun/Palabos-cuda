@@ -33,4 +33,4 @@
 #include "particles/particleProcessingFunctional2D.hh"
 #include "particles/particleNonLocalTransfer2D.hh"
 #include "particles/visualParticle2D.hh"
-
+#include "particles/particleVtk2D.hh"

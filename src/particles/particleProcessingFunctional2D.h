@@ -65,6 +65,24 @@ private:
     Array<plint,2> averageVelocityId;
 };
 
+/// Copy particles of a certain tag from one field to another.
+template<typename T, template<typename U> class Descriptor>
+class CopySelectParticles2D : public BoxProcessingFunctional2D
+{
+public:
+    CopySelectParticles2D(util::SelectInt* tags_);
+    ~CopySelectParticles2D();
+    CopySelectParticles2D(CopySelectParticles2D<T,Descriptor> const& rhs);
+    CopySelectParticles2D<T,Descriptor>& operator=(CopySelectParticles2D<T,Descriptor> const& rhs);
+    void swap(CopySelectParticles2D<T,Descriptor>& rhs);
+    /// Arguments: [0] From Particle-field, [1] To Particle-field.
+    virtual void processGenericBlocks(Box2D domain, std::vector<AtomicBlock2D*> fields);
+    virtual CopySelectParticles2D<T,Descriptor>* clone() const;
+    virtual void getTypeOfModification(std::vector<modif::ModifT>& modified) const;
+private:
+    util::SelectInt* tags;
+};
+
 /// Inject particles into the domain. The particles must be defined in a non-
 ///   parallel way, and duplicated over all processors.
 template<typename T, template<typename U> class Descriptor>
@@ -138,11 +156,15 @@ template<typename T, template<typename U> class Descriptor>
 class FluidToParticleCoupling2D : public BoxProcessingFunctional2D
 {
 public:
+  //TODO FIX ME
+    FluidToParticleCoupling2D(T scaling_):scaling(scaling_){};
     /// Arguments: [0] Particle-field; [1] Fluid.
     virtual void processGenericBlocks(Box2D domain, std::vector<AtomicBlock2D*> fields);
     virtual FluidToParticleCoupling2D<T,Descriptor>* clone() const;
     virtual BlockDomain::DomainT appliesTo() const;
     virtual void getTypeOfModification(std::vector<modif::ModifT>& modified) const;
+private:
+  T scaling;
 };
 
 

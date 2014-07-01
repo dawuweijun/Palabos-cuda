@@ -29,11 +29,12 @@
 
 #include "core/globalDefs.h"
 #include "offLattice/triangleSetGenerator.h"
-
+#include "offLattice/triangularSurfaceMesh.h"
+#include "offLattice/triangularSurfaceMesh.h"
 namespace plb {
 
 template<typename T>
-TriangleSet<T> constructSphere(Array<T,3> const& center, T radius, plint minNumOfTriangles)
+TriangleSet<T>* constructSphere(Array<T,3> const& center, T radius, plint minNumOfTriangles)
 {
     std::vector<typename TriangleSet<T>::Triangle> triangles;
 #ifdef PLB_DEBUG
@@ -160,16 +161,16 @@ TriangleSet<T> constructSphere(Array<T,3> const& center, T radius, plint minNumO
 
     // Scale and translate the mesh
 
-    TriangleSet<T> triangleSet(triangles);
+    TriangleSet<T>* triangleSet=new  TriangleSet<T>(triangles);
 
-    triangleSet.scale(radius);
-    triangleSet.translate(center);
+    triangleSet->scale(radius);
+    triangleSet->translate(center);
 
     return triangleSet;
 }
 
 template<typename T>
-TriangleSet<T> constructCylinder( Array<T,3> const& inletCenter, T inletRadius, T outletRadius,
+TriangleSet<T>* constructCylinder( Array<T,3> const& inletCenter, T inletRadius, T outletRadius,
                                   T length, plint nAxial, plint nCirc,
                                   std::vector<Array<T,3> >& inletPoints )
 {
@@ -292,10 +293,10 @@ TriangleSet<T> constructCylinder( Array<T,3> const& inletCenter, T inletRadius, 
             triangles.push_back(tmp);
         }
     }
-    return TriangleSet<T>(triangles);
+    return new TriangleSet<T>(triangles);
 }
 template<typename T>
-TriangleSet<T> constructCylinder(Array<T,3> const& inletCenter, T inletRadius, T outletRadius,
+TriangleSet<T>* constructCylinder(Array<T,3> const& inletCenter, T inletRadius, T outletRadius,
                                  T length, plint nAxial, plint nCirc)
 {
     static const T eps = std::numeric_limits<T>::epsilon();
@@ -410,7 +411,7 @@ TriangleSet<T> constructCylinder(Array<T,3> const& inletCenter, T inletRadius, T
             triangles.push_back(tmp);
         }
     }
-    return TriangleSet<T>(triangles);
+    return new TriangleSet<T>(triangles);
 }
 
 template<typename T>
@@ -436,7 +437,7 @@ void addSurface (
 }
 
 template<typename T>
-TriangleSet<T> constructCuboid (
+TriangleSet<T>* constructCuboid (
         Array<T,3> const& lowerCorner, Array<T,3> const& upperCorner,
         Array<plint,3> const& nSegments )
 {
@@ -463,17 +464,17 @@ TriangleSet<T> constructCuboid (
     addSurface(lowerCorner+Array<T,3>(T(),T(),lz),
                deltaX, nSegments[0], deltaY, nSegments[1], triangles);
 
-    return TriangleSet<T>(triangles);
+    return new TriangleSet<T>(triangles);
 }
 
 
 template<typename T>
-TriangleSet<T> constructCylinder( Array<T,3> const& inletCenter, Array<T,3> const& axis,
+TriangleSet<T>* constructCylinder( Array<T,3> const& inletCenter, Array<T,3> const& axis,
                                   T inletRadius, T outletRadius,
                                   T length, plint nAxial, plint nCirc,
                                   std::vector<Array<T,3> >& inletPoints )
 {
-    TriangleSet<T> cylinder (
+    TriangleSet<T> *cylinder (
             constructCylinder(Array<T,3>(T(),T(),T()), inletRadius, outletRadius,
             length, nAxial, nCirc, inletPoints) );
     Array<T,3> xAxis((T)1,T(),T());
@@ -484,12 +485,12 @@ TriangleSet<T> constructCylinder( Array<T,3> const& inletCenter, Array<T,3> cons
         crossProduct<T>(xAxis, axis, rotAxis);
         rotAxis /= norm(rotAxis);
         T angle = angleBetweenVectors(xAxis, axis);
-        cylinder.rotateAtOrigin(rotAxis, angle);
+        cylinder->rotateAtOrigin(rotAxis, angle);
         for (pluint i=0; i<inletPoints.size(); ++i) {
             inletPoints[i] = rotateAtOrigin(inletPoints[i], rotAxis, angle);
         }
     }
-    cylinder.translate(inletCenter);
+    cylinder->translate(inletCenter);
     for (pluint i=0; i<inletPoints.size(); ++i) {
         inletPoints[i] += inletCenter;
     }
@@ -508,12 +509,12 @@ TriangleSet<T> patchTubes(TriangleSet<T> const& geometryWithOpenings, plint sort
     TriangularSurfaceMesh<T>& mesh = defMesh->getMesh();
 
     std::vector<Lid> holes = mesh.closeHoles();
-    std::sort(holes.begin(), holes.end(), LidLessThan<T>(sortDirection, mesh));
+    std::sort(holes.begin(), holes.end(), LidLessThan3D<T>(sortDirection, mesh));
 
     PLB_ASSERT( holes.size() == patchLengths.size() );
     
     for (pluint iHole=0; iHole<holes.size(); ++iHole) {
-        Array<T,3> baryCenter = computeGeometricCenter(mesh,holes[iHole]);
+        Array<T,3> baryCenter = computeGeometricCenter3D(mesh,holes[iHole]);
         plint numHoleVertices = (plint) holes[iHole].boundaryVertices.size();
 
         Array<T,3> normal = computeNormal(mesh, holes[iHole]);
@@ -585,7 +586,7 @@ TriangleSet<T> patchTubes(TriangleSet<T> const& geometryWithOpenings, plint sort
 
 
 template<typename T>
-TriangleSet<T> constructRectangle(T lx, T ly, plint nx, plint ny)
+TriangleSet<T> *constructRectangle(T lx, T ly, plint nx, plint ny)
 {
     static const T eps = std::numeric_limits<T>::epsilon();
     PLB_ASSERT(lx > (T) 0.0 && !util::fpequal(lx, (T) 0.0, eps) &&
@@ -625,7 +626,7 @@ TriangleSet<T> constructRectangle(T lx, T ly, plint nx, plint ny)
         }
     }
 
-    return TriangleSet<T>(triangles);
+    return new TriangleSet<T>(triangles);
 }
 
 

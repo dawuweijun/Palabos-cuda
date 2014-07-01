@@ -61,7 +61,7 @@ private:
               BlockLattice2D<T,Descriptor> const& lattice, Dot2D const& guoNode,
               Dot2D const& fluidDirection, int depth, Array<T,2> const& wallNode, T delta,
               Array<T,2> const& wall_vel, OffBoundary::Type bdType,
-              Array<T,2> const& wallNormal, plint triangleId,
+              Array<T,2> const& wallNormal, plint segmentId,
               T& rhoBar, Array<T,Descriptor<T>::d>& j,
               Array<T,SymmetricTensor<T,Descriptor>::n>& PiNeq,
               std::vector<AtomicBlock2D const*> const& args ) const;
@@ -69,7 +69,7 @@ private:
               BlockLattice2D<T,Descriptor> const& lattice, Dot2D const& guoNode,
               Dot2D const& fluidDirection, int depth, Array<T,2> const& wallNode, T delta,
               Array<T,2> const& wall_vel, OffBoundary::Type bdType,
-              Array<T,2> const& wallNormal, plint triangleId,
+              Array<T,2> const& wallNormal, plint segmentId,
               T& rhoBar, Array<T,Descriptor<T>::d>& j,
               Array<T,Descriptor<T>::q>& fNeq,
               std::vector<AtomicBlock2D const*> const& args ) const;
@@ -115,10 +115,10 @@ public:
     };
 
     struct LiquidNeighbor {
-        LiquidNeighbor(plint iNeighbor_, plint depth_, plint iTriangle_, Array<T,2> wallNormal);
+        LiquidNeighbor(plint iNeighbor_, plint depth_, plint iSegment_, Array<T,2> wallNormal);
         bool operator<(LiquidNeighbor const& rhs) const;
         plint iNeighbor, depth;
-        plint iTriangle;
+        plint iSegment;
         T cosAngle;
     };
 };
