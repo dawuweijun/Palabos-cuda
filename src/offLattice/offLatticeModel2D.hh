@@ -5,7 +5,7 @@
  * 1010 Lausanne, Switzerland
  * E-mail contact: contact@flowkit.com
  *
- * The most recent release of Palabos can be downloaded at 
+ * The most recent release of Palabos can be downloaded at
  * <http://www.palabos.org/>
  *
  * The library Palabos is free software: you can redistribute it and/or
@@ -288,7 +288,7 @@ void OffLatticePatternFunctional2D<T,SurfaceData>::processGenericBlocks (
     AtomicContainerBlock2D* container =
         dynamic_cast<AtomicContainerBlock2D*>(fields[0]);
     PLB_ASSERT( container );
-    ContainerBlockData* storeInfo = 
+    ContainerBlockData* storeInfo =
         offLatticeModel->generateOffLatticeInfo();
     container->setData(storeInfo);
 
