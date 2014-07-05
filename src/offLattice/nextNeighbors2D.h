@@ -5,7 +5,7 @@
  * 1010 Lausanne, Switzerland
  * E-mail contact: contact@flowkit.com
  *
- * The most recent release of Palabos can be downloaded at 
+ * The most recent release of Palabos can be downloaded at
  * <http://www.palabos.org/>
  *
  * The library Palabos is free software: you can redistribute it and/or
@@ -33,28 +33,26 @@
 namespace plb {
 
 template <typename T>
-struct NextNeighbor {
-    static const int numNeighbors=26;
-    static const int c[numNeighbors][3];
+struct NextNeighbor2D {
+    static const int numNeighbors=8;
+    static const int c[numNeighbors][2];
     static const T d1;
     static const T d2;
-    static const T d3;
     static const T d[numNeighbors];
     static const T id1;
     static const T id2;
-    static const T id3;
     static const T invD[numNeighbors];
 };
 
 template<typename T, template<typename U> class Descriptor>
-struct NextNeighborPop {
-    NextNeighborPop();
-    int ids[NextNeighbor<T>::numNeighbors];
+struct NextNeighborPop2D {
+    NextNeighborPop2D();
+    int ids[NextNeighbor2D<T>::numNeighbors];
 };
 
 template<typename T, template<typename U> class Descriptor>
-inline plint nextNeighborPop(plint iNeighbor) {
-    static NextNeighborPop<T,Descriptor> instance;
+inline plint nextNeighborPop2D(plint iNeighbor) {
+    static NextNeighborPop2D<T,Descriptor> instance;
     return instance.ids[iNeighbor];
 }
 

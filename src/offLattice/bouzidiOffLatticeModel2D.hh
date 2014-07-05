@@ -38,7 +38,6 @@
 namespace plb
 {
 
-
 template<typename T, template<typename U> class Descriptor>
 BouzidiOffLatticeModel2D<T,Descriptor>::BouzidiOffLatticeModel2D (
     BoundaryShape2D<T,Array<T,2> >* shape_, int flowType_ )
