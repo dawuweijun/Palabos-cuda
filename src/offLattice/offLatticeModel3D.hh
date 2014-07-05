@@ -5,7 +5,7 @@
  * 1010 Lausanne, Switzerland
  * E-mail contact: contact@flowkit.com
  *
- * The most recent release of Palabos can be downloaded at 
+ * The most recent release of Palabos can be downloaded at
  * <http://www.palabos.org/>
  *
  * The library Palabos is free software: you can redistribute it and/or
@@ -28,6 +28,7 @@
 #include "offLattice/offLatticeModel3D.h"
 #include "latticeBoltzmann/geometricOperationTemplates.h"
 #include "latticeBoltzmann/externalFieldAccess.h"
+#include "offLattice/voxelizer3D.h"
 #include <algorithm>
 #include <cmath>
 
@@ -287,7 +288,7 @@ void OffLatticePatternFunctional3D<T,SurfaceData>::processGenericBlocks (
     AtomicContainerBlock3D* container =
         dynamic_cast<AtomicContainerBlock3D*>(fields[0]);
     PLB_ASSERT( container );
-    ContainerBlockData* storeInfo = 
+    ContainerBlockData* storeInfo =
         offLatticeModel->generateOffLatticeInfo();
     container->setData(storeInfo);
 
@@ -349,7 +350,7 @@ void GetForceOnObjectFunctional3D<T,SurfaceData>::processGenericBlocks (
         Box3D domain, std::vector<AtomicBlock3D*> fields )
 {
     PLB_PRECONDITION( fields.size() == 1 );
-    AtomicContainerBlock3D* offLatticeInfo = 
+    AtomicContainerBlock3D* offLatticeInfo =
         dynamic_cast<AtomicContainerBlock3D*>(fields[0]);
     PLB_ASSERT( offLatticeInfo );
 
