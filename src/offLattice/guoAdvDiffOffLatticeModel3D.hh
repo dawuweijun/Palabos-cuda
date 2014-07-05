@@ -5,7 +5,7 @@
  * 1010 Lausanne, Switzerland
  * E-mail contact: contact@flowkit.com
  *
- * The most recent release of Palabos can be downloaded at 
+ * The most recent release of Palabos can be downloaded at
  * <http://www.palabos.org/>
  *
  * The library Palabos is free software: you can redistribute it and/or
@@ -28,8 +28,10 @@
 #include "core/plbTimer.h"
 #include "offLattice/guoAdvDiffOffLatticeModel3D.h"
 #include "offLattice/nextNeighbors3D.h"
+#include "latticeBoltzmann/advectionDiffusionMomentTemplates.h"
 #include "latticeBoltzmann/geometricOperationTemplates.h"
 #include "latticeBoltzmann/externalFieldAccess.h"
+#include "latticeBoltzmann/indexTemplates.h"
 #include <algorithm>
 #include <cmath>
 
@@ -221,7 +223,7 @@ void GuoAdvDiffOffLatticeModel3D<T,Descriptor>::cellCompletion (
 
     T dummyJsqr = T();
     Array<T,SymmetricTensor<T,Descriptor>::n> dummyPiNeq;
-    
+
     Array<T,Descriptor<T>::d> j;
     j.from_cArray(cell.getExternal(Descriptor<T>::ExternalField::velocityBeginsAt));
     j *= Descriptor<T>::fullRho(rhoBar);  // At this point we got jEq.
