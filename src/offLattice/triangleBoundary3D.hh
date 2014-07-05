@@ -5,7 +5,7 @@
  * 1010 Lausanne, Switzerland
  * E-mail contact: contact@flowkit.com
  *
- * The most recent release of Palabos can be downloaded at 
+ * The most recent release of Palabos can be downloaded at
  * <http://www.palabos.org/>
  *
  * The library Palabos is free software: you can redistribute it and/or
@@ -924,7 +924,7 @@ bool TriangleFlowShape3D<T,SurfaceData>::intersectsSurface (
         Array<T,3>  locatedPoint;
         T           distance;
         Array<T,3>  wallNormal;
-        SurfaceData surfaceData;  
+        SurfaceData surfaceData;
         OffBoundary::Type bdType;
         return pointOnSurface(p1, p2-p1, locatedPoint, distance, wallNormal, surfaceData, bdType, id);
     }
@@ -1011,8 +1011,8 @@ VoxelizedDomain3D<T>::VoxelizedDomain3D (
     else {
         boundary.pushSelect(1,0); // Closed, Static.
     }
-    std::auto_ptr<MultiScalarField3D<int> > fullVoxelMatrix ( 
-            voxelize( boundary.getMesh(),
+    std::auto_ptr<MultiScalarField3D<int> > fullVoxelMatrix (
+            voxelize3D( boundary.getMesh(),
                       boundary.getMargin()+extraLayer_, borderWidth ) );
     fullVoxelMatrix->setRefinementLevel(gridLevel_);
     createSparseVoxelMatrix(*fullVoxelMatrix, blockSize_, envelopeWidth_);
@@ -1037,8 +1037,8 @@ VoxelizedDomain3D<T>::VoxelizedDomain3D (
     else {
         boundary.pushSelect(1,0); // Closed, Static.
     }
-    std::auto_ptr<MultiScalarField3D<int> > fullVoxelMatrix ( 
-            voxelize( boundary.getMesh(), boundingBox, borderWidth ) );
+    std::auto_ptr<MultiScalarField3D<int> > fullVoxelMatrix (
+            voxelize3D( boundary.getMesh(), boundingBox, borderWidth ) );
     fullVoxelMatrix->setRefinementLevel(gridLevel_);
     createSparseVoxelMatrix(*fullVoxelMatrix, blockSize_, envelopeWidth_);
     createTriangleHash();
@@ -1062,8 +1062,8 @@ VoxelizedDomain3D<T>::VoxelizedDomain3D (
     else {
         boundary.pushSelect(1,0); // Closed, Static.
     }
-    std::auto_ptr<MultiScalarField3D<int> > fullVoxelMatrix ( 
-            voxelize( boundary.getMesh(), boundingBox, borderWidth, seed ) );
+    std::auto_ptr<MultiScalarField3D<int> > fullVoxelMatrix (
+            voxelize3D( boundary.getMesh(), boundingBox, borderWidth, seed ) );
     fullVoxelMatrix->setRefinementLevel(gridLevel_);
     createSparseVoxelMatrix(*fullVoxelMatrix, blockSize_, envelopeWidth_);
     createTriangleHash();
@@ -1135,7 +1135,7 @@ void VoxelizedDomain3D<T>::adjustVoxelization (
     }
     reCreateTriangleHash(particles);
     MultiScalarField3D<int>* newVoxelMatrix =
-        revoxelize(boundary.getMesh(), *voxelMatrix, *triangleHash, borderWidth).release();
+        revoxelize3D(boundary.getMesh(), *voxelMatrix, *triangleHash, borderWidth).release();
     std::swap(voxelMatrix, newVoxelMatrix);
     delete newVoxelMatrix;
     boundary.popSelect();
@@ -1176,7 +1176,7 @@ void VoxelizedDomain3D<T>::computeSparseVoxelMatrix (
     for (int iLayer=1; iLayer<=boundary.getMargin(); ++iLayer) {
         addLayer(domainMatrix, domainMatrix.getBoundingBox(), iLayer);
     }
-    MultiBlockManagement3D sparseBlockManagement = 
+    MultiBlockManagement3D sparseBlockManagement =
         computeSparseManagement (
                 *plb::reparallelize(domainMatrix, blockSize,blockSize,blockSize),
                 envelopeWidth );

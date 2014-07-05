@@ -1075,7 +1075,7 @@ VoxelizedDomain2D<T>::VoxelizedDomain2D (
         boundary.pushSelect ( 1,0 ); // Closed, Static.
     }
     std::auto_ptr<MultiScalarField2D<int> > fullVoxelMatrix (
-        voxelize ( boundary.getMesh(),
+        voxelize2D ( boundary.getMesh(),
                    boundary.getMargin() +extraLayer_, borderWidth ) );
     fullVoxelMatrix->setRefinementLevel ( gridLevel_ );
     createSparseVoxelMatrix ( *fullVoxelMatrix, blockSize_, envelopeWidth_ );
@@ -1103,7 +1103,7 @@ VoxelizedDomain2D<T>::VoxelizedDomain2D (
         boundary.pushSelect ( 1,0 ); // Closed, Static.
     }
     std::auto_ptr<MultiScalarField2D<int> > fullVoxelMatrix (
-        voxelize ( boundary.getMesh(), boundingBox, borderWidth ) );
+        voxelize2D ( boundary.getMesh(), boundingBox, borderWidth ) );
     fullVoxelMatrix->setRefinementLevel ( gridLevel_ );
     createSparseVoxelMatrix ( *fullVoxelMatrix, blockSize_, envelopeWidth_ );
     createSegmentHash();
@@ -1130,7 +1130,7 @@ VoxelizedDomain2D<T>::VoxelizedDomain2D (
         boundary.pushSelect ( 1,0 ); // Closed, Static.
     }
     std::auto_ptr<MultiScalarField2D<int> > fullVoxelMatrix (
-        voxelize ( boundary.getMesh(), boundingBox, borderWidth, seed ) );
+        voxelize2D ( boundary.getMesh(), boundingBox, borderWidth, seed ) );
     fullVoxelMatrix->setRefinementLevel ( gridLevel_ );
     createSparseVoxelMatrix ( *fullVoxelMatrix, blockSize_, envelopeWidth_ );
     createSegmentHash();
@@ -1207,7 +1207,7 @@ void VoxelizedDomain2D<T>::adjustVoxelization (
     }
     reCreateSegmentHash ( particles );
     MultiScalarField2D<int>* newVoxelMatrix =
-        revoxelize ( boundary.getMesh(), *voxelMatrix, *segmentHash, borderWidth ).release();
+        revoxelize2D ( boundary.getMesh(), *voxelMatrix, *segmentHash, borderWidth ).release();
     std::swap ( voxelMatrix, newVoxelMatrix );
     delete newVoxelMatrix;
     boundary.popSelect();

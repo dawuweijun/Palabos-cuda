@@ -5,7 +5,7 @@
  * 1010 Lausanne, Switzerland
  * E-mail contact: contact@flowkit.com
  *
- * The most recent release of Palabos can be downloaded at 
+ * The most recent release of Palabos can be downloaded at
  * <http://www.palabos.org/>
  *
  * The library Palabos is free software: you can redistribute it and/or
@@ -56,22 +56,22 @@ namespace voxelFlag {
 }
 
 template<typename T>
-std::auto_ptr<MultiScalarField2D<int> > voxelize (
+std::auto_ptr<MultiScalarField2D<int> > voxelize2D (
         SegmentPolygonMesh2D<T> const& mesh,
         plint symmetricLayer, plint borderWidth );
 
 template<typename T>
-std::auto_ptr<MultiScalarField2D<int> > voxelize (
+std::auto_ptr<MultiScalarField2D<int> > voxelize2D (
         SegmentPolygonMesh2D<T> const& mesh,
         Box2D const& domain, plint borderWidth );
 
 template<typename T>
-std::auto_ptr<MultiScalarField2D<int> > voxelize (
+std::auto_ptr<MultiScalarField2D<int> > voxelize2D (
         SegmentPolygonMesh2D<T> const& mesh,
         Box2D const& domain, plint borderWidth, Box2D seed );
 
 template<typename T>
-std::auto_ptr<MultiScalarField2D<int> > revoxelize (
+std::auto_ptr<MultiScalarField2D<int> > revoxelize2D (
         SegmentPolygonMesh2D<T> const& mesh,
         MultiScalarField2D<int>& oldVoxelMatrix,
         MultiContainerBlock2D& hashContainer, plint borderWidth );

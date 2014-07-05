@@ -5,7 +5,7 @@
  * 1010 Lausanne, Switzerland
  * E-mail contact: contact@flowkit.com
  *
- * The most recent release of Palabos can be downloaded at 
+ * The most recent release of Palabos can be downloaded at
  * <http://www.palabos.org/>
  *
  * The library Palabos is free software: you can redistribute it and/or
@@ -82,7 +82,7 @@ namespace voxelFlag {
 }  // namespace voxelFlag
 
 template<typename T>
-std::auto_ptr<MultiScalarField3D<int> > voxelize (
+std::auto_ptr<MultiScalarField3D<int> > voxelize3D (
         TriangularSurfaceMesh<T> const& mesh,
         plint symmetricLayer, plint borderWidth )
 {
@@ -94,11 +94,11 @@ std::auto_ptr<MultiScalarField3D<int> > voxelize (
     plint ny = (plint)(yRange[1] - yRange[0]) + 1 + 2*symmetricLayer;
     plint nz = (plint)(zRange[1] - zRange[0]) + 1 + 2*symmetricLayer;
 
-    return voxelize(mesh, Box3D(0,nx-1, 0,ny-1, 0,nz-1), borderWidth);
+    return voxelize3D(mesh, Box3D(0,nx-1, 0,ny-1, 0,nz-1), borderWidth);
 }
 
 template<typename T>
-std::auto_ptr<MultiScalarField3D<int> > voxelize (
+std::auto_ptr<MultiScalarField3D<int> > voxelize3D (
         TriangularSurfaceMesh<T> const& mesh,
         Box3D const& domain, plint borderWidth )
 {
@@ -134,7 +134,7 @@ std::auto_ptr<MultiScalarField3D<int> > voxelize (
 }
 
 template<typename T>
-std::auto_ptr<MultiScalarField3D<int> > voxelize (
+std::auto_ptr<MultiScalarField3D<int> > voxelize3D (
         TriangularSurfaceMesh<T> const& mesh,
         Box3D const& domain, plint borderWidth, Box3D seed )
 {
@@ -177,7 +177,7 @@ std::auto_ptr<MultiScalarField3D<int> > voxelize (
 
 
 template<typename T>
-std::auto_ptr<MultiScalarField3D<int> > revoxelize (
+std::auto_ptr<MultiScalarField3D<int> > revoxelize3D (
         TriangularSurfaceMesh<T> const& mesh,
         MultiScalarField3D<int>& oldVoxelMatrix,
         MultiContainerBlock3D& hashContainer, plint borderWidth )
@@ -382,9 +382,8 @@ void VoxelizeMeshFunctional3D<T>::printOffender (
                                   << (voxelFlag::insideFlag(typeOfNeighbor) ? "inside" : "outside");
                         if (crossed) {
                             triangles.insert(whichTriangle);
-                            std::cout 
-                                  << " inters. at distance " << distance
-                                  << " with triangle " << whichTriangle << std::endl;
+                            std::cout<< " inters. at distance " << distance
+                                     << " with triangle " << whichTriangle << std::endl;
                         }
                         else {
                             std::cout << " no inters." << std::endl;
@@ -514,9 +513,9 @@ void VoxelizeMeshFunctional3D<T>::processGenericBlocks (
     plint zIncr = zRange[1]>zRange[0] ? 1 : -1;
     // The ranges are closed on both ends. Here, the range[1] end
     //   is converted to an open one so we can use != checks in the loops.
-    xRange[1] += xIncr; 
-    yRange[1] += yIncr; 
-    zRange[1] += zIncr; 
+    xRange[1] += xIncr;
+    yRange[1] += yIncr;
+    zRange[1] += zIncr;
     for (plint iX=xRange[0]; iX!=xRange[1]; iX+=xIncr) {
         for (plint iY=yRange[0]; iY!=yRange[1]; iY+=yIncr) {
             for (plint iZ=zRange[0]; iZ!=zRange[1]; iZ+=zIncr) {
@@ -529,7 +528,7 @@ void VoxelizeMeshFunctional3D<T>::processGenericBlocks (
                                 if (!(dx==0 && dy==0 && dz==0)) {
                                     Dot3D neighbor(iX+dx, iY+dy, iZ+dz);
                                     bool ok = voxelizeFromNeighbor (
-                                                  *voxels, *container, 
+                                                  *voxels, *container,
                                                   pos, neighbor, voxelType );
                                     if (!ok) {
                                         printOffender(*voxels, *container, pos);

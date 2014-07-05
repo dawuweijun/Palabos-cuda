@@ -101,7 +101,7 @@ inline bool outsideFlag ( int arg )
 }  // namespace voxelFlag
 
 template<typename T>
-std::auto_ptr<MultiScalarField2D<int> > voxelize (
+std::auto_ptr<MultiScalarField2D<int> > voxelize2D (
     SegmentPolygonMesh2D<T> const& mesh,
     plint symmetricLayer, plint borderWidth )
 {
@@ -112,11 +112,11 @@ std::auto_ptr<MultiScalarField2D<int> > voxelize (
     plint nx = ( plint ) ( xRange[1] - xRange[0] ) + 1 + 2*symmetricLayer;
     plint ny = ( plint ) ( yRange[1] - yRange[0] ) + 1 + 2*symmetricLayer;
 
-    return voxelize ( mesh, Box2D ( 0,nx-1, 0,ny-1 ), borderWidth );
+    return voxelize2D ( mesh, Box2D ( 0,nx-1, 0,ny-1 ), borderWidth );
 }
 
 template<typename T>
-std::auto_ptr<MultiScalarField2D<int> > voxelize (
+std::auto_ptr<MultiScalarField2D<int> > voxelize2D (
     SegmentPolygonMesh2D<T> const& mesh,
     Box2D const& domain, plint borderWidth )
 {
@@ -153,7 +153,7 @@ std::auto_ptr<MultiScalarField2D<int> > voxelize (
 }
 
 template<typename T>
-std::auto_ptr<MultiScalarField2D<int> > voxelize (
+std::auto_ptr<MultiScalarField2D<int> > voxelize2D (
     SegmentPolygonMesh2D<T> const& mesh,
     Box2D const& domain, plint borderWidth, Box2D seed )
 {
@@ -198,7 +198,7 @@ std::auto_ptr<MultiScalarField2D<int> > voxelize (
 
 
 template<typename T>
-std::auto_ptr<MultiScalarField2D<int> > revoxelize (
+std::auto_ptr<MultiScalarField2D<int> > revoxelize2D (
     SegmentPolygonMesh2D<T> const& mesh,
     MultiScalarField2D<int>& oldVoxelMatrix,
     MultiContainerBlock2D& hashContainer, plint borderWidth )
@@ -243,7 +243,7 @@ bool VoxelizeMeshFunctional2D<T>::distanceToSurface (
     AtomicContainerBlock2D& hashContainer,
     Array<T,2> const& point, T& distance, bool& isBehind ) const
 {
-    T maxDistance = sqrt ( 3 );
+    T maxDistance = sqrt ( 2 );
     Array<T,2> xRange ( point[0]-maxDistance, point[0]+maxDistance );
     Array<T,2> yRange ( point[1]-maxDistance, point[1]+maxDistance );
     SegmentHash<T> segmentHash ( hashContainer );
@@ -275,12 +275,8 @@ bool VoxelizeMeshFunctional2D<T>::checkIfFacetsCrossed (
     Array<T,2> const& point1, Array<T,2> const& point2,
     T& distance, plint& whichSegment )
 {
-    Array<T,2> xRange (
-        std::min ( point1[0], point2[0] ),
-        std::max ( point1[0], point2[0] ) );
-    Array<T,2> yRange (
-        std::min ( point1[1], point2[1] ),
-        std::max ( point1[1], point2[1] ) );
+    Array<T,2> xRange (std::min ( point1[0], point2[0] ),std::max ( point1[0], point2[0] ) );
+    Array<T,2> yRange (std::min ( point1[1], point2[1] ),std::max ( point1[1], point2[1] ) );
     SegmentHash<T> segmentHash ( hashContainer );
     std::vector<plint> possibleSegments;
     segmentHash.getSegments ( xRange, yRange, possibleSegments );

@@ -5,7 +5,7 @@
  * 1010 Lausanne, Switzerland
  * E-mail contact: contact@flowkit.com
  *
- * The most recent release of Palabos can be downloaded at 
+ * The most recent release of Palabos can be downloaded at
  * <http://www.palabos.org/>
  *
  * The library Palabos is free software: you can redistribute it and/or
@@ -56,22 +56,22 @@ namespace voxelFlag {
 }
 
 template<typename T>
-std::auto_ptr<MultiScalarField3D<int> > voxelize (
+std::auto_ptr<MultiScalarField3D<int> > voxelize3D (
         TriangularSurfaceMesh<T> const& mesh,
         plint symmetricLayer, plint borderWidth );
 
 template<typename T>
-std::auto_ptr<MultiScalarField3D<int> > voxelize (
+std::auto_ptr<MultiScalarField3D<int> > voxelize3D (
         TriangularSurfaceMesh<T> const& mesh,
         Box3D const& domain, plint borderWidth );
 
 template<typename T>
-std::auto_ptr<MultiScalarField3D<int> > voxelize (
+std::auto_ptr<MultiScalarField3D<int> > voxelize3D (
         TriangularSurfaceMesh<T> const& mesh,
         Box3D const& domain, plint borderWidth, Box3D seed );
 
 template<typename T>
-std::auto_ptr<MultiScalarField3D<int> > revoxelize (
+std::auto_ptr<MultiScalarField3D<int> > revoxelize3D (
         TriangularSurfaceMesh<T> const& mesh,
         MultiScalarField3D<int>& oldVoxelMatrix,
         MultiContainerBlock3D& hashContainer, plint borderWidth );
