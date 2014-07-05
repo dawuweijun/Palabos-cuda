@@ -5,7 +5,7 @@
  * 1010 Lausanne, Switzerland
  * E-mail contact: contact@flowkit.com
  *
- * The most recent release of Palabos can be downloaded at 
+ * The most recent release of Palabos can be downloaded at
  * <http://www.palabos.org/>
  *
  * The library Palabos is free software: you can redistribute it and/or
@@ -31,6 +31,7 @@
 #include "offLattice/offLatticeModel3D.h"
 #include "latticeBoltzmann/geometricOperationTemplates.h"
 #include "latticeBoltzmann/externalFieldAccess.h"
+#include "latticeBoltzmann/indexTemplates.h"
 #include <algorithm>
 #include <cmath>
 
@@ -79,8 +80,8 @@ void ExtrapolatedGeneralizedOffLatticeModel3D<T,Descriptor>::prepareCell (
         std::vector<std::pair<int,int> > liquidNeighbors;
         std::vector<int> liquidNeighborsNoSolid;
         std::vector<plint> ids;
-        for (int iNeighbor=0; iNeighbor<NextNeighbor<T>::numNeighbors; ++iNeighbor) {
-            int const* c = NextNeighbor<T>::c[iNeighbor];
+        for (int iNeighbor=0; iNeighbor<NextNeighbor3D<T>::numNeighbors; ++iNeighbor) {
+            int const* c = NextNeighbor3D<T>::c[iNeighbor];
             Dot3D neighbor(cellLocation.x+c[0], cellLocation.y+c[1], cellLocation.z+c[2]);
             // If the non-fluid node has a fluid neighbor ...
             if (this->isFluid(neighbor+offset)) {
@@ -118,8 +119,8 @@ void ExtrapolatedGeneralizedOffLatticeModel3D<T,Descriptor>::prepareCell (
             else {
                 bool fluidNeighbor = false;
                 for (int jNeighbor=1; jNeighbor<Descriptor<T>::q; ++jNeighbor) {
-                    Dot3D next_neighbor(neighbor.x+Descriptor<T>::c[jNeighbor][0], 
-                                        neighbor.y+Descriptor<T>::c[jNeighbor][1], 
+                    Dot3D next_neighbor(neighbor.x+Descriptor<T>::c[jNeighbor][0],
+                                        neighbor.y+Descriptor<T>::c[jNeighbor][1],
                                         neighbor.z+Descriptor<T>::c[jNeighbor][2]);
                     if ((this->isFluid(next_neighbor+offset))) {
                         fluidNeighbor = true;
@@ -139,12 +140,12 @@ void ExtrapolatedGeneralizedOffLatticeModel3D<T,Descriptor>::prepareCell (
 //                 selectionLiquid[liquidNeighbors[iA].second].push_back(liquidNeighbors[iA]);
 //                 selectionIds[liquidNeighbors[iA].second].push_back(ids[iA]);
 //             }
-            
+
             info->getDryNodes().push_back(cellLocation);
             info->getDryNodeFluidWithFluidDirections().push_back(liquidNeighborsNoSolid);
             info->getDryNodeFluidDirections().push_back(liquidNeighbors);
             info->getDryNodeIds().push_back(ids);
-            
+
             // add only biggest depth to the list of directions and triangles
 //             for (plint iA = getNumNeighbors(); iA >= 0; --iA) {
 //                 if (!selectionLiquid[iA].empty()) {
@@ -153,7 +154,7 @@ void ExtrapolatedGeneralizedOffLatticeModel3D<T,Descriptor>::prepareCell (
 //                     break;
 //                 }
 //             }
-            
+
         }
     }
 }
@@ -218,7 +219,7 @@ void ExtrapolatedGeneralizedOffLatticeModel3D<T,Descriptor>::cellCompletion (
 {
     typedef Descriptor<T> D;
     using namespace indexTemplates;
-    
+
     Cell<T,Descriptor>& cell =
         lattice.get(genNode.x, genNode.y, genNode.z);
     plint numDirections = (plint)dryNodeFluidDirections.size();
@@ -228,7 +229,7 @@ void ExtrapolatedGeneralizedOffLatticeModel3D<T,Descriptor>::cellCompletion (
     Array<T,3> wallNormal;
     for (plint iDirection=0; iDirection<numDirections; ++iDirection) {
         int iNeighbor = dryNodeFluidDirections[iDirection].first;
-        int const* c = NextNeighbor<T>::c[iNeighbor];
+        int const* c = NextNeighbor3D<T>::c[iNeighbor];
         Dot3D fluidDirection(c[0],c[1],c[2]);
         plint dryNodeId = dryNodeIds[iDirection];
         int depth = dryNodeFluidDirections[iDirection].second;
@@ -248,8 +249,8 @@ void ExtrapolatedGeneralizedOffLatticeModel3D<T,Descriptor>::cellCompletion (
             //   the force term automatically evaluates to zero.
             wall_vel[iD] -= (T)0.5*getExternalForceComponent(cell,iD);
         }
-        T invDistanceToNeighbor = NextNeighbor<T>::invD[iNeighbor];
-        PLB_ASSERT( wallDistance <= NextNeighbor<T>::d[iNeighbor] );
+        T invDistanceToNeighbor = NextNeighbor3D<T>::invD[iNeighbor];
+        PLB_ASSERT( wallDistance <= NextNeighbor3D<T>::d[iNeighbor] );
         T delta = (T)1. - wallDistance * invDistanceToNeighbor;
         Array<T,3> normalFluidDirection((T)fluidDirection.x, (T)fluidDirection.y, (T)fluidDirection.z);
         normalFluidDirection *= invDistanceToNeighbor;
@@ -267,12 +268,12 @@ void ExtrapolatedGeneralizedOffLatticeModel3D<T,Descriptor>::cellCompletion (
         u += u_vect[iDirection] * weights[iDirection];
     }
     u /= sumWeights;
-    
+
     Array<T,D::d> deltaJ;
     deltaJ.resetToZero();
     for (plint iDirection=0; iDirection<numDirections; ++iDirection) {
         int iNeighbor = dryNodeFluidDirections[iDirection].first;
-        int iPop = nextNeighborPop<T,Descriptor>(iNeighbor);
+        int iPop = nextNeighborPop3D<T,Descriptor>(iNeighbor);
         if (iPop>=0) {
             plint oppPop = indexTemplates::opposite<D>(iPop);
             deltaJ[0] += D::c[oppPop][0]*cell[oppPop];
@@ -280,32 +281,32 @@ void ExtrapolatedGeneralizedOffLatticeModel3D<T,Descriptor>::cellCompletion (
             deltaJ[2] += D::c[oppPop][2]*cell[oppPop];
         }
     }
-    
+
     std::vector<plint> knownIndices;
     knownIndices.push_back(0);
     for (pluint iDirection=0; iDirection<dryNodeFluidNoSolidDirections.size(); ++iDirection) {
         int iNeighbor = dryNodeFluidNoSolidDirections[iDirection];
-        plint iPop = nextNeighborPop<T,Descriptor>(iNeighbor);
+        plint iPop = nextNeighborPop3D<T,Descriptor>(iNeighbor);
         if (iPop>=0) {
             plint index = opposite<Descriptor<T> >(iPop);
             knownIndices.push_back(index);
         }
     }
     PLB_ASSERT(knownIndices.size() >= 6);
-    
+
     std::vector<plint> missingIndices = remainingIndexes<Descriptor<T> >(knownIndices);
-    
+
     Dynamics<T,Descriptor> const& dynamics = cell.getDynamics();
     DirichletVelocityBoundarySolver<T,Descriptor> bc(missingIndices, knownIndices, u);
     bc.apply(cell,dynamics,!this->getPartialReplace());
-    
+
     Cell<T,Descriptor> cellCopy(cell);
     BlockStatistics statsCopy(lattice.getInternalStatistics());
     cellCopy.collide(statsCopy);
-    
+
     for (plint iDirection=0; iDirection<(plint)dryNodeFluidDirections.size(); ++iDirection) {
         int iNeighbor = dryNodeFluidDirections[iDirection].first;
-        plint iPop = nextNeighborPop<T,Descriptor>(iNeighbor);
+        plint iPop = nextNeighborPop3D<T,Descriptor>(iNeighbor);
         if (iPop>=0) {
             deltaJ[0] -= D::c[iPop][0]*cellCopy[iPop];
             deltaJ[1] -= D::c[iPop][1]*cellCopy[iPop];
@@ -416,17 +417,17 @@ void InterpolatedGeneralizedOffLatticeModel3D<T,Descriptor>::prepareCell (
         std::vector<std::pair<int,int> > solidNeighbors;
         std::vector<int> wetNodeFluidDirections;
         std::vector<plint> ids;
-        for (int iNeighbor=0; iNeighbor<NextNeighbor<T>::numNeighbors; ++iNeighbor) {
+        for (int iNeighbor=0; iNeighbor<NextNeighbor3D<T>::numNeighbors; ++iNeighbor) {
 //             pcout << "iNeighbor = " << iNeighbor << std::endl;
-            int const* c = NextNeighbor<T>::c[iNeighbor];
+            int const* c = NextNeighbor3D<T>::c[iNeighbor];
             Dot3D neighbor(cellLocation.x+c[0], cellLocation.y+c[1], cellLocation.z+c[2]);
-            
-            // TODO use only depth two if possible (add a check for only depth 
+
+            // TODO use only depth two if possible (add a check for only depth
             // two selection or depth one if depth two not possible.
-            
+
             // If the fluid node has a non-fluid neighbor ...
             if (!this->isFluid(neighbor+offset)) {
-                // ... check how many fluid nodes without solid neighbors 
+                // ... check how many fluid nodes without solid neighbors
                 // in the direction opposite to the solid.
                 int depth = 0;
                 for (int iDepth=1; iDepth<=getNumNeighbors(); ++iDepth) {
@@ -434,7 +435,7 @@ void InterpolatedGeneralizedOffLatticeModel3D<T,Descriptor>::prepareCell (
                     Dot3D nextNeighbor(cellLocation.x-iDepth*c[0],
                                        cellLocation.y-iDepth*c[1],
                                        cellLocation.z-iDepth*c[2]);
-                    
+
                     bool solidNeighbor = false;
                     for (int iPop=1; iPop<Descriptor<T>::q; ++iPop) {
 //                         pcout << "iPop = " << iPop << std::endl;
@@ -447,7 +448,7 @@ void InterpolatedGeneralizedOffLatticeModel3D<T,Descriptor>::prepareCell (
                             break;
                         }
                     }
-                    
+
                     if (this->isFluid(nextNeighbor+offset) && !solidNeighbor) {
                         depth = iDepth;
                     }
@@ -473,7 +474,7 @@ void InterpolatedGeneralizedOffLatticeModel3D<T,Descriptor>::prepareCell (
                 ids.push_back(iTriangle);
             }
         }
-        
+
         if (!solidNeighbors.empty()) {
             // selecting only deepest depth available (for a higher order interpolation order)
             std::vector<std::vector<std::pair<int,int> > > selectionSolid(getNumNeighbors()+1);
@@ -486,12 +487,12 @@ void InterpolatedGeneralizedOffLatticeModel3D<T,Descriptor>::prepareCell (
             for (int iPop=1; iPop<Descriptor<T>::q; ++iPop) {
                 int const* c = Descriptor<T>::c[iPop];
                 Dot3D potFluidNeighbor(cellLocation.x+c[0], cellLocation.y+c[1], cellLocation.z+c[2]);
-                
+
                 if (this->isFluid(potFluidNeighbor+offset)) {
                     wetNodeFluidDirections.push_back(iPop);
                 }
             }
-            
+
             info->getWetNodes().push_back(cellLocation);
             // add only biggest depth to the list of directions and triangles
             for (plint iA = getNumNeighbors(); iA >= 0; --iA) {
@@ -566,7 +567,7 @@ void InterpolatedGeneralizedOffLatticeModel3D<T,Descriptor>::cellCompletion (
 {
     typedef Descriptor<T> D;
     using namespace indexTemplates;
-    
+
     Cell<T,Descriptor>& cell =
         lattice.get(genNode.x, genNode.y, genNode.z);
     plint numDirections = (plint)wetNodeSolidDirections.size();
@@ -578,11 +579,11 @@ void InterpolatedGeneralizedOffLatticeModel3D<T,Descriptor>::cellCompletion (
         int iNeighbor = wetNodeSolidDirections[iDirection].first;
         int depth = wetNodeSolidDirections[iDirection].second;
 //         pcout << "depth = " << depth << std::endl;
-        int const* c = NextNeighbor<T>::c[iNeighbor];
-        
+        int const* c = NextNeighbor3D<T>::c[iNeighbor];
+
         Dot3D solidDirection(c[0],c[1],c[2]);
         plint wetNodeId = wetNodeIds[iDirection];
-        
+
         Array<T,3> wallNode, wall_vel;
         T wallDistance;
         OffBoundary::Type bdType;
@@ -598,9 +599,9 @@ void InterpolatedGeneralizedOffLatticeModel3D<T,Descriptor>::cellCompletion (
             //   the force term automatically evaluates to zero.
             wall_vel[iD] -= (T)0.5*getExternalForceComponent(cell,iD);
         }
-        T invDistanceToNeighbor = NextNeighbor<T>::invD[iNeighbor];
-        PLB_ASSERT( wallDistance <= NextNeighbor<T>::d[iNeighbor] );
-        
+        T invDistanceToNeighbor = NextNeighbor3D<T>::invD[iNeighbor];
+        PLB_ASSERT( wallDistance <= NextNeighbor3D<T>::d[iNeighbor] );
+
         Array<T,3> normalFluidDirection((T)solidDirection.x, (T)solidDirection.y, (T)solidDirection.z);
         normalFluidDirection *= invDistanceToNeighbor;
         weights[iDirection] = fabs ( dot(normalFluidDirection, wallNormal) );
@@ -608,7 +609,7 @@ void InterpolatedGeneralizedOffLatticeModel3D<T,Descriptor>::cellCompletion (
 
         computeVelocity (
                 lattice, genNode, solidDirection, depth,
-                wallNode, wallDistance, NextNeighbor<T>::d[iNeighbor], wall_vel, bdType, wallNormal,
+                wallNode, wallDistance, NextNeighbor3D<T>::d[iNeighbor], wall_vel, bdType, wallNormal,
                 u_vect[iDirection] );
     }
 
@@ -617,21 +618,21 @@ void InterpolatedGeneralizedOffLatticeModel3D<T,Descriptor>::cellCompletion (
         u += u_vect[iDirection] * weights[iDirection];
     }
     u /= sumWeights;
-    
+
 //     pcout << "vel = " << u[0] << ", " << u[1] << ", " << u[2] << std::endl;
 
     Array<T,D::d> deltaJ;
     deltaJ.resetToZero();
     for (plint iDirection=0; iDirection<numDirections; ++iDirection) {
         int iNeighbor = wetNodeSolidDirections[iDirection].first;
-        int iPop = nextNeighborPop<T,Descriptor>(iNeighbor);
+        int iPop = nextNeighborPop3D<T,Descriptor>(iNeighbor);
         if (iPop>=0) {
             deltaJ[0] += D::c[iPop][0]*cell[iPop];
             deltaJ[1] += D::c[iPop][1]*cell[iPop];
             deltaJ[2] += D::c[iPop][2]*cell[iPop];
         }
     }
-    
+
     std::vector<plint> knownIndices;
     knownIndices.push_back(0);
 //     pcout << "indexes = " << std::endl;
@@ -642,20 +643,20 @@ void InterpolatedGeneralizedOffLatticeModel3D<T,Descriptor>::cellCompletion (
 //             pcout << index << std::endl;
     }
     PLB_ASSERT(knownIndices.size() >= 6);
-    
+
     std::vector<plint> missingIndices = remainingIndexes<Descriptor<T> >(knownIndices);
-    
+
     Dynamics<T,Descriptor> const& dynamics = cell.getDynamics();
     DirichletVelocityBoundarySolver<T,Descriptor> bc(missingIndices, knownIndices, u);
     bc.apply(cell,dynamics,!this->getPartialReplace());
-    
+
     Cell<T,Descriptor> cellCopy(cell);
     BlockStatistics statsCopy(lattice.getInternalStatistics());
     cellCopy.collide(statsCopy);
-    
+
     for (plint iDirection=0; iDirection<numDirections; ++iDirection) {
         int iNeighbor = wetNodeSolidDirections[iDirection].first;
-        plint iPop = nextNeighborPop<T,Descriptor>(iNeighbor);
+        plint iPop = nextNeighborPop3D<T,Descriptor>(iNeighbor);
         if (iPop>=0) {
             plint oppPop = indexTemplates::opposite<D>(iPop);
             deltaJ[0] -= D::c[oppPop][0]*cellCopy[oppPop];
@@ -683,14 +684,14 @@ void InterpolatedGeneralizedOffLatticeModel3D<T,Descriptor>::computeVelocity (
         lattice.get( genNode.x-solidDirection.x,
                      genNode.y-solidDirection.y,
                      genNode.z-solidDirection.z );
-        
+
         if (!this->velIsJ()) {
             cell1.getDynamics().computeVelocity(cell1, u1);
         } else {
             T rhoBar;
             cell1.getDynamics().computeRhoBarJ(cell1, rhoBar, u1);
         }
-        
+
         u = (wall_u * cellDistance + wallDistance * u1) / (wallDistance+cellDistance);
     }
     else if (depth >= 2) {  // depth >= 2
@@ -710,10 +711,10 @@ void InterpolatedGeneralizedOffLatticeModel3D<T,Descriptor>::computeVelocity (
             cell1.getDynamics().computeRhoBarJ(cell1, rhoBar, u1);
             cell2.getDynamics().computeRhoBarJ(cell2, rhoBar, u2);
         }
-        
+
         T invDenom = (T)1 / (wallDistance*wallDistance+(T)2*cellDistance*cellDistance+(T)3*wallDistance*cellDistance);
-        
-        u = wallDistance*(-wallDistance-cellDistance)*u2*invDenom 
+
+        u = wallDistance*(-wallDistance-cellDistance)*u2*invDenom
             + (T)2*wallDistance*(wallDistance+(T)2*cellDistance)*u1*invDenom
             + (T)2*cellDistance*cellDistance*wall_u*invDenom;
     }
@@ -723,9 +724,9 @@ void InterpolatedGeneralizedOffLatticeModel3D<T,Descriptor>::computeVelocity (
         lattice.get( genNode.x-solidDirection.x,
                      genNode.y-solidDirection.y,
                      genNode.z-solidDirection.z );
-        
+
         cell1.getDynamics().computeVelocity(cell1, u1);
-        
+
         u = u1;
     }
     if ( bdType==OffBoundary::densityNeumann ) {
@@ -733,9 +734,9 @@ void InterpolatedGeneralizedOffLatticeModel3D<T,Descriptor>::computeVelocity (
         lattice.get( genNode.x-solidDirection.x,
                      genNode.y-solidDirection.y,
                      genNode.z-solidDirection.z );
-        
+
         cell1.getDynamics().computeVelocity(cell1, u1);
-        
+
         u = dot(u1,wallNormal)*wallNormal;
     }
     if ( bdType==OffBoundary::freeSlip ) {
@@ -743,9 +744,9 @@ void InterpolatedGeneralizedOffLatticeModel3D<T,Descriptor>::computeVelocity (
         lattice.get( genNode.x-solidDirection.x,
                      genNode.y-solidDirection.y,
                      genNode.z-solidDirection.z );
-        
+
         cell1.getDynamics().computeVelocity(cell1, u1);
-        
+
         u = u1-dot(u1,wallNormal)*wallNormal;
     }
 }

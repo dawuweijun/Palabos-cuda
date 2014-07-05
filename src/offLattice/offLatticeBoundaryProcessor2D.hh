@@ -159,9 +159,9 @@ void CheckVoxelizationFunctional2D<T>::computeCell (
         plint numNeighbors=0;
         plint numShallow=0;
         plint numFailures=0;
-        for ( int iNeighbor=0; iNeighbor<NextNeighbor<T>::numNeighbors; ++iNeighbor )
+        for ( int iNeighbor=0; iNeighbor<NextNeighbor2D<T>::numNeighbors; ++iNeighbor )
         {
-            int const* c = NextNeighbor<T>::c[iNeighbor];
+            int const* c = NextNeighbor2D<T>::c[iNeighbor];
             Dot2D neighbor ( cellLocation.x+c[0], cellLocation.y+c[1] );
             Dot2D nextNeighbor ( cellLocation.x+2*c[0], cellLocation.y+2*c[1] );
             // If the non-fluid node has a fluid neighbor ...

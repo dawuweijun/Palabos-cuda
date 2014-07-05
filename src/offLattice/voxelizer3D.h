@@ -5,7 +5,7 @@
  * 1010 Lausanne, Switzerland
  * E-mail contact: contact@flowkit.com
  *
- * The most recent release of Palabos can be downloaded at 
+ * The most recent release of Palabos can be downloaded at
  * <http://www.palabos.org/>
  *
  * The library Palabos is free software: you can redistribute it and/or
@@ -24,54 +24,33 @@
 
 /* Main author: Orestis Malaspinas */
 
-#ifndef VOXELIZER_H
-#define VOXELIZER_H
+#ifndef VOXELIZER_3D_H
+#define VOXELIZER_3D_H
 
 #include "core/globalDefs.h"
 #include "atomicBlock/dataProcessingFunctional3D.h"
 #include "offLattice/triangleHash.h"
+#include "offLattice/voxelizer.h"
 
 namespace plb {
 
-namespace voxelFlag {
-
-    /// It is a requirement that "undetermined" equals zero, because the
-    ///   default initialization value for scalar-fields is zero.
-    static const int undetermined = 0;
-    static const int outside      = 1;
-    /// Cells which are outside, but which have
-    ///   inside neighbors.
-    static const int outerBorder  = 2;
-    static const int inside       = 3;
-    /// Cells which are inside, but which have
-    ///   outside neighbors.
-    static const int innerBorder  = 4;
-
-    int invert(int arg);
-    int bulkFlag(int arg);
-    int borderFlag(int arg);
-    bool insideFlag(int arg);
-    bool outsideFlag(int arg);
-
-}
-
 template<typename T>
-std::auto_ptr<MultiScalarField3D<int> > voxelize (
+std::auto_ptr<MultiScalarField3D<int> > voxelize3D (
         TriangularSurfaceMesh<T> const& mesh,
         plint symmetricLayer, plint borderWidth );
 
 template<typename T>
-std::auto_ptr<MultiScalarField3D<int> > voxelize (
+std::auto_ptr<MultiScalarField3D<int> > voxelize3D (
         TriangularSurfaceMesh<T> const& mesh,
         Box3D const& domain, plint borderWidth );
 
 template<typename T>
-std::auto_ptr<MultiScalarField3D<int> > voxelize (
+std::auto_ptr<MultiScalarField3D<int> > voxelize3D (
         TriangularSurfaceMesh<T> const& mesh,
         Box3D const& domain, plint borderWidth, Box3D seed );
 
 template<typename T>
-std::auto_ptr<MultiScalarField3D<int> > revoxelize (
+std::auto_ptr<MultiScalarField3D<int> > revoxelize3D (
         TriangularSurfaceMesh<T> const& mesh,
         MultiScalarField3D<int>& oldVoxelMatrix,
         MultiContainerBlock3D& hashContainer, plint borderWidth );

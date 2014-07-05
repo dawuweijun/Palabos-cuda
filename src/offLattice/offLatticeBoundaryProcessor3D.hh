@@ -151,8 +151,8 @@ void CheckVoxelizationFunctional3D<T>::computeCell (
         plint numNeighbors=0;
         plint numShallow=0;
         plint numFailures=0;
-        for (int iNeighbor=0; iNeighbor<NextNeighbor<T>::numNeighbors; ++iNeighbor) {
-            int const* c = NextNeighbor<T>::c[iNeighbor];
+        for (int iNeighbor=0; iNeighbor<NextNeighbor3D<T>::numNeighbors; ++iNeighbor) {
+            int const* c = NextNeighbor3D<T>::c[iNeighbor];
             Dot3D neighbor(cellLocation.x+c[0], cellLocation.y+c[1], cellLocation.z+c[2]);
             Dot3D nextNeighbor(cellLocation.x+2*c[0], cellLocation.y+2*c[1], cellLocation.z+2*c[2]);
             // If the non-fluid node has a fluid neighbor ...

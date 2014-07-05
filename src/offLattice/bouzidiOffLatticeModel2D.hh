@@ -28,14 +28,15 @@
 #include "core/plbTimer.h"
 #include "offLattice/bouzidiOffLatticeModel2D.h"
 #include "latticeBoltzmann/geometricOperationTemplates.h"
+#include "latticeBoltzmann/indexTemplates.h"
 #include "latticeBoltzmann/externalFieldAccess.h"
+#include "latticeBoltzmann/momentTemplates.h"
 #include <algorithm>
 #include <vector>
 #include <cmath>
 
 namespace plb
 {
-
 
 template<typename T, template<typename U> class Descriptor>
 BouzidiOffLatticeModel2D<T,Descriptor>::BouzidiOffLatticeModel2D (

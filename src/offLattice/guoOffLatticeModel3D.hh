@@ -5,7 +5,7 @@
  * 1010 Lausanne, Switzerland
  * E-mail contact: contact@flowkit.com
  *
- * The most recent release of Palabos can be downloaded at 
+ * The most recent release of Palabos can be downloaded at
  * <http://www.palabos.org/>
  *
  * The library Palabos is free software: you can redistribute it and/or
@@ -43,9 +43,9 @@ GuoOffLatticeModel3D<T,Descriptor>::LiquidNeighbor::LiquidNeighbor
           depth(depth_),
           iTriangle(iTriangle_)
 {
-    int const* c = NextNeighbor<T>::c[iNeighbor];
+    int const* c = NextNeighbor3D<T>::c[iNeighbor];
     Array<T,3> neighborVect(c[0],c[1],c[2]);
-    cosAngle = fabs(dot(neighborVect,wallNormal))*NextNeighbor<T>::invD[iNeighbor];
+    cosAngle = fabs(dot(neighborVect,wallNormal))*NextNeighbor3D<T>::invD[iNeighbor];
 }
 
 template<typename T, template<typename U> class Descriptor>
@@ -86,8 +86,8 @@ void GuoOffLatticeModel3D<T,Descriptor>::prepareCell (
     PLB_ASSERT( info );
     std::vector<LiquidNeighbor> liquidNeighbors;
     if (!this->isFluid(cellLocation+offset)) {
-        for (int iNeighbor=0; iNeighbor<NextNeighbor<T>::numNeighbors; ++iNeighbor) {
-            int const* c = NextNeighbor<T>::c[iNeighbor];
+        for (int iNeighbor=0; iNeighbor<NextNeighbor3D<T>::numNeighbors; ++iNeighbor) {
+            int const* c = NextNeighbor3D<T>::c[iNeighbor];
             Dot3D neighbor(cellLocation.x+c[0], cellLocation.y+c[1], cellLocation.z+c[2]);
             // If the non-fluid node has a fluid neighbor ...
             if (this->isFluid(neighbor+offset)) {
@@ -276,7 +276,7 @@ bool GuoAlgorithm3D<T,Descriptor>::computeNeighborData()
     Array<T,3> wallNormal;
     for (plint iDirection=0; iDirection<numDirections; ++iDirection) {
         int iNeighbor = dryNodeFluidDirections[iDirection].first;
-        int const* c = NextNeighbor<T>::c[iNeighbor];
+        int const* c = NextNeighbor3D<T>::c[iNeighbor];
         Dot3D fluidDirection(c[0],c[1],c[2]);
         plint dryNodeId = dryNodeIds[iDirection];
         int depth = dryNodeFluidDirections[iDirection].second;
@@ -303,8 +303,8 @@ bool GuoAlgorithm3D<T,Descriptor>::computeNeighborData()
                 wall_vel[iD] -= (T)0.5*getExternalForceComponent(cell,iD);
             }
         }
-        T invDistanceToNeighbor = NextNeighbor<T>::invD[iNeighbor];
-        PLB_ASSERT( wallDistance <= NextNeighbor<T>::d[iNeighbor] );
+        T invDistanceToNeighbor = NextNeighbor3D<T>::invD[iNeighbor];
+        PLB_ASSERT( wallDistance <= NextNeighbor3D<T>::d[iNeighbor] );
         T delta = (T)1. - wallDistance * invDistanceToNeighbor;
         Array<T,3> normalFluidDirection((T)fluidDirection.x, (T)fluidDirection.y, (T)fluidDirection.z);
         normalFluidDirection *= invDistanceToNeighbor;
@@ -328,7 +328,7 @@ void GuoAlgorithm3D<T,Descriptor>::finalize()
     if (computeStat) {
         for (plint iDirection=0; iDirection<numDirections; ++iDirection) {
             int iNeighbor = dryNodeFluidDirections[iDirection].first;
-            int iPop = nextNeighborPop<T,Descriptor>(iNeighbor);
+            int iPop = nextNeighborPop3D<T,Descriptor>(iNeighbor);
             if (iPop>=0) {
                 plint oppPop = indexTemplates::opposite<D>(iPop);
                 deltaJ[0] += D::c[oppPop][0]*cell[oppPop];
@@ -347,7 +347,7 @@ void GuoAlgorithm3D<T,Descriptor>::finalize()
 
         for (plint iDirection=0; iDirection<numDirections; ++iDirection) {
             int iNeighbor = dryNodeFluidDirections[iDirection].first;
-            plint iPop = nextNeighborPop<T,Descriptor>(iNeighbor);
+            plint iPop = nextNeighborPop3D<T,Descriptor>(iNeighbor);
             if (iPop>=0) {
                 deltaJ[0] -= D::c[iPop][0]*collidedCell[iPop];
                 deltaJ[1] -= D::c[iPop][1]*collidedCell[iPop];
@@ -511,7 +511,7 @@ void GuoPiNeqAlgorithm3D<T,Descriptor>::complete() {
         dynamics.regularize(this->cell, this->rhoBar, this->j, jSqr, PiNeq);
         for (plint iDirection=0; iDirection<this->numDirections; ++iDirection) {
             int iNeighbor = this->dryNodeFluidDirections[iDirection].first;
-            plint iPop = nextNeighborPop<T,Descriptor>(iNeighbor);
+            plint iPop = nextNeighborPop3D<T,Descriptor>(iNeighbor);
             plint oppPop = indexTemplates::opposite<D>(iPop);
             this->cell[oppPop] = saveCell[oppPop];
         }
@@ -658,7 +658,7 @@ void GuoOffPopAlgorithm3D<T,Descriptor>::complete() {
     if (this->model.getPartialReplace()) {
         for (plint iDirection=0; iDirection<this->numDirections; ++iDirection) {
             int iNeighbor = this->dryNodeFluidDirections[iDirection].first;
-            plint iPop = nextNeighborPop<T,Descriptor>(iNeighbor);
+            plint iPop = nextNeighborPop3D<T,Descriptor>(iNeighbor);
             this->cell[iPop] = this->cell.computeEquilibrium(iPop, this->rhoBar, this->j, jSqr)+fNeq[iPop];
         }
     }

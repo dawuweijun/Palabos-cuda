@@ -5,7 +5,7 @@
  * 1010 Lausanne, Switzerland
  * E-mail contact: contact@flowkit.com
  *
- * The most recent release of Palabos can be downloaded at 
+ * The most recent release of Palabos can be downloaded at
  * <http://www.palabos.org/>
  *
  * The library Palabos is free software: you can redistribute it and/or
@@ -36,13 +36,13 @@
 #include "offLattice/segmentHash.h"
 #include "offLattice/offLatticeBoundaryProcessor2D.h"
 #include "offLattice/offLatticeBoundaryProfiles2D.h"
-// #include "offLattice/offLatticeBoundaryCondition2D.h"
+#include "offLattice/offLatticeBoundaryCondition2D.h"
 #include "offLattice/boundaryShapes2D.h"
 #include "offLattice/segmentBoundary2D.h"
 #include "offLattice/offLatticeModel2D.h"
 #include "offLattice/guoOffLatticeModel2D.h"
 #include "offLattice/bouzidiOffLatticeModel2D.h"
-// #include "offLattice/guoAdvDiffOffLatticeModel2D.h"
+#include "offLattice/guoAdvDiffOffLatticeModel2D.h"
 #include "offLattice/segmentSetGenerator.h"
 #include "offLattice/immersedWalls2D.h"
 #include "offLattice/filippovaHaenel2D.h"

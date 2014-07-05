@@ -22,12 +22,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef GUO_ADV_DIFF_OFF_LATTICE_MODEL_3D_HH
-#define GUO_ADV_DIFF_OFF_LATTICE_MODEL_3D_HH
+#ifndef GUO_ADV_DIFF_OFF_LATTICE_MODEL_2D_HH
+#define GUO_ADV_DIFF_OFF_LATTICE_MODEL_2D_HH
 
 #include "core/plbTimer.h"
-#include "offLattice/guoAdvDiffOffLatticeModel3D.h"
-#include "offLattice/nextNeighbors3D.h"
+#include "offLattice/guoAdvDiffOffLatticeModel2D.h"
+#include "offLattice/nextNeighbors2D.h"
 #include "latticeBoltzmann/advectionDiffusionMomentTemplates.h"
 #include "latticeBoltzmann/geometricOperationTemplates.h"
 #include "latticeBoltzmann/externalFieldAccess.h"
@@ -38,60 +38,59 @@
 namespace plb {
 
 template<typename T, template<typename U> class Descriptor>
-GuoAdvDiffOffLatticeModel3D<T,Descriptor>::GuoAdvDiffOffLatticeModel3D (
-        BoundaryShape3D<T,Array<T,2> >* shape_, int flowType_ )
-    : OffLatticeModel3D<T,Array<T,2> >(shape_, flowType_),
+GuoAdvDiffOffLatticeModel2D<T,Descriptor>::GuoAdvDiffOffLatticeModel2D (
+        BoundaryShape2D<T,Array<T,2> >* shape_, int flowType_ )
+    : OffLatticeModel2D<T,Array<T,2> >(shape_, flowType_),
       secondOrderFlag(true)
 { }
 
 template<typename T, template<typename U> class Descriptor>
-GuoAdvDiffOffLatticeModel3D<T,Descriptor>::GuoAdvDiffOffLatticeModel3D (
-        GuoAdvDiffOffLatticeModel3D<T,Descriptor> const& rhs )
-    : OffLatticeModel3D<T,Array<T,2> >(rhs),
+GuoAdvDiffOffLatticeModel2D<T,Descriptor>::GuoAdvDiffOffLatticeModel2D (
+        GuoAdvDiffOffLatticeModel2D<T,Descriptor> const& rhs )
+    : OffLatticeModel2D<T,Array<T,2> >(rhs),
       secondOrderFlag(rhs.secondOrderFlag)
 { }
 
 template<typename T, template<typename U> class Descriptor>
-GuoAdvDiffOffLatticeModel3D<T,Descriptor>&
-    GuoAdvDiffOffLatticeModel3D<T,Descriptor>::operator=(GuoAdvDiffOffLatticeModel3D<T,Descriptor> const& rhs)
+GuoAdvDiffOffLatticeModel2D<T,Descriptor>&
+    GuoAdvDiffOffLatticeModel2D<T,Descriptor>::operator=(GuoAdvDiffOffLatticeModel2D<T,Descriptor> const& rhs)
 {
-    OffLatticeModel3D<T,Array<T,2> >::operator=(rhs);
+    OffLatticeModel2D<T,Array<T,2> >::operator=(rhs);
     return *this;
 }
 
 template<typename T, template<typename U> class Descriptor>
-GuoAdvDiffOffLatticeModel3D<T,Descriptor>* GuoAdvDiffOffLatticeModel3D<T,Descriptor>::clone() const {
-    return new GuoAdvDiffOffLatticeModel3D(*this);
+GuoAdvDiffOffLatticeModel2D<T,Descriptor>* GuoAdvDiffOffLatticeModel2D<T,Descriptor>::clone() const {
+    return new GuoAdvDiffOffLatticeModel2D(*this);
 }
 
 template<typename T, template<typename U> class Descriptor>
-plint GuoAdvDiffOffLatticeModel3D<T,Descriptor>::getNumNeighbors() const {
+plint GuoAdvDiffOffLatticeModel2D<T,Descriptor>::getNumNeighbors() const {
     return 2;
 }
 
 template<typename T, template<typename U> class Descriptor>
-void GuoAdvDiffOffLatticeModel3D<T,Descriptor>::prepareCell (
-        Dot3D const& cellLocation,
-        AtomicContainerBlock3D& container )
+void GuoAdvDiffOffLatticeModel2D<T,Descriptor>::prepareCell (
+        Dot2D const& cellLocation,
+        AtomicContainerBlock2D& container )
 {
-    Dot3D offset = container.getLocation();
-    GuoAdvDiffOffLatticeInfo3D* info =
-        dynamic_cast<GuoAdvDiffOffLatticeInfo3D*>(container.getData());
+    Dot2D offset = container.getLocation();
+    GuoAdvDiffOffLatticeInfo2D* info =
+        dynamic_cast<GuoAdvDiffOffLatticeInfo2D*>(container.getData());
     PLB_ASSERT( info );
     if (!this->isFluid(cellLocation+offset)) {
         std::vector<std::pair<int,int> > liquidNeighbors;
         std::vector<plint> ids;
-        for (int iNeighbor=0; iNeighbor<NextNeighbor3D<T>::numNeighbors; ++iNeighbor) {
-            int const* c = NextNeighbor3D<T>::c[iNeighbor];
-            Dot3D neighbor(cellLocation.x+c[0], cellLocation.y+c[1], cellLocation.z+c[2]);
+        for (int iNeighbor=0; iNeighbor<NextNeighbor2D<T>::numNeighbors; ++iNeighbor) {
+            int const* c = NextNeighbor2D<T>::c[iNeighbor];
+            Dot2D neighbor(cellLocation.x+c[0], cellLocation.y+c[1]);
             // If the non-fluid node has a fluid neighbor ...
             if (this->isFluid(neighbor+offset)) {
                 // ... check how many fluid nodes it has ahead of it ...
                 int depth = 1;
                 for (int iDepth=2; iDepth<=getNumNeighbors(); ++iDepth) {
-                    Dot3D nextNeighbor(cellLocation.x+iDepth*c[0],
-                                       cellLocation.y+iDepth*c[1],
-                                       cellLocation.z+iDepth*c[2]);
+                    Dot2D nextNeighbor(cellLocation.x+iDepth*c[0],
+                                       cellLocation.y+iDepth*c[1]);
                     if (this->isFluid(nextNeighbor+offset)) {
                         depth = iDepth;
                     }
@@ -112,7 +111,7 @@ void GuoAdvDiffOffLatticeModel3D<T,Descriptor>::prepareCell (
                 bool ok =
 #endif
                     this->pointOnSurface (
-                            cellLocation+offset, Dot3D(c[0],c[1],c[2]), locatedPoint, distance,
+                            cellLocation+offset, Dot2D(c[0],c[1]), locatedPoint, distance,
                             wallNormal, surfaceData, bdType, iTriangle );
                 global::timer("intersect").stop();
                 PLB_ASSERT( ok );
@@ -130,23 +129,23 @@ void GuoAdvDiffOffLatticeModel3D<T,Descriptor>::prepareCell (
 
 template<typename T, template<typename U> class Descriptor>
 ContainerBlockData*
-    GuoAdvDiffOffLatticeModel3D<T,Descriptor>::generateOffLatticeInfo() const
+    GuoAdvDiffOffLatticeModel2D<T,Descriptor>::generateOffLatticeInfo() const
 {
-    return new GuoAdvDiffOffLatticeInfo3D;
+    return new GuoAdvDiffOffLatticeInfo2D;
 }
 
 template<typename T, template<typename U> class Descriptor>
-void GuoAdvDiffOffLatticeModel3D<T,Descriptor>::boundaryCompletion (
-        AtomicBlock3D& nonTypeLattice,
-        AtomicContainerBlock3D& container,
-            std::vector<AtomicBlock3D const*> const& args )
+void GuoAdvDiffOffLatticeModel2D<T,Descriptor>::boundaryCompletion (
+        AtomicBlock2D& nonTypeLattice,
+        AtomicContainerBlock2D& container,
+            std::vector<AtomicBlock2D const*> const& args )
 {
-    BlockLattice3D<T,Descriptor>& lattice =
-        dynamic_cast<BlockLattice3D<T,Descriptor>&> (nonTypeLattice);
-    GuoAdvDiffOffLatticeInfo3D* info =
-        dynamic_cast<GuoAdvDiffOffLatticeInfo3D*>(container.getData());
+    BlockLattice2D<T,Descriptor>& lattice =
+        dynamic_cast<BlockLattice2D<T,Descriptor>&> (nonTypeLattice);
+    GuoAdvDiffOffLatticeInfo2D* info =
+        dynamic_cast<GuoAdvDiffOffLatticeInfo2D*>(container.getData());
     PLB_ASSERT( info );
-    std::vector<Dot3D> const&
+    std::vector<Dot2D> const&
         dryNodes = info->getDryNodes();
     std::vector<std::vector<std::pair<int,int> > > const&
         dryNodeFluidDirections = info->getDryNodeFluidDirections();
@@ -154,7 +153,7 @@ void GuoAdvDiffOffLatticeModel3D<T,Descriptor>::boundaryCompletion (
         dryNodeIds = info->getDryNodeIds();
     PLB_ASSERT( dryNodes.size() == dryNodeFluidDirections.size() );
 
-    Dot3D absoluteOffset = lattice.getLocation();
+    Dot2D absoluteOffset = lattice.getLocation();
 
     for (pluint iDry=0; iDry<dryNodes.size(); ++iDry) {
         cellCompletion (
@@ -164,11 +163,11 @@ void GuoAdvDiffOffLatticeModel3D<T,Descriptor>::boundaryCompletion (
 }
 
 template<typename T, template<typename U> class Descriptor>
-void GuoAdvDiffOffLatticeModel3D<T,Descriptor>::cellCompletion (
-        BlockLattice3D<T,Descriptor>& lattice,
-        Dot3D const& guoNode,
+void GuoAdvDiffOffLatticeModel2D<T,Descriptor>::cellCompletion (
+        BlockLattice2D<T,Descriptor>& lattice,
+        Dot2D const& guoNode,
         std::vector<std::pair<int,int> > const& dryNodeFluidDirections,
-        std::vector<plint> const& dryNodeIds, Dot3D const& absoluteOffset )
+        std::vector<plint> const& dryNodeIds, Dot2D const& absoluteOffset )
 {
     typedef Descriptor<T> D;
     Cell<T,Descriptor>& cell =
@@ -181,8 +180,8 @@ void GuoAdvDiffOffLatticeModel3D<T,Descriptor>::cellCompletion (
     Array<T,3> wallNormal;
     for (plint iDirection=0; iDirection<numDirections; ++iDirection) {
         int iNeighbor = dryNodeFluidDirections[iDirection].first;
-        int const* c = NextNeighbor3D<T>::c[iNeighbor];
-        Dot3D fluidDirection(c[0],c[1],c[2]);
+        int const* c = NextNeighbor2D<T>::c[iNeighbor];
+        Dot2D fluidDirection(c[0],c[1]);
         plint dryNodeId = dryNodeIds[iDirection];
         int depth = dryNodeFluidDirections[iDirection].second;
 
@@ -197,10 +196,10 @@ void GuoAdvDiffOffLatticeModel3D<T,Descriptor>::cellCompletion (
                                   wallNode, wallDistance, wallNormal,
                                   wallData, bdType, dryNodeId );
         PLB_ASSERT( ok );
-        T invDistanceToNeighbor = NextNeighbor3D<T>::invD[iNeighbor];
-        PLB_ASSERT( wallDistance <= NextNeighbor3D<T>::d[iNeighbor] );
+        T invDistanceToNeighbor = NextNeighbor2D<T>::invD[iNeighbor];
+        PLB_ASSERT( wallDistance <= NextNeighbor2D<T>::d[iNeighbor] );
         T delta = (T)1. - wallDistance * invDistanceToNeighbor;
-        Array<T,3> normalFluidDirection((T)fluidDirection.x, (T)fluidDirection.y, (T)fluidDirection.z);
+        Array<T,3> normalFluidDirection((T)fluidDirection.x, (T)fluidDirection.y);
         normalFluidDirection *= invDistanceToNeighbor;
         weights[iDirection] = util::sqr(fabs ( dot(normalFluidDirection, wallNormal) ));
         sumWeights += weights[iDirection];
@@ -235,7 +234,7 @@ void GuoAdvDiffOffLatticeModel3D<T,Descriptor>::cellCompletion (
         dynamics.regularize(cell, rhoBar, j, dummyJsqr, dummyPiNeq);
         for (plint iDirection=0; iDirection<numDirections; ++iDirection) {
             int iNeighbor = dryNodeFluidDirections[iDirection].first;
-            plint iPop = nextNeighborPop3D<T,Descriptor>(iNeighbor);
+            plint iPop = nextNeighborPop2D<T,Descriptor>(iNeighbor);
             plint oppPop = indexTemplates::opposite<D>(iPop);
             cell[oppPop] = saveCell[oppPop];
         }
@@ -246,9 +245,9 @@ void GuoAdvDiffOffLatticeModel3D<T,Descriptor>::cellCompletion (
 }
 
 template<typename T, template<typename U> class Descriptor>
-void GuoAdvDiffOffLatticeModel3D<T,Descriptor>::computeRhoBarJNeq (
-          BlockLattice3D<T,Descriptor> const& lattice, Dot3D const& guoNode,
-          Dot3D const& fluidDirection, int depth, Array<T,3> const& wallNode, T delta,
+void GuoAdvDiffOffLatticeModel2D<T,Descriptor>::computeRhoBarJNeq (
+          BlockLattice2D<T,Descriptor> const& lattice, Dot2D const& guoNode,
+          Dot2D const& fluidDirection, int depth, Array<T,3> const& wallNode, T delta,
           Array<T,2> wallData, OffBoundary::Type bdType, Array<T,3> const& wallNormal,
           T& rhoBar, Array<T,Descriptor<T>::d>& jNeq ) const
 {
@@ -302,13 +301,13 @@ void GuoAdvDiffOffLatticeModel3D<T,Descriptor>::computeRhoBarJNeq (
     }
     else if ( bdType==OffBoundary::flux )
     {
-        T dx = sqrt(util::sqr((T)fluidDirection.x)+util::sqr((T)fluidDirection.y)+util::sqr((T)fluidDirection.z));
+        T dx = sqrt(util::sqr((T)fluidDirection.x)+util::sqr((T)fluidDirection.y));
         T gradRho = wallData[0];
         rhoBar = rhoBar1 + dx*gradRho;
     }
     else if ( bdType==OffBoundary::isolation )
     {
-        T dx = sqrt(util::sqr((T)fluidDirection.x)+util::sqr((T)fluidDirection.y)+util::sqr((T)fluidDirection.z));
+        T dx = sqrt(util::sqr((T)fluidDirection.x)+util::sqr((T)fluidDirection.y));
         T rhoBarOut = Descriptor<T>::rhoBar(wallData[0]);
         T kappa = wallData[1];
         rhoBar = (rhoBar1+kappa*dx*rhoBarOut)/((T)1+kappa*dx);
@@ -317,4 +316,4 @@ void GuoAdvDiffOffLatticeModel3D<T,Descriptor>::computeRhoBarJNeq (
 
 }  // namespace plb
 
-#endif  // GUO_ADV_DIFF_OFF_LATTICE_MODEL_3D_HH
+#endif  // GUO_ADV_DIFF_OFF_LATTICE_MODEL_2D_HH
