@@ -37,69 +37,6 @@
 
 namespace plb
 {
-
-namespace voxelFlag
-{
-inline int invert ( int arg )
-{
-    switch ( arg )
-    {
-    case inside:
-        return outside;
-    case outside:
-        return inside;
-    case innerBorder:
-        return outerBorder;
-    case outerBorder:
-        return innerBorder;
-    case undetermined:
-        return undetermined;
-    default:
-        PLB_ASSERT ( false );
-    }
-    return undetermined;
-}
-inline int bulkFlag ( int arg )
-{
-    if ( arg==innerBorder || arg==inside )
-    {
-        return inside;
-    }
-    else if ( arg==outerBorder || arg==outside )
-    {
-        return outside;
-    }
-    else
-    {
-        return undetermined;
-    }
-}
-inline int borderFlag ( int arg )
-{
-    if ( arg==inside || arg==innerBorder )
-    {
-        return innerBorder;
-    }
-    else if ( arg==outside || arg==outerBorder )
-    {
-        return outerBorder;
-    }
-    else
-    {
-        return undetermined;
-    }
-}
-inline bool insideFlag ( int arg )
-{
-    return arg==inside || arg==innerBorder;
-}
-inline bool outsideFlag ( int arg )
-{
-    return arg==outside || arg==outerBorder;
-}
-
-}  // namespace voxelFlag
-
 template<typename T>
 std::auto_ptr<MultiScalarField2D<int> > voxelize2D (
     SegmentPolygonMesh2D<T> const& mesh,

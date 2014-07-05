@@ -24,36 +24,14 @@
 
 /* Main author: Orestis Malaspinas */
 
-#ifndef VOXELIZER2D_H
-#define VOXELIZER2D_H
+#ifndef VOXELIZER_2D_H
+#define VOXELIZER_2D_H
 
 #include "core/globalDefs.h"
 #include "atomicBlock/dataProcessingFunctional2D.h"
 #include "offLattice/segmentHash.h"
-
+#include "offLattice/voxelizer.h"
 namespace plb {
-
-namespace voxelFlag {
-
-    /// It is a requirement that "undetermined" equals zero, because the
-    ///   default initialization value for scalar-fields is zero.
-    static const int undetermined = 0;
-    static const int outside      = 1;
-    /// Cells which are outside, but which have
-    ///   inside neighbors.
-    static const int outerBorder  = 2;
-    static const int inside       = 3;
-    /// Cells which are inside, but which have
-    ///   outside neighbors.
-    static const int innerBorder  = 4;
-
-    int invert(int arg);
-    int bulkFlag(int arg);
-    int borderFlag(int arg);
-    bool insideFlag(int arg);
-    bool outsideFlag(int arg);
-
-}
 
 template<typename T>
 std::auto_ptr<MultiScalarField2D<int> > voxelize2D (
