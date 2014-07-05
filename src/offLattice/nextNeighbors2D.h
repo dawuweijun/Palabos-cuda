@@ -25,8 +25,8 @@
 /** \file
  * Helper functions for domain initialization -- header file.
  */
-#ifndef NEXT_NEIGHBORS_3D_H
-#define NEXT_NEIGHBORS_3D_H
+#ifndef NEXT_NEIGHBORS_2D_H
+#define NEXT_NEIGHBORS_2D_H
 
 #include "core/globalDefs.h"
 
@@ -58,4 +58,4 @@ inline plint nextNeighborPop2D(plint iNeighbor) {
 
 }  // namespace plb
 
-#endif  // NEXT_NEIGHBORS_3D_H
+#endif  // NEXT_NEIGHBORS_2D_H

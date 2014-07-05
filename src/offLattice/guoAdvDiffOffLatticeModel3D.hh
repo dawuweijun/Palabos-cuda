@@ -79,8 +79,8 @@ void GuoAdvDiffOffLatticeModel3D<T,Descriptor>::prepareCell (
     if (!this->isFluid(cellLocation+offset)) {
         std::vector<std::pair<int,int> > liquidNeighbors;
         std::vector<plint> ids;
-        for (int iNeighbor=0; iNeighbor<NextNeighbor<T>::numNeighbors; ++iNeighbor) {
-            int const* c = NextNeighbor<T>::c[iNeighbor];
+        for (int iNeighbor=0; iNeighbor<NextNeighbor3D<T>::numNeighbors; ++iNeighbor) {
+            int const* c = NextNeighbor3D<T>::c[iNeighbor];
             Dot3D neighbor(cellLocation.x+c[0], cellLocation.y+c[1], cellLocation.z+c[2]);
             // If the non-fluid node has a fluid neighbor ...
             if (this->isFluid(neighbor+offset)) {
@@ -179,7 +179,7 @@ void GuoAdvDiffOffLatticeModel3D<T,Descriptor>::cellCompletion (
     Array<T,3> wallNormal;
     for (plint iDirection=0; iDirection<numDirections; ++iDirection) {
         int iNeighbor = dryNodeFluidDirections[iDirection].first;
-        int const* c = NextNeighbor<T>::c[iNeighbor];
+        int const* c = NextNeighbor3D<T>::c[iNeighbor];
         Dot3D fluidDirection(c[0],c[1],c[2]);
         plint dryNodeId = dryNodeIds[iDirection];
         int depth = dryNodeFluidDirections[iDirection].second;
@@ -195,8 +195,8 @@ void GuoAdvDiffOffLatticeModel3D<T,Descriptor>::cellCompletion (
                                   wallNode, wallDistance, wallNormal,
                                   wallData, bdType, dryNodeId );
         PLB_ASSERT( ok );
-        T invDistanceToNeighbor = NextNeighbor<T>::invD[iNeighbor];
-        PLB_ASSERT( wallDistance <= NextNeighbor<T>::d[iNeighbor] );
+        T invDistanceToNeighbor = NextNeighbor3D<T>::invD[iNeighbor];
+        PLB_ASSERT( wallDistance <= NextNeighbor3D<T>::d[iNeighbor] );
         T delta = (T)1. - wallDistance * invDistanceToNeighbor;
         Array<T,3> normalFluidDirection((T)fluidDirection.x, (T)fluidDirection.y, (T)fluidDirection.z);
         normalFluidDirection *= invDistanceToNeighbor;
@@ -233,7 +233,7 @@ void GuoAdvDiffOffLatticeModel3D<T,Descriptor>::cellCompletion (
         dynamics.regularize(cell, rhoBar, j, dummyJsqr, dummyPiNeq);
         for (plint iDirection=0; iDirection<numDirections; ++iDirection) {
             int iNeighbor = dryNodeFluidDirections[iDirection].first;
-            plint iPop = nextNeighborPop<T,Descriptor>(iNeighbor);
+            plint iPop = nextNeighborPop3D<T,Descriptor>(iNeighbor);
             plint oppPop = indexTemplates::opposite<D>(iPop);
             cell[oppPop] = saveCell[oppPop];
         }

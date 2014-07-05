@@ -22,8 +22,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef NEXT_NEIGHBORS_3D_HH
-#define NEXT_NEIGHBORS_3D_HH
+#ifndef NEXT_NEIGHBORS_2D_HH
+#define NEXT_NEIGHBORS_2D_HH
 
 #include "offLattice/nextNeighbors2D.h"
 #include "latticeBoltzmann/geometricOperationTemplates.h"
@@ -84,4 +84,4 @@ NextNeighborPop2D<T,Descriptor>::NextNeighborPop2D()
 
 }  // namespace plb
 
-#endif  // NEXT_NEIGHBORS_3D_HH
+#endif  // NEXT_NEIGHBORS_2D_HH
