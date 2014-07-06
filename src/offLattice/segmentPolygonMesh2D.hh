@@ -5,7 +5,7 @@
  * 1010 Lausanne, Switzerland
  * E-mail contact: contact@flowkit.com
  *
- * The most recent release of Palabos can be downloaded at 
+ * The most recent release of Palabos can be downloaded at
  * <http://www.palabos.org/>
  *
  * The library Palabos is free software: you can redistribute it and/or
@@ -65,7 +65,7 @@ SegmentPolygonMesh2D<T>::SegmentPolygonMesh2D (
       : vertexList(&vertexList_),
         emanatingEdgeList(&emanatingEdgeList_),
         edgeList(&edgeList_),
-        numSegments((plint)edges().size()/(plint)3),
+        numSegments((plint)edges().size()),
         numVertices(numVertices_>=0 ? numVertices_ : ( (plint)vertices().size() ) )
 {
     avoidIntegerPositions();
@@ -779,7 +779,7 @@ T SegmentPolygonMesh2D<T>::computeEdgeTileSpan(plint iVertex, plint jVertex) con
     Array<T,2> v32 = v2 - v3;
     Array<T,2> v12 = -v21;
     T angle_321 = angleBetweenVectors(v12, v32);
-    
+
     span += fabs(sin(angle_321)) * norm(v32);
 
     return span/6.0;
@@ -1293,8 +1293,7 @@ void SegmentPolygonMesh2D<T>::avoidIntegerPosition(plint iVertex) {
     Array<T,2>& vertex = getVertex(iVertex);
     Array<T,2> normal = computeVertexNormal(iVertex);
     if ( vertex[0]-(plint)vertex[0] < 1.e-12 ||
-         vertex[1]-(plint)vertex[1] < 1.e-12 ||
-         vertex[2]-(plint)vertex[2] < 1.e-12 )
+         vertex[1]-(plint)vertex[1] < 1.e-12 )
     {
         vertex += (T)1.e-12 * normal;
     }
@@ -1392,7 +1391,7 @@ Curve2D SegmentPolygonMesh2D<T>::closeHole(std::vector<plint> const& hole)
         counterEdge.ne = emanatingEdges()[iVertex];
         edges().push_back(counterEdge);
         // Convert this former boundary edge to a bulk edge.
-        edges()[counterEdge.ne].ne = edgeIndex; 
+        edges()[counterEdge.ne].ne = edgeIndex;
 
         // b) Add the edge that goes from a boundary vertex to the barycenter.
         Edge2D firstEdge; ++edgeIndex;
@@ -1449,7 +1448,7 @@ void toLatticeUnits2D (
         case 1: deltaX = yRange[1] - yRange[0];
                 break;
     }
-    
+
     T scalingFactor = (T)(resolution)/deltaX;
 
     // Transform mesh into the frame of coordinate of the multiScalarField.
@@ -1656,7 +1655,7 @@ void SegmentPolygonMesh2D<T>::writeHTML (
     }
     T dx_ndToPhys = phys_dx/dx_nonDim;
     Array<T,2> location_ndToPhys = phys_location-dx_ndToPhys*offset_nonDim;
-    
+
     std::ofstream ofile(fname.c_str());
     ofile << std::fixed << std::setprecision(5);
     ofile << "<!DOCTYPE HTML>\n";
