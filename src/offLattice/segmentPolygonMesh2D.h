@@ -5,7 +5,7 @@
  * 1010 Lausanne, Switzerland
  * E-mail contact: contact@flowkit.com
  *
- * The most recent release of Palabos can be downloaded at 
+ * The most recent release of Palabos can be downloaded at
  * <http://www.palabos.org/>
  *
  * The library Palabos is free software: you can redistribute it and/or
@@ -72,7 +72,7 @@ struct Curve2D{
  *
  * For more information on the directed-edges format, check the paper
  * "Directed edges - A scalable representation for triangle meshes",
- * Journal of Graphics Tools (3), 1998, pp 1 - 11  
+ * Journal of Graphics Tools (3), 1998, pp 1 - 11
  **/
 template<typename T>
 class SegmentPolygonMesh2D {
@@ -95,12 +95,12 @@ public:
             std::vector<Edge2D>& edgeList_,
             plint numVertices_ = -1 );
 
-    /// Return number of segments on the surface (they are numbered 
+    /// Return number of segments on the surface (they are numbered
     ///   continuously from 0 to getNumSegments() -1.
     plint getNumSegments() const {
         return numSegments;
     }
-    /// Return number of vertices on the surface (they are numbered 
+    /// Return number of vertices on the surface (they are numbered
     ///   continuously from 0 to getNumVertices() -1.
     plint getNumVertices() const {
         return numVertices;
@@ -125,9 +125,7 @@ public:
     bool isValidVertex(plint iVertex) const;
 
     /// Compute the minimum and maximum vertex positions in every direction.
-    void computeBoundingBox (
-            Array<T,2>& xRange,
-            Array<T,2>& yRange ) const;
+    void computeBoundingBox (Array<T,2>& xRange, Array<T,2>& yRange ) const;
 
     /// Translate the surface mesh.
     void translate(Array<T,2> const& vector);

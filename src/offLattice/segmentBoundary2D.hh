@@ -289,9 +289,8 @@ void DEFscaledMesh2D<T>::initialize (
 {
     T eps = getEpsilon<T> ( segmentSet_.getPrecision() );
 
-    constructSurfaceMesh<T> (
-        segmentSet_.getSegments(),
-        vertexList, emanatingEdgeList, edgeList, eps );
+    constructSurfaceMesh<T> ( segmentSet_.getSegments(),vertexList,
+                              emanatingEdgeList, edgeList, eps );
     mesh = new SegmentPolygonMesh2D<T> ( vertexList, emanatingEdgeList, edgeList );
 
     if ( resolution_!=0 )
@@ -378,8 +377,8 @@ SegmentBoundary2D<T>::SegmentBoundary2D (
     emanatingEdgeLists[1] = emanatingEdgeLists[0];
     edgeLists[1] = edgeLists[0];
 
-    meshes.push_back ( SegmentPolygonMesh2D<T> (vertexLists[0], emanatingEdgeLists[0], edgeLists[0] ) );
-    meshes.push_back ( SegmentPolygonMesh2D<T> (vertexLists[0], emanatingEdgeLists[1], edgeLists[1] ) );
+    meshes.push_back ( SegmentPolygonMesh2D<T> ( vertexLists[0], emanatingEdgeLists[0], edgeLists[0] ) );
+    meshes.push_back ( SegmentPolygonMesh2D<T> ( vertexLists[0], emanatingEdgeLists[1], edgeLists[1] ) );
 
     // Prepare the vector "segment type", which later on will inform on
     //   the type of boundary condition implemented by a given segment.
@@ -624,7 +623,7 @@ bool SegmentBoundary2D<T>::intersectSegment (
     Array<T,2> point2 ( fromPoint+direction );
     bool doesIntersect =
         getMesh().pointOnSegment ( fromPoint, point2, flag, iSegment,
-                                    locatedPoint, wallNormal, distance ) == 1;
+                                   locatedPoint, wallNormal, distance ) == 1;
     return doesIntersect;
 }
 
@@ -1076,7 +1075,7 @@ VoxelizedDomain2D<T>::VoxelizedDomain2D (
     }
     std::auto_ptr<MultiScalarField2D<int> > fullVoxelMatrix (
         voxelize2D ( boundary.getMesh(),
-                   boundary.getMargin() +extraLayer_, borderWidth ) );
+                     boundary.getMargin() +extraLayer_, borderWidth ) );
     fullVoxelMatrix->setRefinementLevel ( gridLevel_ );
     createSparseVoxelMatrix ( *fullVoxelMatrix, blockSize_, envelopeWidth_ );
     createSegmentHash();
