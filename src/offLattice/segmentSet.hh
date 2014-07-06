@@ -336,8 +336,9 @@ bool SegmentSet<T>::checkNoAbort ( Segment& segment, Array<T,2> const& n )
 template<typename T>
 void SegmentSet<T>::translate ( Array<T,2> const& vector )
 {
-#warning fix me
     T eps = std::numeric_limits<T>::epsilon();
+
+
     if ( util::fpequal ( ( T ) sqrt ( VectorTemplateImpl<T,2>::normSqr ( vector ) ), ( T ) 0.0, eps ) )
         return;
 
@@ -347,10 +348,8 @@ void SegmentSet<T>::translate ( Array<T,2> const& vector )
 
     for ( plint i = 0; i < size; i++ )
     {
-        for ( int j = 0; j < 2; j++ )
-        {
-            segments[i][j] += vector;
-        }
+        segments[i][0] += vector;
+        segments[i][1] += vector;
     }
 
     boundingCuboid.lowerLeftCorner  += vector;
@@ -516,7 +515,7 @@ void SegmentSet<T>::writeAsciiSTL ( std::string fname ) const
             Array<T,2> v1 = segments[i][1];
 
             Array<T,2> e01 = v1 - v0;
-	    //顺着线段的正方向看，左侧为正，右侧为负
+            //顺着线段的正方向看，左侧为正，右侧为负
             Array<T,2> n ( -e01[1],e01[0] );
             n /= sqrt ( VectorTemplateImpl<T,2>::normSqr ( n ) );
             fprintf ( fp, "  segment normal % e % e\n", ( double ) n[0], ( double ) n[1] );
@@ -554,8 +553,8 @@ void SegmentSet<T>::writeBinarySTL ( std::string fname ) const
             Array<T,2> v1 = segments[i][1];
 
             Array<T,2> e01 = v1 - v0;
-	    //顺着线段的正方向看，左侧为正，右侧为负
-            Array<T,2> nrml(-e01[1],e01[0]);
+            //顺着线段的正方向看，左侧为正，右侧为负
+            Array<T,2> nrml ( -e01[1],e01[0] );
             nrml /= sqrt ( VectorTemplateImpl<T,2>::normSqr ( nrml ) );
 
             float n[2];
@@ -573,6 +572,34 @@ void SegmentSet<T>::writeBinarySTL ( std::string fname ) const
         }
 
         fclose ( fp );
+    }
+}
+
+template<typename T>
+void SegmentSet<T>::writeSVG ( std::string fname ) const
+{
+    if ( global::mpi().isMainProcessor() )
+    {
+        plb_ofstream out ( fname.c_str() );
+
+        plint size = segments.size();
+
+        //write header
+        out << "<?xml version=\"1.0\" standalone=\"no\"?>\n";
+        out << "<!DOCTYPE svg PUBLIC"
+            << " \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">\n";
+        out << "<svg width=\"100%\" height=\"100%\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\">\n";
+        //line set
+        for ( plint i = 0; i < size; i++ )
+        {
+            out<<"<line x1=\""<<segments[i][0][0]
+		    <<"\" y1=\""<<segments[i][0][1]
+		    <<"\" x2=\""<<segments[i][1][0]
+		    <<"\" y2=\""<<segments[i][1][1]
+		    <<"\" style=\"stroke:rgb(0,0,0);stroke-width:0.5\"/>\n";
+        }
+        //write end
+        out<<"</svg>";
     }
 }
 

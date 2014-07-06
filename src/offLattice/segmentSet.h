@@ -5,7 +5,7 @@
  * 1010 Lausanne, Switzerland
  * E-mail contact: contact@flowkit.com
  *
- * The most recent release of Palabos can be downloaded at 
+ * The most recent release of Palabos can be downloaded at
  * <http://www.palabos.org/>
  *
  * The library Palabos is free software: you can redistribute it and/or
@@ -61,7 +61,7 @@ public:
     ///       the new x-axis,
     ///   3.] The third rotation is by an angle psi about the new z-axis.
     void rotate(T theta);
-    
+
     /// Erase the current segment set surface mesh, and merge into it the new meshes.
     ///   This function currently does not check for duplicate
     ///   segments in the new meshes, and does not handle
@@ -95,6 +95,9 @@ public:
     void writeAsciiSTL(std::string fname) const;
     /// Export the mesh as an binary STL file.
     void writeBinarySTL(std::string fname) const;
+
+    /// Export the mesh as an SVG file.
+    void writeSVG(std::string fname) const;
 
     /// Cut the current segment set mesh by a line "line" which is
     ///   defined by a point and a normal. This cutting operation will
