@@ -213,7 +213,7 @@ void BlockLattice3D<T,Descriptor>::stream(Box3D domain) {
     boundaryStream(domain, Box3D(domain.x0,domain.x0+vicinity-1,
                                  domain.y0,domain.y1,
                                  domain.z0,domain.z1) );
-    boundaryStream(domain, Box3D(domain.x1-vicinity-1,domain.x1,
+    boundaryStream(domain, Box3D(domain.x1-vicinity+1,domain.x1,
                                  domain.y0,domain.y1,
                                  domain.z0,domain.z1) );
     boundaryStream(domain, Box3D(domain.x0+vicinity,domain.x1-vicinity,
