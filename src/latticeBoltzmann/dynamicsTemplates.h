@@ -128,7 +128,7 @@ static void bgk_ma2_equilibria( T rhoBar, T invRho, Array<T,Descriptor::d>
         const& j,
                                 T jSqr, Array<T,Descriptor::q>& eqPop )
 {
-    for (int iPop=0; iPop<Descriptor::d; ++iPop) {
+    for (int iPop=0; iPop<Descriptor::q; ++iPop) {
         eqPop[iPop] = bgk_ma2_equilibrium(iPop, rhoBar, invRho, j, jSqr);
     }
 }

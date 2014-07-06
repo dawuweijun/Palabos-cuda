@@ -37,7 +37,7 @@ namespace plb
 {
 
 template<typename T>
-SegmentSet<T> constructCircle ( Array<T,2> const& center, T radius, plint minNumOfSegments )
+SegmentSet<T>* constructCircle ( Array<T,2> const& center, T radius, plint minNumOfSegments )
 {
     std::vector<typename SegmentSet<T>::Segment> segments;
 #ifdef PLB_DEBUG
@@ -55,7 +55,7 @@ SegmentSet<T> constructCircle ( Array<T,2> const& center, T radius, plint minNum
     Array<T,2> vb( 0.0,1.0);
 
     Array<T,2> vc(-1.0,0.0);
-    
+
     Array<T,2> vd(0.0 ,-1 );
 
     // Initial 4 segments
@@ -104,10 +104,10 @@ SegmentSet<T> constructCircle ( Array<T,2> const& center, T radius, plint minNum
 
     // Scale and translate the mesh
 
-    SegmentSet<T> segmentSet ( segments );
+    SegmentSet<T> *segmentSet=new SegmentSet<T> ( segments );
 
-    segmentSet.scale ( radius );
-    segmentSet.translate ( center );
+    segmentSet->scale ( radius );
+    segmentSet->translate ( center );
 
     return segmentSet;
 }

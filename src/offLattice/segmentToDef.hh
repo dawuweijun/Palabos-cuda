@@ -352,8 +352,7 @@ void SegmentToDef<T>::fixOrientationOfNeighbors ( plint iSegment,
 template<typename T>
 plint SegmentToDef<T>::uniqueVertices ( std::vector<Segment> const& segments )
 {
-
-    edgeList.resize ( 3*numSegments );
+    edgeList.resize ( numSegments );
 
     segmentIndices.resize ( numSegments );
     plint index=0;
@@ -444,7 +443,7 @@ void SegmentToDef<T>::findBoundaryVertices()
     plint jVertex, segment;
     plint iVertex;
     int lock;
-    for ( iVertex=0, lock=1;iVertex< ( plint ) edgeTable.size(); ++iVertex, lock=1 )
+    for ( iVertex=0, lock=1; iVertex< ( plint ) edgeTable.size(); ++iVertex, lock=1 )
     {
         for ( pluint iEdge=0; iEdge<edgeTable[iVertex].size(); ++iEdge )
         {
