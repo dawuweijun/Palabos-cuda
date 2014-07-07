@@ -308,7 +308,6 @@ void SegmentSet<T>::check ( Segment& segment, Array<T,2> const& n )
     {
         std::swap ( segment[0],segment[1] );
     }
-    return true;
 }
 
 /// Make some optional checks and fix segment orientation.

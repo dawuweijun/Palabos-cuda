@@ -232,9 +232,9 @@ SegmentSet<T> constructRectangle ( T lx, T ly )
 {
     std::vector<typename SegmentSet<T>::Segment> segments;
 
-    Array< T, 2  > &pA ( 0.,0. );
+    Array< T, 2  >  pA ( 0.,0. );
     Array< T, 2  >  pB ( lx,0. );
-    Array< T, 2  > &pC ( lx,ly );
+    Array< T, 2  >  pC ( lx,ly );
     Array< T, 2  >  pD ( 0 ,ly );
 
     segments.push_back ( SegmentSet<T>::Segment ( pA,pB ) );

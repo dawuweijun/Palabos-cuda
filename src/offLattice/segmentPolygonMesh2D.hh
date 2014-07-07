@@ -1248,7 +1248,7 @@ void SegmentPolygonMesh2D<T>::reverseOrientation()
         }
 
     // Rearrange the neighboring edge list.
-    std::vector<Edge> tmp = edges();
+    std::vector<Edge2D> tmp = edges();
     for (plint iEdge = 0; iEdge < 3*numSegments; iEdge++)
         if (edges()[iEdge].ne < 0) {
             tmp[changeEdgeId(iEdge)].ne = -1;

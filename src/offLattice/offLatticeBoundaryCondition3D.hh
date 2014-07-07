@@ -98,7 +98,7 @@ template< typename T,
           class BoundaryType >
 OffLatticeBoundaryCondition3D<T,Descriptor,BoundaryType>::OffLatticeBoundaryCondition3D (
         OffLatticeBoundaryCondition3D<T,Descriptor,BoundaryType> const& rhs )
-    : offLatticeModel(rhs.offLatticeModel.clone()),
+    : offLatticeModel(rhs.offLatticeModel->clone()),
       voxelizedDomain(rhs.voxelizedDomain),
       lattice(rhs.lattice),
       boundaryShapeArg(rhs.boundaryShapeArg),
