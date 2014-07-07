@@ -44,7 +44,6 @@ ReduceAxialTorqueImmersed2D<T>::ReduceAxialTorqueImmersed2D (
       sum_torque_ids (
             Array<plint,2> (
                 this->getStatistics().subscribeSum(),
-                this->getStatistics().subscribeSum(),
                 this->getStatistics().subscribeSum() ) ),
       reductionFlag(reductionFlag_)
 { }
@@ -110,7 +109,6 @@ template<typename T>
 ReduceImmersedForce2D<T>::ReduceImmersedForce2D(int reductionFlag_)
     : sum_g_ids(
             Array<plint,2> (
-                this->getStatistics().subscribeSum(),
                 this->getStatistics().subscribeSum(),
                 this->getStatistics().subscribeSum() ) ),
       reductionFlag(reductionFlag_)
