@@ -102,9 +102,9 @@ void GuoAdvDiffOffLatticeModel2D<T,Descriptor>::prepareCell (
                 liquidNeighbors.push_back(std::make_pair(iNeighbor,depth));
                 plint iTriangle=-1;
                 global::timer("intersect").start();
-                Array<T,3> locatedPoint;
+                Array<T,2> locatedPoint;
                 T distance;
-                Array<T,3> wallNormal;
+                Array<T,2> wallNormal;
                 Array<T,2> surfaceData;
                 OffBoundary::Type bdType;
 #ifdef PLB_DEBUG
@@ -171,13 +171,13 @@ void GuoAdvDiffOffLatticeModel2D<T,Descriptor>::cellCompletion (
 {
     typedef Descriptor<T> D;
     Cell<T,Descriptor>& cell =
-        lattice.get(guoNode.x, guoNode.y, guoNode.z);
+        lattice.get(guoNode.x, guoNode.y);
     plint numDirections = (plint)dryNodeFluidDirections.size();
     std::vector<T> weights(numDirections);
     std::vector<T> rhoBar_vect(numDirections);
     std::vector<Array<T,Descriptor<T>::d> > jNeq_vect(numDirections);
     T sumWeights = T();
-    Array<T,3> wallNormal;
+    Array<T,2> wallNormal;
     for (plint iDirection=0; iDirection<numDirections; ++iDirection) {
         int iNeighbor = dryNodeFluidDirections[iDirection].first;
         int const* c = NextNeighbor2D<T>::c[iNeighbor];
@@ -185,7 +185,7 @@ void GuoAdvDiffOffLatticeModel2D<T,Descriptor>::cellCompletion (
         plint dryNodeId = dryNodeIds[iDirection];
         int depth = dryNodeFluidDirections[iDirection].second;
 
-        Array<T,3> wallNode;
+        Array<T,2> wallNode;
         Array<T,2> wallData;
         T wallDistance;
         OffBoundary::Type bdType;
@@ -199,7 +199,7 @@ void GuoAdvDiffOffLatticeModel2D<T,Descriptor>::cellCompletion (
         T invDistanceToNeighbor = NextNeighbor2D<T>::invD[iNeighbor];
         PLB_ASSERT( wallDistance <= NextNeighbor2D<T>::d[iNeighbor] );
         T delta = (T)1. - wallDistance * invDistanceToNeighbor;
-        Array<T,3> normalFluidDirection((T)fluidDirection.x, (T)fluidDirection.y);
+        Array<T,2> normalFluidDirection((T)fluidDirection.x, (T)fluidDirection.y);
         normalFluidDirection *= invDistanceToNeighbor;
         weights[iDirection] = util::sqr(fabs ( dot(normalFluidDirection, wallNormal) ));
         sumWeights += weights[iDirection];
@@ -247,8 +247,8 @@ void GuoAdvDiffOffLatticeModel2D<T,Descriptor>::cellCompletion (
 template<typename T, template<typename U> class Descriptor>
 void GuoAdvDiffOffLatticeModel2D<T,Descriptor>::computeRhoBarJNeq (
           BlockLattice2D<T,Descriptor> const& lattice, Dot2D const& guoNode,
-          Dot2D const& fluidDirection, int depth, Array<T,3> const& wallNode, T delta,
-          Array<T,2> wallData, OffBoundary::Type bdType, Array<T,3> const& wallNormal,
+          Dot2D const& fluidDirection, int depth, Array<T,2> const& wallNode, T delta,
+          Array<T,2> wallData, OffBoundary::Type bdType, Array<T,2> const& wallNormal,
           T& rhoBar, Array<T,Descriptor<T>::d>& jNeq ) const
 {
     if (!usesSecondOrder()) {
@@ -259,12 +259,10 @@ void GuoAdvDiffOffLatticeModel2D<T,Descriptor>::computeRhoBarJNeq (
     Array<T,Descriptor<T>::d> jNeq1, jNeq2, jEqDummy;
     Cell<T,Descriptor> const& cell1 =
         lattice.get( guoNode.x+fluidDirection.x,
-                     guoNode.y+fluidDirection.y,
-                     guoNode.z+fluidDirection.z );
+                     guoNode.y+fluidDirection.y );
     Cell<T,Descriptor> const& cell2 =
         lattice.get( guoNode.x+2*fluidDirection.x,
-                     guoNode.y+2*fluidDirection.y,
-                     guoNode.z+2*fluidDirection.z );
+                     guoNode.y+2*fluidDirection.y );
     advectionDiffusionMomentTemplates<T,Descriptor>::get_rhoBar_jEq_jNeq (
             cell1, rhoBar1, jEqDummy, jNeq1 );
     advectionDiffusionMomentTemplates<T,Descriptor>::get_rhoBar_jEq_jNeq (

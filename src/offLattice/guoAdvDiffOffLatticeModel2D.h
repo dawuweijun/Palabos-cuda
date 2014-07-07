@@ -47,7 +47,7 @@ public:
             AtomicBlock2D& lattice, AtomicContainerBlock2D& container,
             std::vector<AtomicBlock2D const*> const& args );
     virtual ContainerBlockData* generateOffLatticeInfo() const;
-    virtual Array<T,3> getLocalForce(AtomicContainerBlock2D& container) const { return Array<T,3>(T(),T(),T()); }
+    virtual Array<T,2> getLocalForce(AtomicContainerBlock2D& container) const { return Array<T,2>(T(),T(),T()); }
     void selectSecondOrder(bool flag) { secondOrderFlag = flag; }
     bool usesSecondOrder() const { return secondOrderFlag; }
 private:
@@ -58,8 +58,8 @@ private:
             std::vector<plint> const& dryNodeIds, Dot2D const& absoluteOffset );
     void computeRhoBarJNeq (
               BlockLattice2D<T,Descriptor> const& lattice, Dot2D const& guoNode,
-              Dot2D const& fluidDirection, int depth, Array<T,3> const& wallNode, T delta,
-              Array<T,2> wallData, OffBoundary::Type bdType, Array<T,3> const& wallNormal,
+              Dot2D const& fluidDirection, int depth, Array<T,2> const& wallNode, T delta,
+              Array<T,2> wallData, OffBoundary::Type bdType, Array<T,2> const& wallNormal,
               T& rhoBar, Array<T,Descriptor<T>::d>& jNeq ) const;
 private:
     bool secondOrderFlag;
