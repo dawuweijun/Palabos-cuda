@@ -144,6 +144,7 @@ bool SegmentToDef<T>::bvmCheck() const
 template<typename T>
 void SegmentToDef<T>::bvmLabel()
 {
+  //FIXME
     plint vertex2, segment2, localEdge2;
     BvmNodeConstIt it = boundaryVertexMap.begin();
     for ( ; it !=boundaryVertexMap.end(); ++it )
@@ -313,28 +314,6 @@ void SegmentToDef<T>::fixOrientationOfNeighbors ( plint iSegment,
                 globalVertex ( jSegment,1 ) = segmentIndices[jSegment][1];
                 flag = true;
             }
-#if 0
-            else if ( ia == j1 && ib == j2 )
-            {
-                std::swap ( segmentIndices[jSegment][1], segmentIndices[jSegment][2] );
-                globalVertex ( jSegment,1 ) = segmentIndices[jSegment][1];
-                globalVertex ( jSegment,2 ) = segmentIndices[jSegment][2];
-                flag = true;
-            }
-            else if ( ia == j2 && ib == j0 )
-            {
-                std::swap ( segmentIndices[jSegment][2], segmentIndices[jSegment][0] );
-                globalVertex ( jSegment,2 ) = segmentIndices[jSegment][2];
-                globalVertex ( jSegment,0 ) = segmentIndices[jSegment][0];
-                flag = true;
-            }
-            else if ( ( ia == j1 && ib == j0 ) ||
-                      ( ia == j2 && ib == j1 ) ||
-                      ( ia == j0 && ib == j2 ) )
-            {
-                flag = false;
-            }
-#endif
             else
             {
                 PLB_ASSERT ( false ); // Problem with the surface mesh.
@@ -390,41 +369,37 @@ plint SegmentToDef<T>::createEdgeTable()
     edgeTable.resize ( 0 );
     edgeTable.resize ( vertexList.size() );
     /* Local indices of edge endpoints */
-    int epoint[3][2] = { {0, 1}, {1, 2}, {2,0} };
 
     plint nbe = 0; /* Number of boundary edges */
 
     for ( plint iSegment = 0; iSegment < numSegments; ++iSegment )
     {
-        for ( plint localEdge = 0; localEdge < 3; ++localEdge )
-        {
-            plint i0 = globalVertex ( iSegment, epoint[localEdge][0] );
-            plint i1 = globalVertex ( iSegment, epoint[localEdge][1] );
-            plint min_i = std::min ( i0,i1 );
-            plint max_i = std::max ( i0,i1 );
+        plint i0 = globalVertex ( iSegment, 0 );
+        plint i1 = globalVertex ( iSegment, 1 );
+        plint min_i = std::min ( i0,i1 );
+        plint max_i = std::max ( i0,i1 );
 
-            plint iList = searchEdgeList ( edgeTable[min_i], max_i );
-            if ( iList==-1 )
+        plint iList = searchEdgeList ( edgeTable[min_i], max_i );
+        if ( iList==-1 )
+        {
+            EdgeListNode newNode;
+            newNode.maxv = max_i;
+            newNode.t1   = iSegment;
+            newNode.t2   = -1;
+            edgeTable[min_i].push_back ( newNode );
+            ++nbe;
+        }
+        else
+        {
+            EdgeListNode& node = edgeTable[min_i][iList];
+            if ( node.t2 == -1 )
             {
-                EdgeListNode newNode;
-                newNode.maxv = max_i;
-                newNode.t1   = iSegment;
-                newNode.t2   = -1;
-                edgeTable[min_i].push_back ( newNode );
-                ++nbe;
+                node.t2 = iSegment;
+                --nbe;
             }
             else
             {
-                EdgeListNode& node = edgeTable[min_i][iList];
-                if ( node.t2 == -1 )
-                {
-                    node.t2 = iSegment;
-                    --nbe;
-                }
-                else
-                {
-                    PLB_ASSERT ( false ); // The surface mesh contains non-manifold edges.
-                }
+                PLB_ASSERT ( false ); // The surface mesh contains non-manifold edges.
             }
         }
     }

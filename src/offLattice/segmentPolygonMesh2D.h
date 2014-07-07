@@ -173,7 +173,7 @@ public:
     ///   the normal has length equal to twice the area of the triangle.
     Array<T,2> computeSegmentNormal(plint iSegment, bool isAreaWeighted = false) const;
     Array<T,2> computeSegmentNormal(
-            plint iVertex, plint jVertex, plint kVertex, bool isAreaWeighted = false) const;
+            plint iVertex, plint jVertex, bool isAreaWeighted = false) const;
 
     /// Compute the normal vector at a given edge. If "isAreaWeighted" is true, then
     ///   the triangle normals used in the computation are area weighted.
@@ -198,23 +198,16 @@ public:
     Array<T,2> computeContinuousNormal(
             Array<T,2> const& p, plint iSegment, bool isAreaWeighted = false) const;
 
-    /// Compute the area of a given triangle.
-    T computeSegmentArea(plint iSegment) const;
-    T computeSegmentArea(plint iVertex, plint jVertex, plint kVertex) const;
-    /// Compute the one third of the sum of the areas of the segments that share
-    ///   the specific edge.
-    T computeEdgeArea(plint iVertex, plint jVertex) const;
-    /// Compute the one third of the sum of the areas of all segments that
-    ///   share the given vertex.
-    T computeVertexArea(plint iVertex) const;
-
     /// Compute the length of a given edge.
-    T computeEdgeLength(plint iVertex, plint jVertex) const;
+    T computeSegmentLength(plint iSegment) const;
+    T computeSegmentLength(plint iVertex, plint jVertex) const;
+    /// Compute the one second of the sum of the lengths of all segments that
+    ///   share the given vertex.
+    T computeVertexLength(plint iVertex) const;
 
-    /// Compute the dihedral angle of an edge (in radians).
-    ///   By convention, if the edge is a boundary edge, the
-    ///   dihedral angle returned by the function is 0.
-    T computeDihedralAngle(plint iVertex, plint jVertex) const;
+    /// Compute the angle of a vertex (in radians).By convention, if the
+    /// edge is a boundary edge, the angle returned by the function is 0.
+    T computeAngle(plint iVertex) const;
 
     /// Compute the one sixth of the sum of the heights of the
     ///   two segments incident to the specific edge.
@@ -382,9 +375,9 @@ public:
     { }
     bool operator()(Curve2D const& lid1, Curve2D const& lid2) const
     {
+      //FIXME
         plint dim1 = mainDirection;
         plint dim2 = (dim1+1)%3;
-        plint dim3 = (dim2+1)%3;
         // Compare on bary-center for main coordinate, and, in the unlikely
         //   case that these two floats are equal, on the two subsequent
         //   coordinates.
@@ -394,8 +387,7 @@ public:
           (baryCenter1[dim1] < baryCenter2[dim1]) || (
                   equiv(baryCenter1[dim1],baryCenter2[dim1]) && (
                       (baryCenter1[dim2] < baryCenter2[dim2]) || (
-                          equiv(baryCenter1[dim2],baryCenter2[dim2]) &&
-                          (baryCenter1[dim3] < baryCenter2[dim3]) ) ) ) ;
+                          equiv(baryCenter1[dim2],baryCenter2[dim2]) ) ) ) ;
     }
     static bool equiv(T a, T b) {
         return !(a<b || b<a);
@@ -444,11 +436,11 @@ template<typename T>
 T computeOuterRadius (
         SegmentPolygonMesh2D<T> const& mesh, Curve2D const& lid );
 //TODO in 2D condition, we should compute the length of the curve
-/*
+
 template<typename T>
-T computeArea (
+T computeLength (
         SegmentPolygonMesh2D<T> const& mesh, Curve2D const& lid );
-*/
+
 template<typename T>
 Array<T,2> computeNormal (
         SegmentPolygonMesh2D<T> const& mesh, Curve2D const& lid );
