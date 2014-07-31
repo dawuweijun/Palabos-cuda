@@ -5,7 +5,7 @@
  * 1010 Lausanne, Switzerland
  * E-mail contact: contact@flowkit.com
  *
- * The most recent release of Palabos can be downloaded at
+ * The most recent release of Palabos can be downloaded at 
  * <http://www.palabos.org/>
  *
  * The library Palabos is free software: you can redistribute it and/or
@@ -38,26 +38,13 @@
 #include <vector>
 #include <map>
 
+
 namespace plb {
 
 template<typename T, template<typename U> class Descriptor> struct Dynamics;
 template<typename T, template<typename U> class Descriptor> class BlockLattice2D;
 
-/**
- * ATTENTION:
- * 1,能否将“std::vector<char>& buffer”移植到KERNEL空间执行？
- *    	答案是不太方便，由于Palabos在设计的时候使用多处使用std::vector<char>& buffer,
- * 如果使用 cudaManagedMemory 容易造成工作量较大，因此应该在BlockLatticeDataTransfer
- * 中使用cudaManagedMemory缓存需要交换的数据，避免在GPU和CPU之间复制BlockLattice中的
- * 所有数据。
- * 2,send-receive 和 attribute 策略有何区别？
- *
- * TODO:
- * 	1,需要BlockLatticeDataTransfer能够访问 BlockLattice2D 的私有数据成员
- * \ref BlockLattice2D::rawData 或者 \ref BlockLattice2D::grid;
- * 	2,BlockDataTransfer2D 需要成为 \ref BlockLattice2D 的友元类。
- * 	3,需要给 \ref BlockLatticeDataTransfer2D 添加 \ref PLB_KERNEL 函数;
- */
+
 template<typename T, template<typename U> class Descriptor>
 class BlockLatticeDataTransfer2D : public BlockDataTransfer2D {
 public:
@@ -113,9 +100,6 @@ private:
  * some useful methods to execute the LB dynamics on the lattice.
  *
  * This class is not intended to be derived from.
- * TODO: 1,查找该类的成员变量的在进行运算时的角色，确定哪一个需要复制到GPU上;
- * 	2,修改BlockLattice2D的部分函数，使其能够在GPU上对rawData进行操作;
- *
  */
 template<typename T, template<typename U> class Descriptor>
 class BlockLattice2D : public BlockLatticeBase2D<T,Descriptor>,
@@ -150,15 +134,15 @@ public:
     /// Apply collision step to a rectangular domain
     virtual void collide(Box2D domain);
     /// Apply collision step to the whole domain
-    PLB_HOST_ONLY virtual void collide();
+    virtual void collide();
     /// Apply streaming step to a rectangular domain
-    PLB_HOST_ONLY virtual void stream(Box2D domain);
+    virtual void stream(Box2D domain);
     /// Apply streaming step to the whole domain
-    PLB_HOST_ONLY virtual void stream();
+    virtual void stream();
     /// Apply first collision, then streaming step to a rectangular domain
-    PLB_HOST_ONLY virtual void collideAndStream(Box2D domain);
+    virtual void collideAndStream(Box2D domain);
     /// Apply first collision, then streaming step to the whole domain
-    PLB_HOST_ONLY virtual void collideAndStream();
+    virtual void collideAndStream();
     /// Increment time counter
     virtual void incrementTime();
     /// Get access to data transfer between blocks
@@ -194,9 +178,6 @@ private:
     void periodicDomain(Box2D domain);
 private:
     Dynamics<T,Descriptor>* backgroundDynamics;
-    /*
-     * TODO: Inherit Cell from cudaManaged to enable Unified Memory;
-     */
     Cell<T,Descriptor>     *rawData;
     Cell<T,Descriptor>    **grid;
     BlockLatticeDataTransfer2D<T,Descriptor> dataTransfer;
@@ -204,16 +185,6 @@ public:
     static CachePolicy2D& cachePolicy();
 template<typename T_, template<typename U_> class Descriptor_>
     friend class ExternalRhoJcollideAndStream2D;
-
-#ifndef PLB_CUDA_DISABLED
-    /**
-     * For CUDA_ENABLED, to enable \ref BlockLatticeDataTransfer2D access
-     * \ref BlockLattice2D::rawData and \ref BlockLattice2D::grid directly;
-     */
-template<typename T_, template<typename U_> class Descriptor_>
-    friend class BlockLatticeDataTransfer2D;
-#endif
-
 };
 
 template<typename T, template<typename U> class Descriptor>

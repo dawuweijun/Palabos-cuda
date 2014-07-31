@@ -5,7 +5,7 @@
  * 1010 Lausanne, Switzerland
  * E-mail contact: contact@flowkit.com
  *
- * The most recent release of Palabos can be downloaded at 
+ * The most recent release of Palabos can be downloaded at
  * <http://www.palabos.org/>
  *
  * The library Palabos is free software: you can redistribute it and/or
@@ -506,8 +506,6 @@ template<typename T, template<typename U> class Descriptor>
 T computeAverageSphereDensity( std::vector<MultiBlock3D*> const& twoPhaseArgs,
                                Array<T,3> const& center, T radius, Box3D domain );
 
-
-
 /// A wrapper offering convenient access to the free-surface data provided to
 /// data processors. Avoids verbous casting, asserting, etc.
 template<typename T,template<typename U> class Descriptor>
@@ -533,7 +531,7 @@ public:
         j_ = dynamic_cast<TensorField3D<T,3>*>(atomicBlocks[2]);
         PLB_ASSERT(j_);
 
-        mass_ = dynamic_cast<ScalarField3D<T>*>(atomicBlocks[3]);               
+        mass_ = dynamic_cast<ScalarField3D<T>*>(atomicBlocks[3]);
         PLB_ASSERT(mass_);
 
         volumeFraction_ = dynamic_cast<ScalarField3D<T>*>(atomicBlocks[4]);
@@ -579,20 +577,20 @@ public:
         }
 
         absoluteOffset       = fluid_->getLocation();
-        relativeOffsetRhoBar = computeRelativeDisplacement(*fluid_,*rhoBar_);      
-        relativeOffsetJ      = computeRelativeDisplacement(*fluid_,*j_);      
-        relativeOffsetMass   = computeRelativeDisplacement(*fluid_,*mass_);      
-        relativeOffsetVF     = computeRelativeDisplacement(*fluid_,*volumeFraction_);      
-        relativeOffsetFS     = computeRelativeDisplacement(*fluid_,*flag_); 
-        relativeOffsetNormal = computeRelativeDisplacement(*fluid_,*normal_); 
-        relativeOffsetC      = computeRelativeDisplacement(*fluid_,*curvature_); 
-        relativeOffsetOD     = computeRelativeDisplacement(*fluid_,*outsideDensity_); 
+        relativeOffsetRhoBar = computeRelativeDisplacement(*fluid_,*rhoBar_);
+        relativeOffsetJ      = computeRelativeDisplacement(*fluid_,*j_);
+        relativeOffsetMass   = computeRelativeDisplacement(*fluid_,*mass_);
+        relativeOffsetVF     = computeRelativeDisplacement(*fluid_,*volumeFraction_);
+        relativeOffsetFS     = computeRelativeDisplacement(*fluid_,*flag_);
+        relativeOffsetNormal = computeRelativeDisplacement(*fluid_,*normal_);
+        relativeOffsetC      = computeRelativeDisplacement(*fluid_,*curvature_);
+        relativeOffsetOD     = computeRelativeDisplacement(*fluid_,*outsideDensity_);
 
         if (!useFreeSurfaceLimit) {
-            relativeOffsetFluid2 = computeRelativeDisplacement(*fluid_,*fluid2_);      
-            relativeOffsetRhoBar2= computeRelativeDisplacement(*fluid_,*rhoBar2_);      
-            relativeOffsetJ2     = computeRelativeDisplacement(*fluid_,*j2_);      
-            relativeOffsetMass2  = computeRelativeDisplacement(*fluid_,*mass2_);      
+            relativeOffsetFluid2 = computeRelativeDisplacement(*fluid_,*fluid2_);
+            relativeOffsetRhoBar2= computeRelativeDisplacement(*fluid_,*rhoBar2_);
+            relativeOffsetJ2     = computeRelativeDisplacement(*fluid_,*j2_);
+            relativeOffsetMass2  = computeRelativeDisplacement(*fluid_,*mass2_);
         }
     }
     Cell<T,Descriptor>& cell(plint iX, plint iY, plint iZ) { return fluid_->get(iX,iY,iZ); }
@@ -853,7 +851,7 @@ public:
           useFreeSurfaceLimit(rhs.useFreeSurfaceLimit)
     { }
     DefaultInitializeTwoPhase3D<T,Descriptor>& operator=(DefaultInitializeTwoPhase3D<T,Descriptor> const& rhs)
-    { 
+    {
         DefaultInitializeTwoPhase3D<T,Descriptor>(rhs).swap(*this);
         return *this;
     }
@@ -918,7 +916,7 @@ public:
           useFreeSurfaceLimit(rhs.useFreeSurfaceLimit)
     { }
     PartiallyDefaultInitializeTwoPhase3D<T,Descriptor>& operator=(PartiallyDefaultInitializeTwoPhase3D<T,Descriptor> const& rhs)
-    { 
+    {
         PartiallyDefaultInitializeTwoPhase3D<T,Descriptor>(rhs).swap(*this);
         return *this;
     }
@@ -1239,7 +1237,7 @@ public:
           model(rhs.model)
     { }
     TwoPhaseIniInterfaceToAnyNodes3D<T,Descriptor>& operator=(TwoPhaseIniInterfaceToAnyNodes3D<T,Descriptor> const& rhs)
-    { 
+    {
         TwoPhaseIniInterfaceToAnyNodes3D<T,Descriptor>(rhs).swap(*this);
         return *this;
     }
@@ -1283,7 +1281,7 @@ public:
         }
     }
 private:
-    T rhoDefault; 
+    T rhoDefault;
     Dynamics<T,Descriptor> *dynamicsTemplate, *dynamicsTemplate2;
     Array<T,3> force, force2;
     T densityRatio, surfaceTension;
@@ -1319,7 +1317,7 @@ public:
     { }
     TwoPhaseIniEmptyToInterfaceNodes3D<T,Descriptor>& operator=(
             TwoPhaseIniEmptyToInterfaceNodes3D<T,Descriptor> const& rhs)
-    { 
+    {
         TwoPhaseIniEmptyToInterfaceNodes3D<T,Descriptor>(rhs).swap(*this);
         return *this;
     }
@@ -1405,7 +1403,7 @@ public:
         }
     }
 private:
-    T rhoDefault;  
+    T rhoDefault;
     TwoPhaseModel model;
 };
 
@@ -1414,7 +1412,7 @@ class TwoPhaseInitializeInterfaceLists3D : public BoxProcessingFunctional3D {
     virtual void processGenericBlocks(Box3D domain, std::vector<AtomicBlock3D*> atomicBlocks)
     {
         PLB_ASSERT(atomicBlocks.size()==1);
-        
+
         AtomicContainerBlock3D* containerInterfaceLists = dynamic_cast<AtomicContainerBlock3D*>(atomicBlocks[0]);
         PLB_ASSERT(containerInterfaceLists);
         TwoPhaseInterfaceLists<T,Descriptor>* interfaceLists = new TwoPhaseInterfaceLists<T,Descriptor>;
@@ -1969,7 +1967,7 @@ struct TwoPhaseFields3D {
         integrateProcessingFunctional (
                 new TwoPhaseComputeNormals3D<T,Descriptor>,
                 lattice.getBoundingBox(), twoPhaseArgs, pl );
-                                    
+
 
         /***** New level ******/
         pl++;
@@ -1977,13 +1975,13 @@ struct TwoPhaseFields3D {
         integrateProcessingFunctional (
             new TwoPhaseMassChange3D<T,Descriptor>(model==freeSurface), lattice.getBoundingBox(),
             twoPhaseArgs, pl );
-       
+
         integrateProcessingFunctional (
             new TwoPhaseCompletion3D<T,Descriptor>(model==freeSurface),
             lattice.getBoundingBox(), twoPhaseArgs, pl );
 
         integrateProcessingFunctional (
-            new TwoPhaseMacroscopic3D<T,Descriptor>(rhoDefault, densityRatio, surfaceTension, model), 
+            new TwoPhaseMacroscopic3D<T,Descriptor>(rhoDefault, densityRatio, surfaceTension, model),
             lattice.getBoundingBox(), twoPhaseArgs, pl );
 
         if (useSurfaceTension) {
@@ -2008,7 +2006,7 @@ struct TwoPhaseFields3D {
 
         if (useSurfaceTension) {
             integrateProcessingFunctional (
-                new TwoPhaseAddSurfaceTension3D<T,Descriptor>(surfaceTension), 
+                new TwoPhaseAddSurfaceTension3D<T,Descriptor>(surfaceTension),
                 lattice.getBoundingBox(), twoPhaseArgs, pl );
         }
 
@@ -2027,12 +2025,12 @@ struct TwoPhaseFields3D {
                 rhoDefault, dynamics->clone(), dynamics2->clone(), force, force2,
                 densityRatio, surfaceTension, model),
             lattice.getBoundingBox(), twoPhaseArgs, pl );
-            
+
         //empty->interface  --      fluid->interface
         integrateProcessingFunctional (
             new TwoPhaseIniEmptyToInterfaceNodes3D<T,Descriptor>(dynamics->clone(), force, densityRatio, model),
                                     lattice.getBoundingBox(),
-                                    twoPhaseArgs, pl ); 
+                                    twoPhaseArgs, pl );
 
         /***** New level ******/
         pl++;

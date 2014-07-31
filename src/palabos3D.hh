@@ -21,8 +21,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef PALABOS_3D_HH
-#define PALABOS_3D_HH
+
 #include <parallelism/headers3D.hh>
 #include <latticeBoltzmann/headers3D.hh>
 #include <core/headers3D.hh>
@@ -48,4 +47,3 @@
 #include <atomicBlock/headers2D.hh>
 #include <multiBlock/headers2D.hh>
 #include <multiGrid/headers2D.hh>
-#endif

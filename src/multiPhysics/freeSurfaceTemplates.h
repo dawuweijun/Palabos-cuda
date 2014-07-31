@@ -38,210 +38,210 @@ namespace plb {
 template<typename T, template<typename U> class Descriptor>
 struct freeSurfaceTemplates {
 
-    static void massExchangeFluidCell (
-        FreeSurfaceProcessorParam3D<T,Descriptor>& param,
-        plint iX, plint iY, plint iZ )
-    {
-        typedef Descriptor<T> D;
-        using namespace twoPhaseFlag;
-        // Calculate mass at time t+1 --> eq 6 Thurey's paper.
+static void massExchangeFluidCell (
+    FreeSurfaceProcessorParam3D<T,Descriptor>& param,
+    plint iX, plint iY, plint iZ )
+{
+    typedef Descriptor<T> D;
+    using namespace twoPhaseFlag;
+    // Calculate mass at time t+1 --> eq 6 Thurey's paper.
     for(plint iPop=0; iPop < D::q; ++iPop) {
-            plint nextX = iX + D::c[iPop][0];
-            plint nextY = iY + D::c[iPop][1];
-            plint nextZ = iZ + D::c[iPop][2];
+        plint nextX = iX + D::c[iPop][0];
+        plint nextY = iY + D::c[iPop][1];
+        plint nextZ = iZ + D::c[iPop][2];
         int nextFlag = param.flag(nextX,nextY,nextZ);
         if (nextFlag==fluid || nextFlag==interface) {
-                // In Thuerey's paper, the mass balance is computed locally on one cell, but
-                // N. Thuerey uses outgoing populations. Palabos works with incoming populations
-                // and uses the relation f_out_i(x,t) = f_in_opp(i)(x+c_i,t+1).
+            // In Thuerey's paper, the mass balance is computed locally on one cell, but
+            // N. Thuerey uses outgoing populations. Palabos works with incoming populations
+            // and uses the relation f_out_i(x,t) = f_in_opp(i)(x+c_i,t+1).
             plint opp = indexTemplates::opposite<D>(iPop);
             param.mass(iX,iY,iZ) += param.cell(iX,iY,iZ)[opp] - param.cell(nextX,nextY,nextZ)[iPop];
             }
         }
     }
 
-    static void massExchangeFluidCell (
-        FreeSurfaceProcessorParam2D<T,Descriptor>& param,
-        plint iX, plint iY )
+static void massExchangeFluidCell (
+    FreeSurfaceProcessorParam2D<T,Descriptor>& param,
+    plint iX, plint iY )
+{
+    typedef Descriptor<T> D;
+    using namespace twoPhaseFlag;
+    // Calculate mass at time t+1 --> eq 6 Thurey's paper.
+    for ( plint iPop=0; iPop < D::q; ++iPop )
     {
-        typedef Descriptor<T> D;
-        using namespace twoPhaseFlag;
-        // Calculate mass at time t+1 --> eq 6 Thurey's paper.
-        for ( plint iPop=0; iPop < D::q; ++iPop )
+        plint nextX = iX + D::c[iPop][0];
+        plint nextY = iY + D::c[iPop][1];
+        int nextFlag = param.flag ( nextX,nextY );
+        if ( nextFlag==fluid || nextFlag==interface )
         {
-            plint nextX = iX + D::c[iPop][0];
-            plint nextY = iY + D::c[iPop][1];
-            int nextFlag = param.flag ( nextX,nextY );
-            if ( nextFlag==fluid || nextFlag==interface )
-            {
-                // In Thuerey's paper, the mass balance is computed locally on one cell, but
-                // N. Thuerey uses outgoing populations. Palabos works with incoming populations
-                // and uses the relation f_out_i(x,t) = f_in_opp(i)(x+c_i,t+1).
-                plint opp = indexTemplates::opposite<D> ( iPop );
-                param.mass ( iX,iY ) += param.cell ( iX,iY ) [opp] - param.cell ( nextX,nextY ) [iPop];
-            }
+            // In Thuerey's paper, the mass balance is computed locally on one cell, but
+            // N. Thuerey uses outgoing populations. Palabos works with incoming populations
+            // and uses the relation f_out_i(x,t) = f_in_opp(i)(x+c_i,t+1).
+            plint opp = indexTemplates::opposite<D> ( iPop );
+            param.mass ( iX,iY ) += param.cell ( iX,iY ) [opp] - param.cell ( nextX,nextY ) [iPop];
         }
     }
+}
 
 };
 
 template<typename T>
 struct freeSurfaceTemplates<T, descriptors::ForcedD3Q19Descriptor > {
 
-    static void massExchangeFluidCell (
-        FreeSurfaceProcessorParam3D<T,descriptors::ForcedD3Q19Descriptor>& param,
-        plint iX, plint iY, plint iZ )
-    {
-        typedef descriptors::ForcedD3Q19Descriptor<T> D;
-        using namespace twoPhaseFlag;
-        // Calculate mass at time t+1 --> eq 6 Thurey's paper.
-        plint nextX, nextY, nextZ, nextFlag;
+static void massExchangeFluidCell (
+    FreeSurfaceProcessorParam3D<T,descriptors::ForcedD3Q19Descriptor>& param,
+    plint iX, plint iY, plint iZ )
+{
+    typedef descriptors::ForcedD3Q19Descriptor<T> D;
+    using namespace twoPhaseFlag;
+    // Calculate mass at time t+1 --> eq 6 Thurey's paper.
+    plint nextX, nextY, nextZ, nextFlag;
 
-        nextX = iX + -1;
-        nextY = iY + 0;
-        nextZ = iZ + 0;
+    nextX = iX + -1;
+    nextY = iY + 0;
+    nextZ = iZ + 0;
     nextFlag = param.flag(nextX,nextY,nextZ);
     if (nextFlag==fluid || nextFlag==interface) {
         param.mass(iX,iY,iZ) += param.cell(iX,iY,iZ)[10] - param.cell(nextX,nextY,nextZ)[1 ];
-        }
+    }
 
-        nextX = iX +  0;
-        nextY = iY + -1;
-        nextZ = iZ + 0;
+    nextX = iX +  0;
+    nextY = iY + -1;
+    nextZ = iZ + 0;
     nextFlag = param.flag(nextX,nextY,nextZ);
     if (nextFlag==fluid || nextFlag==interface) {
         param.mass(iX,iY,iZ) += param.cell(iX,iY,iZ)[11] - param.cell(nextX,nextY,nextZ)[2 ];
-        }
+    }
 
-        nextX = iX +  0;
-        nextY = iY + 0;
-        nextZ = iZ + -1;
+    nextX = iX +  0;
+    nextY = iY + 0;
+    nextZ = iZ + -1;
     nextFlag = param.flag(nextX,nextY,nextZ);
     if (nextFlag==fluid || nextFlag==interface) {
         param.mass(iX,iY,iZ) += param.cell(iX,iY,iZ)[12] - param.cell(nextX,nextY,nextZ)[3 ];
-        }
+    }
 
-        nextX = iX + -1;
-        nextY = iY + -1;
-        nextZ = iZ + 0;
+    nextX = iX + -1;
+    nextY = iY + -1;
+    nextZ = iZ + 0;
     nextFlag = param.flag(nextX,nextY,nextZ);
     if (nextFlag==fluid || nextFlag==interface) {
         param.mass(iX,iY,iZ) += param.cell(iX,iY,iZ)[13] - param.cell(nextX,nextY,nextZ)[4 ];
-        }
+    }
 
-        nextX = iX + -1;
-        nextY = iY + 1;
-        nextZ = iZ + 0;
+    nextX = iX + -1;
+    nextY = iY + 1;
+    nextZ = iZ + 0;
     nextFlag = param.flag(nextX,nextY,nextZ);
     if (nextFlag==fluid || nextFlag==interface) {
         param.mass(iX,iY,iZ) += param.cell(iX,iY,iZ)[14] - param.cell(nextX,nextY,nextZ)[5 ];
-        }
+    }
 
-        nextX = iX + -1;
-        nextY = iY + 0;
-        nextZ = iZ + -1;
+    nextX = iX + -1;
+    nextY = iY + 0;
+    nextZ = iZ + -1;
     nextFlag = param.flag(nextX,nextY,nextZ);
     if (nextFlag==fluid || nextFlag==interface) {
         param.mass(iX,iY,iZ) += param.cell(iX,iY,iZ)[15] - param.cell(nextX,nextY,nextZ)[6 ];
-        }
+    }
 
-        nextX = iX + -1;
-        nextY = iY + 0;
-        nextZ = iZ + 1;
+    nextX = iX + -1;
+    nextY = iY + 0;
+    nextZ = iZ + 1;
     nextFlag = param.flag(nextX,nextY,nextZ);
     if (nextFlag==fluid || nextFlag==interface) {
         param.mass(iX,iY,iZ) += param.cell(iX,iY,iZ)[16] - param.cell(nextX,nextY,nextZ)[7 ];
-        }
+    }
 
-        nextX = iX +  0;
-        nextY = iY + -1;
-        nextZ = iZ + -1;
+    nextX = iX +  0;
+    nextY = iY + -1;
+    nextZ = iZ + -1;
     nextFlag = param.flag(nextX,nextY,nextZ);
     if (nextFlag==fluid || nextFlag==interface) {
         param.mass(iX,iY,iZ) += param.cell(iX,iY,iZ)[17] - param.cell(nextX,nextY,nextZ)[8 ];
-        }
+    }
 
-        nextX = iX +  0;
-        nextY = iY + -1;
-        nextZ = iZ + 1;
+    nextX = iX +  0;
+    nextY = iY + -1;
+    nextZ = iZ + 1;
     nextFlag = param.flag(nextX,nextY,nextZ);
     if (nextFlag==fluid || nextFlag==interface) {
         param.mass(iX,iY,iZ) += param.cell(iX,iY,iZ)[18] - param.cell(nextX,nextY,nextZ)[9 ];
-        }
+    }
 
-        nextX = iX +  1;
-        nextY = iY + 0;
-        nextZ = iZ + 0;
+    nextX = iX +  1;
+    nextY = iY + 0;
+    nextZ = iZ + 0;
     nextFlag = param.flag(nextX,nextY,nextZ);
     if (nextFlag==fluid || nextFlag==interface) {
         param.mass(iX,iY,iZ) += param.cell(iX,iY,iZ)[1] - param.cell(nextX,nextY,nextZ)[10  ];
-        }
+    }
 
-        nextX = iX +  0;
-        nextY = iY + 1;
-        nextZ = iZ + 0;
+    nextX = iX +  0;
+    nextY = iY + 1;
+    nextZ = iZ + 0;
     nextFlag = param.flag(nextX,nextY,nextZ);
     if (nextFlag==fluid || nextFlag==interface) {
         param.mass(iX,iY,iZ) += param.cell(iX,iY,iZ)[2] - param.cell(nextX,nextY,nextZ)[11  ];
-        }
+    }
 
-        nextX = iX +  0;
-        nextY = iY + 0;
-        nextZ = iZ + 1;
+    nextX = iX +  0;
+    nextY = iY + 0;
+    nextZ = iZ + 1;
     nextFlag = param.flag(nextX,nextY,nextZ);
     if (nextFlag==fluid || nextFlag==interface) {
         param.mass(iX,iY,iZ) += param.cell(iX,iY,iZ)[3] - param.cell(nextX,nextY,nextZ)[12  ];
-        }
+    }
 
-        nextX = iX +  1;
-        nextY = iY + 1;
-        nextZ = iZ + 0;
+    nextX = iX +  1;
+    nextY = iY + 1;
+    nextZ = iZ + 0;
     nextFlag = param.flag(nextX,nextY,nextZ);
     if (nextFlag==fluid || nextFlag==interface) {
         param.mass(iX,iY,iZ) += param.cell(iX,iY,iZ)[4] - param.cell(nextX,nextY,nextZ)[13  ];
-        }
+    }
 
-        nextX = iX +  1;
-        nextY = iY + -1;
-        nextZ = iZ + 0;
+    nextX = iX +  1;
+    nextY = iY + -1;
+    nextZ = iZ + 0;
     nextFlag = param.flag(nextX,nextY,nextZ);
     if (nextFlag==fluid || nextFlag==interface) {
         param.mass(iX,iY,iZ) += param.cell(iX,iY,iZ)[5] - param.cell(nextX,nextY,nextZ)[14  ];
-        }
+    }
 
-        nextX = iX +  1;
-        nextY = iY + 0;
-        nextZ = iZ + 1;
+    nextX = iX +  1;
+    nextY = iY + 0;
+    nextZ = iZ + 1;
     nextFlag = param.flag(nextX,nextY,nextZ);
     if (nextFlag==fluid || nextFlag==interface) {
         param.mass(iX,iY,iZ) += param.cell(iX,iY,iZ)[6] - param.cell(nextX,nextY,nextZ)[15  ];
-        }
+    }
 
-        nextX = iX +  1;
-        nextY = iY + 0;
-        nextZ = iZ + -1;
+    nextX = iX +  1;
+    nextY = iY + 0;
+    nextZ = iZ + -1;
     nextFlag = param.flag(nextX,nextY,nextZ);
     if (nextFlag==fluid || nextFlag==interface) {
         param.mass(iX,iY,iZ) += param.cell(iX,iY,iZ)[7] - param.cell(nextX,nextY,nextZ)[16  ];
-        }
+    }
 
-        nextX = iX +  0;
-        nextY = iY + 1;
-        nextZ = iZ + 1;
+    nextX = iX +  0;
+    nextY = iY + 1;
+    nextZ = iZ + 1;
     nextFlag = param.flag(nextX,nextY,nextZ);
     if (nextFlag==fluid || nextFlag==interface) {
         param.mass(iX,iY,iZ) += param.cell(iX,iY,iZ)[8] - param.cell(nextX,nextY,nextZ)[17  ];
-        }
+    }
 
-        nextX = iX +  0;
-        nextY = iY + 1;
-        nextZ = iZ + -1;
+    nextX = iX +  0;
+    nextY = iY + 1;
+    nextZ = iZ + -1;
     nextFlag = param.flag(nextX,nextY,nextZ);
     if (nextFlag==fluid || nextFlag==interface) {
         param.mass(iX,iY,iZ) += param.cell(iX,iY,iZ)[9] - param.cell(nextX,nextY,nextZ)[18  ];
-        }
-
     }
+
+}
 
 };
 

@@ -35,10 +35,6 @@
 #include "core/array.h"
 #include "core/hierarchicSerializer.h"
 
-#ifndef PLB_CUDA_DISABLED
-  #include "core/plbCuda.h"
-  #include "core/plbCudaManagedMemory.h"
-#endif
 namespace plb {
 
 /// Helper class: allocation of memory for external fields in a cell
@@ -92,13 +88,8 @@ struct CellInfo {
  *
  * This class is not intended to be derived from.
  */
-#ifdef PLB_CUDA_DISABLED
 template<typename T, template<typename U> class Descriptor>
 class Cell {
-#else
-  template<typename T, template<typename U> class Descriptor>
-class Cell:public plb::cudaManaged {
-#endif 
 public:
     /// Additional per-cell scalars for external fields, e.g. forces
     typedef ExternalFieldArray<T, typename Descriptor<T>::ExternalField> External;
@@ -110,14 +101,12 @@ public:
 public:
     /// Read-write access to distribution functions.
     /** \param iPop index of the accessed distribution function */
-    PLB_DEV_CALLABLE_INLINE
     T& operator[](plint iPop) {
         PLB_PRECONDITION( iPop < Descriptor<T>::numPop );
         return f[iPop];
     }
     /// Read-only access to distribution functions.
     /** \param iPop index of the accessed distribution function */
-    PLB_DEV_CALLABLE_INLINE
     T const& operator[](plint iPop) const {
         PLB_PRECONDITION( iPop < Descriptor<T>::numPop );
         return f[iPop];
@@ -151,13 +140,11 @@ public:
         return *this;
     };
     /// Get a pointer to an external field
-    PLB_DEV_CALLABLE
     T* getExternal(plint offset) {
         PLB_PRECONDITION( offset < Descriptor<T>::ExternalField::numScalars );
         return external.get(offset);
     }
     /// Get a const pointer to an external field
-    PLB_DEV_CALLABLE_INLINE
     T const* getExternal(plint offset) const {
         PLB_PRECONDITION( offset < Descriptor<T>::ExternalField::numScalars );
         return external.get(offset);
@@ -193,13 +180,13 @@ private:
 // to the Dynamics object
 public:
     /// Apply LB collision to the cell according to local dynamics.
-    PLB_DEV_CALLABLE void collide(BlockStatistics& statistics) {
+    void collide(BlockStatistics& statistics) {
         PLB_PRECONDITION( dynamics );
         dynamics->collide(*this, statistics);
     }
 
     /// Compute equilibrium distribution function
-    PLB_DEV_CALLABLE T computeEquilibrium(plint iPop, T rhoBar, Array<T,Descriptor<T>::d> const& j,
+    T computeEquilibrium(plint iPop, T rhoBar, Array<T,Descriptor<T>::d> const& j,
                          T jSqr, T thetaBar=T()) const
     {
         PLB_PRECONDITION( dynamics );

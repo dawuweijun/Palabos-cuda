@@ -60,9 +60,6 @@ class HierarchicUnserializer;
 /// Interface for the dynamics classes
 template<typename T, template<typename U> class Descriptor>
 struct Dynamics {
-  /*
-   * TODO: Some methods of this class should run on coProcessor;
-   */
 /* *************** Construction, Descruction, and unique identifier ********* */
 
     /// Destructor: virtual to enable inheritance
@@ -512,9 +509,6 @@ public:
     /// Toggle flag on whether prepareCollision() is invoked before collision or not.
     void toggleAutomaticPrepareCollision(bool flag);
 private:
-    /*
-     * TODO: Inherit CompositeDynamics to enable Unified Memory; 
-     */
     Dynamics<T,Descriptor>* baseDynamics;
     bool automaticPrepareCollision;
 };
